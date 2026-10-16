@@ -10,9 +10,9 @@ Cloudflare account.
 
 ## Status
 
-Daluang is in early development. The repository has the workspace, the CMS app shell,
-the landing page, and this site. The editor, the note storage, and the deploy guide come in later
-releases.
+Daluang is in early development. The CMS has sign-in with GitHub and the frame of the app.
+The editor and the note storage come in later releases. [Deploy](/guide/deploy) tells you
+how to host your own copy.
 
 ## The parts
 
