@@ -1,7 +1,7 @@
 /** The color theme of the page. The class `dark` on `<html>` selects the dark tokens. */
 export type Theme = "light" | "dark";
 
-/** The key of the stored choice. The inline script in the layout of each app reads it. */
+/** The key of the stored choice. `PREFERENCES_SCRIPT` reads it before the first paint. */
 export const THEME_STORAGE_KEY = "theme";
 
 export function readTheme(): Theme {
@@ -19,6 +19,7 @@ export function subscribeTheme(onChange: () => void) {
 
 export function writeTheme(theme: Theme) {
 	document.documentElement.classList.toggle("dark", theme === "dark");
+	document.documentElement.style.colorScheme = theme;
 	try {
 		localStorage.setItem(THEME_STORAGE_KEY, theme);
 	} catch {

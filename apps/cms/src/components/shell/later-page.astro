@@ -1,0 +1,17 @@
+---
+// The body of a page that has a menu item but no feature yet. It says what the page will do.
+interface Props {
+	title: string;
+	description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<section
+	class="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center px-6 py-24 text-center"
+>
+	<h1 class="font-serif text-2xl font-semibold tracking-tight">{title}</h1>
+	<p class="mt-2 text-pretty text-muted-foreground">{description}</p>
+	<p class="mt-4 text-sm text-muted-foreground">This page comes in a later step.</p>
+</section>

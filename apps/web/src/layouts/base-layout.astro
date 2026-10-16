@@ -1,5 +1,6 @@
 ---
 import { Font } from "astro:assets";
+import { PREFERENCES_SCRIPT } from "@daluang/ui/lib/preferences-script";
 import "@/styles/global.css";
 
 interface Props {
@@ -16,6 +17,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="light dark" />
+		<!-- First in the head: it applies the saved theme before the first paint. -->
+		<script is:inline set:html={PREFERENCES_SCRIPT} />
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonical} />
@@ -27,16 +31,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 		<Font cssVariable="--font-inter" preload />
 		<Font cssVariable="--font-lora" preload />
 		<Font cssVariable="--font-jetbrains-mono" />
-		<!-- Set the theme before the first paint. `@daluang/ui/lib/theme` uses the same key. -->
-		<script is:inline>
-			try {
-				const stored = localStorage.getItem("theme");
-				const dark = stored
-					? stored === "dark"
-					: matchMedia("(prefers-color-scheme: dark)").matches;
-				document.documentElement.classList.toggle("dark", dark);
-			} catch {}
-		</script>
 	</head>
 	<body class="flex min-h-dvh flex-col">
 		<slot />

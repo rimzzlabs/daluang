@@ -1,4 +1,4 @@
-import { MoonIcon, SunIcon } from "@phosphor-icons/react";
+import { CircleHalfIcon } from "@phosphor-icons/react";
 import { useSyncExternalStore } from "react";
 import {
 	readTheme,
@@ -32,7 +32,8 @@ export function ThemeToggle(props: ThemeToggleProps) {
 			aria-label={`Use the ${next} theme`}
 			onClick={() => writeTheme(next)}
 		>
-			{theme === "dark" ? <SunIcon /> : <MoonIcon />}
+			{/* One icon for the two themes, so the server and the browser render the same. */}
+			<CircleHalfIcon />
 		</Button>
 	);
 }

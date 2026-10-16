@@ -12,7 +12,13 @@ import {
 	SidebarGroupLabel,
 	SidebarHeader,
 } from "@daluang/ui/components/sidebar-sections";
-import { NotePencilIcon } from "@phosphor-icons/react";
+import {
+	ImagesIcon,
+	KeyIcon,
+	NotePencilIcon,
+	TranslateIcon,
+	WebhooksLogoIcon,
+} from "@phosphor-icons/react";
 import type { ComponentType } from "react";
 
 interface NavItem {
@@ -21,10 +27,40 @@ interface NavItem {
 	icon: ComponentType;
 }
 
-// Each item has a page. Add an item with its page, not before.
-const WRITE_ITEMS: readonly NavItem[] = [
-	{ label: "Notes", href: "/", icon: NotePencilIcon },
+interface NavGroup {
+	label: string;
+	items: readonly NavItem[];
+}
+
+// The menus of the CMS. Each item has a page in `src/pages`.
+export const NAV_GROUPS: readonly NavGroup[] = [
+	{
+		label: "Write",
+		items: [
+			{ label: "Notes", href: "/", icon: NotePencilIcon },
+			{ label: "Media", href: "/media", icon: ImagesIcon },
+		],
+	},
+	{
+		label: "Publish",
+		items: [
+			{ label: "API tokens", href: "/settings/api-tokens", icon: KeyIcon },
+			{ label: "Webhooks", href: "/settings/webhooks", icon: WebhooksLogoIcon },
+		],
+	},
+	{
+		label: "Settings",
+		items: [
+			{ label: "Languages", href: "/settings/languages", icon: TranslateIcon },
+		],
+	},
 ];
+
+/** True when `pathname` is the page of `href` or a page below it. `/` matches only itself. */
+export function isActivePath(pathname: string, href: string): boolean {
+	if (href === "/") return pathname === "/";
+	return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export interface AppSidebarProps {
 	pathname: string;
@@ -51,25 +87,27 @@ export function AppSidebar(props: AppSidebarProps) {
 			</SidebarHeader>
 			<SidebarContent>
 				<nav aria-label="Main">
-					<SidebarGroup>
-						<SidebarGroupLabel>Write</SidebarGroupLabel>
-						<SidebarGroupContent>
-							<SidebarMenu>
-								{WRITE_ITEMS.map((item) => (
-									<SidebarMenuItem key={item.href}>
-										<SidebarMenuButton
-											render={<a href={item.href} />}
-											isActive={props.pathname === item.href}
-											tooltip={item.label}
-										>
-											<item.icon />
-											<span>{item.label}</span>
-										</SidebarMenuButton>
-									</SidebarMenuItem>
-								))}
-							</SidebarMenu>
-						</SidebarGroupContent>
-					</SidebarGroup>
+					{NAV_GROUPS.map((group) => (
+						<SidebarGroup key={group.label}>
+							<SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+							<SidebarGroupContent>
+								<SidebarMenu>
+									{group.items.map((item) => (
+										<SidebarMenuItem key={item.href}>
+											<SidebarMenuButton
+												render={<a href={item.href} />}
+												isActive={isActivePath(props.pathname, item.href)}
+												tooltip={item.label}
+											>
+												<item.icon />
+												<span>{item.label}</span>
+											</SidebarMenuButton>
+										</SidebarMenuItem>
+									))}
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</SidebarGroup>
+					))}
 				</nav>
 			</SidebarContent>
 			<SidebarRail />

@@ -22,6 +22,9 @@ The first site that reads the notes is rimzzlabs.com. Its source is in
 - **Markdown is the one content format.** The CMS does not keep HTML, MDX, or rich text.
   Comark ([comark.dev](https://comark.dev)) parses and renders the Markdown.
 - **A note is text only, for now.** Images and videos in a note come in a later step.
+- **A note has metadata,** and the language is part of it. A writer can write in more than
+  one language. Each note has one language, as a BCP 47 tag, for example `en` or `id`.
+  The languages of a CMS are a setting.
 - Each step of this list has a plan before its code. "Open decisions" has the questions
   that have no answer yet.
 
@@ -34,6 +37,8 @@ Do not decide these in code. Ask the person you work for.
 | How does a static site get a changed note?      | The site stays static. A publish in the CMS starts a rebuild of the site. The site reads the notes at build time through a content loader package. `experimental.incrementalBuild` of Astro 7.2 skips each page whose `cacheKey` did not change. |
 | Where do the bytes of an image or a video go?   | R2 keeps the bytes. A Durable Object can keep the state of an upload. A Durable Object does not keep the bytes: one stored value has a size limit of 2 MB.                                                                                       |
 | Where does the CMS keep the Markdown of a note? | D1 is the database of the CMS, and it holds the auth tables. Where the Markdown of a note lives is not decided.                                                                                                                                  |
+| How does a translation link to its note?        | Two notes with the same slug and different languages are translations of each other, as on rimzzlabs.com: `notes/en/<slug>` and `notes/id/<slug>`.                                                                                               |
+| Which metadata fields does a note have?         | Not decided. The old site has title, description, keywords, publishedAt, updatedAt, status, featured, author, and relatedPosts.                                                                                                                  |
 
 ## Repository layout
 
@@ -204,6 +209,26 @@ own words and its own rules: for example, the editor, the notes, or the media.
   migration.
 - `apps/cms/.dev.vars.example` lists each variable. In production, set each one with
   `wrangler secret put`.
+
+## Menus
+
+- `NAV_GROUPS` in `apps/cms/src/components/shell/app-sidebar.tsx` holds the menus of the
+  sidebar: Write (Notes, Media), Publish (API tokens, Webhooks), and Settings
+  (Languages).
+- Each item has a page in `apps/cms/src/pages`. A page with no feature yet uses
+  `later-page.astro`, which says what the page will do. Do not add an item with no page.
+- An item is active on its page and on each page below its path. `/` is active only on
+  `/`.
+
+## Preferences
+
+- `PREFERENCES_SCRIPT` of `@daluang/ui/lib/preferences-script` applies the saved theme
+  before the first paint. Each app puts it first in the `<head>`:
+  `<script is:inline set:html={PREFERENCES_SCRIPT} />`. Do not write a second theme
+  script.
+- The theme has no server value, so `ThemeToggle` shows one icon for the two themes. The
+  server HTML and the browser then show the same icon.
+- The sidebar keeps its state in cookies instead, and the server renders it.
 
 ## Pages and islands
 
