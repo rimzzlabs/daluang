@@ -90,6 +90,13 @@ is a command of pnpm.
 
 - `daluang-web` serves static files only. It has no server code.
 - `apps/docs` has `basePath: "/docs"`. Each of its URLs starts with `/docs/`.
+- **The root of the docs site is `/docs/`, with the slash.** At `/docs`, the client
+  router of Vocs (Waku) throws "pathname must start with basePath". Link to `/docs/`.
+  The Worker (`auto-trailing-slash`) and the dev middleware of `apps/web` redirect
+  `/docs` to `/docs/`.
+- A page of `apps/web` is a file (`build.format: "file"`), so its URL has no slash.
+- Keep `trailingSlash: "ignore"` in `apps/web`. Astro checks the slash before the dev
+  proxy runs, and the other values refuse a URL of the docs site.
 - `apps/web/scripts/copy-docs.ts` copies `apps/docs/dist/public` into
   `apps/web/dist/docs`. Run `pnpm web:build`, which builds the docs site first.
 - A missing page gets the nearest `404.html`: below `/docs`, the 404 page of Vocs.

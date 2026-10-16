@@ -8,9 +8,10 @@
 		// A missing page gets the nearest `404.html`. Below `/docs`, that is the 404 page of
 		// the docs site.
 		"not_found_handling": "404-page",
-		// The links of the docs site have no trailing slash: `/docs/guide/local-development`.
-		// This serves such a URL with no redirect.
-		"html_handling": "drop-trailing-slash"
+		// The default, `auto-trailing-slash`, redirects `/docs` to `/docs/`. The router of
+		// the docs site needs the slash on its root. A page of the landing page is a file
+		// (`about.html`), so its URL has no slash.
+		"html_handling": "auto-trailing-slash"
 	},
 	"routes": [{ "pattern": "daluang.rimzzlabs.com", "custom_domain": true }]
 }
