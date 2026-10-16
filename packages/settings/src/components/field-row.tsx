@@ -98,24 +98,24 @@ export function FieldRow(props: FieldRowProps) {
 					)}
 				</Field>
 			</div>
-			<div className="flex flex-wrap items-center gap-x-6 gap-y-4">
-				<ToggleGroup
-					variant="outline"
-					size="sm"
-					aria-label={`Type of ${title}`}
-					className="flex-wrap"
-					value={[draft.type]}
-					onValueChange={(values) => {
-						const [type] = values;
-						if (isFieldType(type)) props.onChange({ ...draft, type });
-					}}
-				>
-					{A.map(FIELD_TYPES, (type) => (
-						<ToggleGroupItem key={type} value={type}>
-							{TYPE_LABELS[type]}
-						</ToggleGroupItem>
-					))}
-				</ToggleGroup>
+			<ToggleGroup
+				variant="outline"
+				size="sm"
+				aria-label={`Type of ${title}`}
+				className="flex-wrap"
+				value={[draft.type]}
+				onValueChange={(values) => {
+					const [type] = values;
+					if (isFieldType(type)) props.onChange({ ...draft, type });
+				}}
+			>
+				{A.map(FIELD_TYPES, (type) => (
+					<ToggleGroupItem key={type} value={type}>
+						{TYPE_LABELS[type]}
+					</ToggleGroupItem>
+				))}
+			</ToggleGroup>
+			<div className="flex items-center justify-between gap-4">
 				<Field orientation="horizontal" className="w-auto">
 					<Checkbox
 						id={`${id}-required`}
@@ -130,7 +130,6 @@ export function FieldRow(props: FieldRowProps) {
 					type="button"
 					variant="ghost"
 					size="sm"
-					className="ml-auto"
 					aria-label={`Remove ${title}`}
 					onClick={props.onRemove}
 				>
