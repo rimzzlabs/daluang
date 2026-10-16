@@ -133,6 +133,16 @@ describe("Onboarding", () => {
 		).toBe(false);
 	});
 
+	it("keeps the focus in a field while the writer types after a move back", async () => {
+		renderOnboarding();
+		await fillSite("rimzzlabs");
+		await userEvent.click(screen.getByRole("button", { name: "Back" }));
+		const name = screen.getByLabelText("Site name");
+		await userEvent.type(name, " notes");
+		expect(document.activeElement).toBe(name);
+		expect(name).toHaveProperty("value", "rimzzlabs notes");
+	});
+
 	it("goes back to the step before", async () => {
 		renderOnboarding();
 		await fillSite("rimzzlabs");
