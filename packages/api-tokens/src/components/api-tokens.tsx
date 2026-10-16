@@ -29,6 +29,19 @@ function listState(
 	);
 }
 
+/**
+ * A change of the list of the current state. A request can end after another change, so
+ * the change reads the state then, not the state of the click.
+ */
+function changeTokens(
+	change: (tokens: readonly ApiToken[]) => readonly ApiToken[],
+): (current: ListState) => ListState {
+	return (current) => {
+		if (current.status !== "ready") return current;
+		return { status: "ready", tokens: change(current.tokens) };
+	};
+}
+
 /** The page of the API tokens: make a token, see the tokens, and revoke one. */
 export function ApiTokens() {
 	const [list, setList] = useState<ListState>({ status: "loading" });
@@ -52,18 +65,15 @@ export function ApiTokens() {
 
 	function addToken(next: CreatedApiToken) {
 		setCreated(next);
-		if (list.status === "ready")
-			setList({ status: "ready", tokens: [next.token, ...list.tokens] });
+		setList(changeTokens((tokens) => [next.token, ...tokens]));
 	}
 
 	function removeToken(id: string) {
 		// The token of the panel is no longer valid, so the panel closes.
-		if (created?.token.id === id) setCreated(null);
-		if (list.status !== "ready") return;
-		setList({
-			status: "ready",
-			tokens: A.reject(list.tokens, (token) => token.id === id),
-		});
+		setCreated((current) => (current?.token.id === id ? null : current));
+		setList(
+			changeTokens((tokens) => A.reject(tokens, (token) => token.id === id)),
+		);
 	}
 
 	return (
