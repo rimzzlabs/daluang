@@ -9,5 +9,8 @@ vi.stubGlobal("matchMedia", (query: string) => ({
 	removeEventListener: () => {},
 }));
 
+// jsdom has no scrolling. The router scrolls to the top after each navigation.
+vi.stubGlobal("scrollTo", () => {});
+
 // Each test starts with an empty document.
 afterEach(cleanup);

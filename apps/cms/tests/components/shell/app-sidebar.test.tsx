@@ -10,7 +10,7 @@ import {
 function renderAt(pathname: string) {
 	render(
 		<SidebarProvider>
-			<AppSidebar pathname={pathname} />
+			<AppSidebar pathname={pathname} linkKind="anchor" />
 		</SidebarProvider>,
 	);
 }

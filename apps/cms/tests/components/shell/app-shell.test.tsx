@@ -13,6 +13,7 @@ describe("AppShell", () => {
 				user={user}
 				defaultOpen
 				defaultWidth={18}
+				linkKind="anchor"
 			>
 				<p>No notes yet</p>
 			</AppShell>,
@@ -28,7 +29,7 @@ describe("AppShell", () => {
 		expect(wrapper?.style.getPropertyValue("--sidebar-width")).toBe("18rem");
 	});
 
-	it("renders the sidebar collapsed when the cookie says so", () => {
+	it("renders the sidebar collapsed when it is stored collapsed", () => {
 		render(
 			<AppShell
 				title="Notes"
@@ -36,6 +37,7 @@ describe("AppShell", () => {
 				user={user}
 				defaultOpen={false}
 				defaultWidth={16}
+				linkKind="anchor"
 			/>,
 		);
 		expect(

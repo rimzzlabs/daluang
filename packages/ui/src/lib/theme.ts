@@ -2,7 +2,7 @@
 export type Theme = "light" | "dark";
 
 /** The key of the stored choice. `PREFERENCES_SCRIPT` reads it before the first paint. */
-export const THEME_STORAGE_KEY = "theme";
+export const THEME_STORAGE_KEY = "daluang:theme";
 
 export function readTheme(): Theme {
 	return document.documentElement.classList.contains("dark") ? "dark" : "light";

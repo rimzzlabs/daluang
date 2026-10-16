@@ -20,10 +20,12 @@ import {
 	WebhooksLogoIcon,
 } from "@phosphor-icons/react";
 import type { ComponentType } from "react";
+import type { AppPagePath } from "@/lib/app-pages";
+import { type NavLinkKind, navLinkElement } from "./nav-link";
 
 interface NavItem {
 	label: string;
-	href: string;
+	href: AppPagePath;
 	icon: ComponentType;
 }
 
@@ -32,7 +34,7 @@ interface NavGroup {
 	items: readonly NavItem[];
 }
 
-// The menus of the CMS. Each item has a page in `src/pages`.
+// The menus of the CMS. Each item has a page in `APP_PAGES` and a route in `routes/router.ts`.
 export const NAV_GROUPS: readonly NavGroup[] = [
 	{
 		label: "Write",
@@ -64,6 +66,7 @@ export function isActivePath(pathname: string, href: string): boolean {
 
 export interface AppSidebarProps {
 	pathname: string;
+	linkKind: NavLinkKind;
 }
 
 export function AppSidebar(props: AppSidebarProps) {
@@ -74,7 +77,7 @@ export function AppSidebar(props: AppSidebarProps) {
 					<SidebarMenuItem>
 						<SidebarMenuButton
 							size="lg"
-							render={<a href="/" />}
+							render={navLinkElement({ kind: props.linkKind, href: "/" })}
 							tooltip="Daluang"
 						>
 							<span className="flex size-8 shrink-0 items-center justify-center">
@@ -95,7 +98,10 @@ export function AppSidebar(props: AppSidebarProps) {
 									{group.items.map((item) => (
 										<SidebarMenuItem key={item.href}>
 											<SidebarMenuButton
-												render={<a href={item.href} />}
+												render={navLinkElement({
+													kind: props.linkKind,
+													href: item.href,
+												})}
 												isActive={isActivePath(props.pathname, item.href)}
 												tooltip={item.label}
 											>

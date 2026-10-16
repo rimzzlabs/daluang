@@ -16,10 +16,11 @@ import {
 import { useIsMobile } from "../hooks/use-mobile";
 import {
 	clampSidebarWidth,
-	SIDEBAR_STATE_COOKIE,
-	SIDEBAR_WIDTH_COOKIE,
+	SIDEBAR_STATE_KEY,
+	SIDEBAR_WIDTH_KEY,
 	SIDEBAR_WIDTH_REM,
-} from "../lib/sidebar-cookies";
+	writeSidebarPreference,
+} from "../lib/sidebar-preferences";
 import { Button } from "./button";
 import {
 	Sheet,
@@ -29,7 +30,6 @@ import {
 	SheetTitle,
 } from "./sheet";
 
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON_REM = 3;
 const KEYBOARD_SHORTCUT = "b";
@@ -38,13 +38,6 @@ const KEYBOARD_STEP_REM = 1;
 const COLLAPSE_BELOW_REM = SIDEBAR_WIDTH_REM.min - 4;
 // A pointer that moves less than this is a click, not a drag.
 const DRAG_THRESHOLD_PX = 3;
-
-function writeCookie(name: string, value: string) {
-	// The server reads the cookie on the next request, so the sidebar renders in its saved
-	// state with no flash.
-	// biome-ignore lint/suspicious/noDocumentCookie: a plain cookie that the server reads.
-	document.cookie = `${name}=${value}; path=/; max-age=${COOKIE_MAX_AGE}; samesite=lax`;
-}
 
 interface SidebarContextValue {
 	state: "expanded" | "collapsed";
@@ -72,9 +65,9 @@ export function useSidebar(): SidebarContextValue {
 }
 
 export interface SidebarProviderProps extends ComponentProps<"div"> {
-	/** The open state from the `sidebar_state` cookie. `parseSidebarOpen` reads it. */
+	/** The stored open state. `readSidebarPreferences` reads it in the browser. */
 	defaultOpen?: boolean;
-	/** The width in rem from the `sidebar_width` cookie. `parseSidebarWidth` reads it. */
+	/** The stored width, in rem. */
 	defaultWidth?: number;
 }
 
@@ -94,13 +87,17 @@ export function SidebarProvider(props: SidebarProviderProps) {
 
 	function setOpen(value: boolean) {
 		setOpenState(value);
-		writeCookie(SIDEBAR_STATE_COOKIE, String(value));
+		writeSidebarPreference({
+			key: SIDEBAR_STATE_KEY,
+			value: value ? "expanded" : "collapsed",
+		});
 	}
 
 	function setWidth(value: number, commit: boolean) {
 		const next = clampSidebarWidth(value);
 		setWidthState(next);
-		if (commit) writeCookie(SIDEBAR_WIDTH_COOKIE, String(next));
+		if (commit)
+			writeSidebarPreference({ key: SIDEBAR_WIDTH_KEY, value: String(next) });
 	}
 
 	function toggleSidebar() {

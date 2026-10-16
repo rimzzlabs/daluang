@@ -4,22 +4,25 @@ import { TooltipProvider } from "@daluang/ui/components/tooltip";
 import type { ReactNode } from "react";
 import { AppNavbar } from "./app-navbar";
 import { AppSidebar } from "./app-sidebar";
+import type { NavLinkKind } from "./nav-link";
 
 export interface AppShellProps {
 	title: string;
 	pathname: string;
 	user: UserMenuProps;
-	/** From the `sidebar_state` cookie, so the server renders the saved state. */
+	/** The stored open state of the sidebar. */
 	defaultOpen: boolean;
-	/** From the `sidebar_width` cookie, in rem. */
+	/** The stored width of the sidebar, in rem. */
 	defaultWidth: number;
-	/** The page. Astro renders it as HTML, and the island does not hydrate it. */
+	/** `router` inside the app island, `anchor` in the HTML of the server. */
+	linkKind: NavLinkKind;
 	children?: ReactNode;
 }
 
 /**
- * The frame of each signed-in page: the sidebar, the navbar, and the page in between. It is
- * one island, because the sidebar, its trigger, and its rail share the state of the sidebar.
+ * The frame of each signed-in page: the sidebar, the navbar, and the page in between. The
+ * root route of the app island renders it. The server also renders it, as the HTML that
+ * shows before the island starts, and the two give the same HTML.
  */
 export function AppShell(props: AppShellProps) {
 	return (
@@ -28,7 +31,7 @@ export function AppShell(props: AppShellProps) {
 				defaultOpen={props.defaultOpen}
 				defaultWidth={props.defaultWidth}
 			>
-				<AppSidebar pathname={props.pathname} />
+				<AppSidebar pathname={props.pathname} linkKind={props.linkKind} />
 				<SidebarInset>
 					<AppNavbar title={props.title} user={props.user} />
 					<div className="flex flex-1 flex-col">{props.children}</div>

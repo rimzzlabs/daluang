@@ -1,0 +1,39 @@
+---
+import { SIGN_IN_PATH } from "@daluang/auth/paths";
+import { SIDEBAR_WIDTH_REM } from "@daluang/ui/lib/sidebar-preferences";
+import { AppShell } from "@/components/shell/app-shell";
+import BaseLayout from "@/layouts/base-layout.astro";
+import { documentTitle, findAppPage, pageTitle } from "@/lib/app-pages";
+import { App } from "@/routes/app";
+import { PageContent } from "@/routes/page-content";
+
+// Each path that is not the sign-in page and not an endpoint opens the app island. The
+// client router of the island shows the page of the path.
+const user = Astro.locals.user;
+// The sign-in guard sends a request with no session to the sign-in page, so a user exists
+// here. The check keeps the type narrow.
+if (user === null) return Astro.redirect(SIGN_IN_PATH);
+
+const { pathname } = Astro.url;
+if (findAppPage(pathname) === undefined) Astro.response.status = 404;
+
+const title = pageTitle(pathname);
+const menuUser = { name: user.name, githubLogin: user.githubLogin, image: user.image ?? null };
+---
+
+<BaseLayout title={documentTitle(title)}>
+	<div data-static-shell class="contents">
+		<AppShell
+			title={title}
+			pathname={pathname}
+			user={menuUser}
+			defaultOpen={true}
+			defaultWidth={SIDEBAR_WIDTH_REM.default}
+			linkKind="anchor"
+		>
+			<PageContent pathname={pathname} />
+		</AppShell>
+	</div>
+	<!-- `client:only`: the client router reads the browser history when it starts. -->
+	<App client:only="react" user={menuUser} />
+</BaseLayout>
