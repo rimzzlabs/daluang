@@ -6,7 +6,7 @@ import { settingsStore } from "../settings";
 
 describe("settings pages", () => {
 	it("shows the site of the store on the Site page", () => {
-		render(<SitePage settings={settingsStore()} />);
+		render(<SitePage settings={settingsStore()} linkKind="anchor" />);
 		expect(screen.getByRole("heading", { name: "Site" })).toBeTruthy();
 		expect(screen.getByLabelText("Site name")).toHaveProperty(
 			"value",
@@ -15,7 +15,7 @@ describe("settings pages", () => {
 	});
 
 	it("shows the languages of the store on the Languages page", () => {
-		render(<LanguagesPage settings={settingsStore()} />);
+		render(<LanguagesPage settings={settingsStore()} linkKind="anchor" />);
 		expect(screen.getByRole("heading", { name: "Languages" })).toBeTruthy();
 		expect(
 			screen
@@ -25,7 +25,7 @@ describe("settings pages", () => {
 	});
 
 	it("shows the core fields on the Fields page", () => {
-		render(<FieldsPage settings={settingsStore()} />);
+		render(<FieldsPage settings={settingsStore()} linkKind="anchor" />);
 		expect(screen.getByRole("heading", { name: "Fields" })).toBeTruthy();
 		expect(screen.getByText("publishedAt")).toBeTruthy();
 	});
