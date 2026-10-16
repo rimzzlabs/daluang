@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Build output and generated files
+dist/
+.astro/
+.wrangler/
+.vocs/
+# The route types that the Waku of Vocs writes at each `vocs dev`.
+apps/docs/src/pages.gen.ts
+*.tsbuildinfo
+
+# Environment files. `.dev.vars.example` and `.env.example` list each variable
+# with no secret.
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+
+# This repository is a pnpm workspace. Ignore the lockfiles of other package
+# managers, so that a stray `npm install` cannot commit one.
+/package-lock.json
+/yarn.lock
+
+# Logs
+*.log
+
+# OS and editor files
+.DS_Store
+.idea/
+
+# Agent files. Only the skills are committed: `.agents/skills/`, and the
+# symbolic links in `.claude/skills/`.
+.agents/*
+!.agents/skills/
+.claude/*
+!.claude/skills/
+.worktrees/

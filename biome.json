@@ -1,0 +1,125 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignoreUnknown": false,
+		"includes": ["**", "!LICENSE", "!.agents", "!.claude", "!skills-lock.json"]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab"
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"preset": "recommended",
+			"suspicious": {
+				"noUnknownAtRules": "off"
+			},
+			"style": {
+				"noEnum": "error",
+				"noRestrictedImports": {
+					"level": "error",
+					"options": {
+						"paths": {
+							"radix-ui": "Radix UI is not permitted. Use a component from @wcontent/ui, which is built on Base UI (@base-ui/react).",
+							"lodash": "@mobily/ts-belt is the one utility library.",
+							"lodash-es": "@mobily/ts-belt is the one utility library.",
+							"radash": "@mobily/ts-belt is the one utility library.",
+							"ramda": "@mobily/ts-belt is the one utility library.",
+							"remeda": "@mobily/ts-belt is the one utility library.",
+							"clsx": "The class merge library is the package cn: import { cn } from \"cn\".",
+							"tailwind-merge": "The class merge library is the package cn: import { cn } from \"cn\".",
+							"lucide-react": "The icon library is Hugeicons: @hugeicons/react with @hugeicons/core-free-icons."
+						},
+						"patterns": [
+							{
+								"group": ["@radix-ui/*"],
+								"message": "Radix UI is not permitted. Use a component from @wcontent/ui, which is built on Base UI (@base-ui/react)."
+							}
+						]
+					}
+				}
+			},
+			"correctness": {
+				"useExhaustiveDependencies": {
+					"level": "error",
+					"options": {
+						"hooks": [
+							{
+								"name": "useEffectEvent",
+								"stableResult": true
+							}
+						]
+					}
+				}
+			}
+		},
+		"domains": {
+			"react": "recommended"
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double"
+		}
+	},
+	"assist": {
+		"enabled": true,
+		"actions": {
+			"source": {
+				"organizeImports": "on"
+			}
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	},
+	"html": {
+		"experimentalFullSupportEnabled": true
+	},
+	"overrides": [
+		{
+			"includes": ["apps/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"paths": {
+									"radix-ui": "Radix UI is not permitted. Use a component from @wcontent/ui, which is built on Base UI (@base-ui/react).",
+									"@base-ui/react": "Only packages/ui imports Base UI. Use the component from @wcontent/ui, or add it there.",
+									"lodash": "@mobily/ts-belt is the one utility library.",
+									"lodash-es": "@mobily/ts-belt is the one utility library.",
+									"radash": "@mobily/ts-belt is the one utility library.",
+									"ramda": "@mobily/ts-belt is the one utility library.",
+									"remeda": "@mobily/ts-belt is the one utility library.",
+									"clsx": "The class merge library is the package cn: import { cn } from \"cn\".",
+									"tailwind-merge": "The class merge library is the package cn: import { cn } from \"cn\".",
+									"lucide-react": "The icon library is Hugeicons: @hugeicons/react with @hugeicons/core-free-icons."
+								},
+								"patterns": [
+									{
+										"group": ["@radix-ui/*"],
+										"message": "Radix UI is not permitted. Use a component from @wcontent/ui, which is built on Base UI (@base-ui/react)."
+									},
+									{
+										"group": ["@base-ui/react/*"],
+										"message": "Only packages/ui imports Base UI. Use the component from @wcontent/ui, or add it there."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		}
+	]
+}

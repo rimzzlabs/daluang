@@ -1,0 +1,12 @@
+# Prettier formats Markdown and YAML only. Biome formats all other files.
+# The scripts in package.json and the lefthook job give Prettier those files.
+
+# Lockfiles, for example `pnpm-lock.yaml`.
+*-lock.yaml
+
+# release-please writes the changelog.
+CHANGELOG.md
+
+# Skills come from their own repositories. `skills-lock.json` records each source.
+.agents/
+.claude/

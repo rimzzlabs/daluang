@@ -1,0 +1,11 @@
+{
+	"extends": ["astro/tsconfigs/strict", "@wcontent/tsconfig/base.json"],
+	"compilerOptions": {
+		"jsxImportSource": "react",
+		"paths": {
+			"@/*": ["./src/*"]
+		}
+	},
+	"include": [".astro/types.d.ts", "**/*"],
+	"exclude": ["dist"]
+}

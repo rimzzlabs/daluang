@@ -1,0 +1,30 @@
+{
+	"name": "@wcontent/docs",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"license": "MIT",
+	"scripts": {
+		"dev": "vocs dev",
+		"build": "vocs build",
+		"preview": "vocs preview",
+		"typecheck": "tsc",
+		"deploy": "vocs build && wrangler deploy"
+	},
+	"dependencies": {
+		"react": "catalog:",
+		"react-dom": "catalog:",
+		"react-server-dom-webpack": "catalog:",
+		"vite": "catalog:",
+		"vocs": "catalog:",
+		"waku": "catalog:"
+	},
+	"devDependencies": {
+		"@fontsource-variable/inter": "catalog:",
+		"@fontsource-variable/jetbrains-mono": "catalog:",
+		"@fontsource-variable/lora": "catalog:",
+		"@wcontent/tsconfig": "workspace:*",
+		"typescript": "catalog:",
+		"wrangler": "catalog:"
+	}
+}

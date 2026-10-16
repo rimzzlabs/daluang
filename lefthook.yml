@@ -1,0 +1,32 @@
+# Git hooks. `pnpm install` runs `lefthook install` through the `prepare`
+# script of the root package.
+
+pre-commit:
+  parallel: true
+  jobs:
+    # Lint and format the staged code, then stage the fixes. `pnpm check` runs
+    # the same tools on the full repository.
+    - name: biome
+      glob: "*.{js,cjs,mjs,ts,tsx,json,jsonc,css,astro}"
+      run: pnpm exec biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      stage_fixed: true
+
+    # Prettier formats Markdown and YAML only. `.prettierignore` skips the
+    # lockfiles and the changelog. Prettier stops with an error on a symbolic
+    # link, and `CLAUDE.md` is one.
+    - name: prettier
+      glob: "*.{md,yml,yaml}"
+      exclude:
+        - CLAUDE.md
+      run: pnpm exec prettier --write --ignore-unknown {staged_files}
+      stage_fixed: true
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: pnpm exec commitlint --edit {1}
+
+pre-push:
+  jobs:
+    - name: typecheck
+      run: pnpm typecheck

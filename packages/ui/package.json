@@ -1,0 +1,38 @@
+{
+	"name": "@wcontent/ui",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"license": "MIT",
+	"sideEffects": [
+		"**/*.css"
+	],
+	"exports": {
+		"./components/*": "./src/components/*.tsx",
+		"./hooks/*": "./src/hooks/*.ts",
+		"./lib/*": "./src/lib/*.ts",
+		"./styles/*.css": "./src/styles/*.css"
+	},
+	"scripts": {
+		"typecheck": "tsc"
+	},
+	"peerDependencies": {
+		"react": "catalog:",
+		"react-dom": "catalog:"
+	},
+	"dependencies": {
+		"@base-ui/react": "catalog:",
+		"class-variance-authority": "catalog:",
+		"cn": "catalog:",
+		"tailwindcss": "catalog:",
+		"tw-animate-css": "catalog:"
+	},
+	"devDependencies": {
+		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:",
+		"@wcontent/tsconfig": "workspace:*",
+		"react": "catalog:",
+		"react-dom": "catalog:",
+		"typescript": "catalog:"
+	}
+}

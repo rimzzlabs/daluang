@@ -1,0 +1,75 @@
+name: Checks
+
+# The gates that a change passes before it reaches `main`: lint, format, type
+# check, and build. Nothing in this file deploys.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# A new push to the same pull request replaces the run in progress.
+concurrency:
+  group: checks-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+env:
+  # Git hooks belong to a working copy, not to a runner.
+  LEFTHOOK: 0
+
+jobs:
+  lint:
+    name: Lint and format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/install
+
+      # Biome for code, Prettier for Markdown and YAML. The same tools run in
+      # the pre-commit hook on the staged files.
+      - run: pnpm check
+
+      # A squash merge makes the title of the pull request the commit subject,
+      # and release-please reads that subject. The title is text that a
+      # contributor wrote, so it goes through the environment.
+      - name: Lint the pull request title
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: echo "$TITLE" | pnpm exec commitlint
+
+  typecheck:
+    name: Type check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/install
+
+      # `tsc` in each package, and `astro check` in `apps/cms`.
+      - run: pnpm typecheck
+
+  build:
+    name: Build the CMS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/install
+
+      - run: pnpm build
+
+  docs:
+    name: Build the docs site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/install
+
+      # `vocs build` fails on a dead link.
+      - run: pnpm docs:build

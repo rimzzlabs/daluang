@@ -1,0 +1,36 @@
+{
+	"name": "@wcontent/cms",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"license": "MIT",
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"typecheck": "astro check",
+		"astro": "astro",
+		"deploy": "astro build && wrangler deploy"
+	},
+	"dependencies": {
+		"@astrojs/cloudflare": "catalog:",
+		"@astrojs/react": "catalog:",
+		"@hugeicons/core-free-icons": "catalog:",
+		"@hugeicons/react": "catalog:",
+		"@tailwindcss/vite": "catalog:",
+		"@wcontent/ui": "workspace:*",
+		"astro": "catalog:",
+		"react": "catalog:",
+		"react-dom": "catalog:",
+		"tailwindcss": "catalog:"
+	},
+	"devDependencies": {
+		"@astrojs/check": "catalog:",
+		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:",
+		"@wcontent/tsconfig": "workspace:*",
+		"oxc-transform-react": "catalog:",
+		"typescript": "catalog:",
+		"wrangler": "catalog:"
+	}
+}

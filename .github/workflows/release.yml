@@ -1,0 +1,34 @@
+name: Release
+
+# release-please reads the Conventional Commits on `main`. It keeps a release
+# pull request open with the next version and the changelog. A merge of that
+# pull request cuts the tag and the GitHub release.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+# A release must not stop halfway, so runs wait in a queue.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - id: release
+        uses: googleapis/release-please-action@v5
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+      - name: Write the summary
+        if: ${{ steps.release.outputs.release_created == 'true' }}
+        env:
+          TAG: ${{ steps.release.outputs.tag_name }}
+        run: echo "Released $TAG" >> "$GITHUB_STEP_SUMMARY"
