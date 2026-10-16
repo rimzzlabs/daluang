@@ -61,6 +61,16 @@ The workflow does these steps:
 After that, each release deploys again. release-please opens a pull request for each
 release, and a merge of that pull request makes the release.
 
+## Protect the sign-in
+
+The CMS allows 3 sign-in requests in 10 seconds from one address. Each Worker isolate
+keeps its own count. For one count across all of Cloudflare, add a rate limiting rule:
+
+1. Open the dashboard of your domain on Cloudflare.
+2. Open **Security → WAF → Rate limiting rules**, and make a new rule.
+3. Match the requests where the URI path starts with `/api/auth/`.
+4. Set the limit, for example 20 requests in 1 minute for each IP address.
+
 ## Sign in
 
 Open the domain of the CMS, and sign in with GitHub. At the first sign-in, the CMS asks

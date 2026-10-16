@@ -112,6 +112,35 @@ describe("createAuth", () => {
 		);
 	});
 
+	it("limits the sign-in to 3 requests in 10 seconds from one address", async () => {
+		const auth = makeAuth();
+		function signIn(ip: string) {
+			return auth.handler(
+				new Request("http://localhost:4321/api/auth/sign-in/social", {
+					method: "POST",
+					headers: {
+						"content-type": "application/json",
+						origin: "http://localhost:4321",
+						"cf-connecting-ip": ip,
+					},
+					body: JSON.stringify({ provider: "github" }),
+				}),
+			);
+		}
+		const statuses: number[] = [];
+		for (const _ of [1, 2, 3, 4])
+			statuses.push((await signIn("203.0.113.7")).status);
+		expect(statuses.slice(0, 3)).not.toContain(429);
+		expect(statuses[3]).toBe(429);
+		expect((await signIn("203.0.113.8")).status).not.toBe(429);
+	});
+
+	it("reads the address of the client from CF-Connecting-IP only", () => {
+		expect(makeAuth().options.advanced?.ipAddress?.ipAddressHeaders).toEqual([
+			"cf-connecting-ip",
+		]);
+	});
+
 	it("encrypts the GitHub tokens in D1", () => {
 		expect(makeAuth().options.account?.encryptOAuthTokens).toBe(true);
 	});
