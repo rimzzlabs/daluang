@@ -10,10 +10,16 @@ Cloudflare account.
 
 ## Status
 
-Daluang is in early development. The CMS has sign-in with GitHub, the questions of the
-[first sign-in](/guide/first-sign-in), and the frame of the app. The editor and the note
-storage come in later releases. [Deploy](/guide/deploy) tells you how to host your own
-copy.
+Daluang is in early development. The CMS has these parts now:
+
+- Sign-in with GitHub, for the users of an allow list.
+- The questions of the [first sign-in](/guide/first-sign-in): the site and the languages.
+- The settings of the site, the languages, and the extra fields of a note.
+- The [API tokens](/guide/api-tokens) of a site, and the [webhooks](/guide/webhooks) that
+  tell a site to rebuild.
+
+The editor and the note storage come in later releases. [Deploy](/guide/deploy) tells you
+how to host your own copy.
 
 ## The parts
 
