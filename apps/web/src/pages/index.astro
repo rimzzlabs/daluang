@@ -51,9 +51,17 @@ const points = [
 				browser, and Daluang publishes each note to the site you built, from your own
 				Cloudflare account.
 			</p>
-			<a href="/docs/" class={buttonVariants({ size: "lg", className: "mt-10 h-11" })}>
-				Read the docs
-			</a>
+			<div class="mt-10 flex flex-wrap gap-3">
+				<a href="/docs/" class={buttonVariants({ size: "lg", className: "h-11" })}>
+					Read the docs
+				</a>
+				<a
+					href="https://github.com/rimzzlabs/daluang"
+					class={buttonVariants({ variant: "outline", size: "lg", className: "h-11" })}
+				>
+					View source
+				</a>
+			</div>
 		</section>
 
 		<section aria-label="What Daluang does" class="border-t border-border">
@@ -84,10 +92,10 @@ const points = [
 				editor and publishing are not ready yet. The docs say what works today.
 			</p>
 			<a
-				href="/docs/"
+				href="https://github.com/rimzzlabs/daluang"
 				class={buttonVariants({ variant: "outline", size: "lg", className: "mt-8 h-11" })}
 			>
-				Read the docs
+				Read the code on GitHub
 			</a>
 		</section>
 	</main>

@@ -2,7 +2,7 @@ name: Release
 
 # release-please reads the Conventional Commits on `main`. It keeps a release
 # pull request open with the next version and the changelog. A merge of that
-# pull request cuts the tag and the GitHub release.
+# pull request cuts the tag and the GitHub release, and then deploys the release.
 on:
   push:
     branches: [main]
@@ -20,6 +20,9 @@ concurrency:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - id: release
         uses: googleapis/release-please-action@v5
@@ -32,3 +35,13 @@ jobs:
         env:
           TAG: ${{ steps.release.outputs.tag_name }}
         run: echo "Released $TAG" >> "$GITHUB_STEP_SUMMARY"
+
+  # Chained here, not started by the tag: release-please makes the tag with GITHUB_TOKEN,
+  # and GitHub starts no workflow for an event that this token makes.
+  deploy:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    uses: ./.github/workflows/deploy.yml
+    with:
+      ref: ${{ needs.release-please.outputs.tag_name }}
+    secrets: inherit

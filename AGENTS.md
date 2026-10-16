@@ -94,8 +94,8 @@ Run each script from the root:
 | `pnpm db:migrate:local` | Apply `apps/cms/migrations` to the local D1 database                                         |
 
 `apps/cms` and `apps/web` each have a `cf:deploy` script, which runs `wrangler deploy`.
-Run it only when the person tells you to. The name is not `deploy`, because `pnpm deploy`
-is a command of pnpm.
+Do not run it. The workflow `deploy.yml` deploys, after a release. The name is not
+`deploy`, because `pnpm deploy` is a command of pnpm.
 
 ## Hosting
 
@@ -124,7 +124,35 @@ is a command of pnpm.
   fails in development, stop the process on port 4323.
 - Vocs does not add `basePath` to `iconUrl` and `logoUrl`. Write these URLs with `/docs`
   in `apps/docs/vocs.config.ts`.
-- `apps/cms/wrangler.jsonc` has no domain. A developer who hosts Daluang adds their own.
+- `apps/cms/wrangler.jsonc` has no domain and no database ID. The deploy workflow gives
+  the domain from the variable `CMS_DOMAIN`, and Wrangler finds the database by its name,
+  `daluang`. A fork deploys with no change to a file.
+- The CMS has no Astro sessions (`session: false`) and no image service
+  (`imageService: "passthrough"`), so the adapter adds no KV namespace and no Images
+  binding. Its one binding is `DB`.
+
+## Release and deploy
+
+- release-please (`release.yml`) reads the Conventional Commits on `main`, and keeps a
+  release pull request open. A merge of that pull request cuts the tag and the GitHub
+  release. Its title is `chore(release): v<version>`, which commitlint accepts.
+- The first release is v0.1.0 (`initial-version`). Before 1.0.0, a `feat` raises the
+  minor number and a `fix` the patch number. A breaking change raises the minor number,
+  so a release does not jump to 1.0.0.
+- After a release, `release.yml` calls `deploy.yml` with the tag. A person can also run
+  `deploy.yml` from the Actions tab, with a tag or a branch.
+- `deploy.yml` deploys the CMS: it makes the D1 database `daluang` if it is missing,
+  applies the migrations, builds, and deploys with `--secrets-file` and `--domain`. The
+  migrations come before the deploy, so new code never runs on an old schema.
+- `deploy.yml` deploys the landing page and the docs site only in `rimzzlabs/daluang`. A
+  fork deploys only its CMS.
+- The values come from the settings of the repository: the secrets
+  `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `BETTER_AUTH_SECRET`,
+  `AUTH_GITHUB_CLIENT_ID`, and `AUTH_GITHUB_CLIENT_SECRET`, and the variables `CMS_DOMAIN`
+  and `ALLOWED_GITHUB_USERS`. `apps/docs/src/pages/guide/deploy.md` is the guide.
+- A secret name of GitHub cannot start with `GITHUB_`, so the OAuth values start with
+  `AUTH_`. The workflow gives them to the Worker as `GITHUB_CLIENT_ID` and
+  `GITHUB_CLIENT_SECRET`.
 
 ## Tech stack
 

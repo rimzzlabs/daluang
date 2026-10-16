@@ -2,6 +2,8 @@
 
 A Markdown CMS that runs as a Cloudflare Worker. Open source under the MIT license.
 
+[daluang.rimzzlabs.com](https://daluang.rimzzlabs.com) · [Docs](https://daluang.rimzzlabs.com/docs/) · [Deploy your own](https://daluang.rimzzlabs.com/docs/guide/deploy)
+
 ## Workspace
 
 | Path                | Package             | Does                                                                  |

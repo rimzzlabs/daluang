@@ -6,8 +6,12 @@ import { defineConfig, fontProviders } from "astro/config";
 
 export default defineConfig({
 	output: "server",
-	// `astro dev` runs the app in workerd, with the bindings of `wrangler.jsonc`.
-	adapter: cloudflare(),
+	// `astro dev` runs the app in workerd, with the bindings of `wrangler.jsonc`. The CMS
+	// transforms no images, so it needs no Images binding of Cloudflare.
+	adapter: cloudflare({ imageService: "passthrough" }),
+	// Better Auth keeps the sessions in D1. With no Astro sessions, the adapter adds no KV
+	// namespace, and a deploy makes none in the account.
+	session: false,
 	// `daluangAuth` adds the `/api/auth` endpoints and the sign-in guard. The app has no
 	// auth route file.
 	integrations: [react({ compiler: true }), daluangAuth()],

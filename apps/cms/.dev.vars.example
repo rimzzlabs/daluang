@@ -8,7 +8,8 @@ BETTER_AUTH_SECRET=
 BETTER_AUTH_URL=http://localhost:4321
 
 # A GitHub OAuth app: https://github.com/settings/developers
-# Its callback URL is <BETTER_AUTH_URL>/api/auth/callback/github
+# Its callback URL is <BETTER_AUTH_URL>/api/auth/callback/github. One app can have the
+# callback URL of local development and the callback URL of production.
 GITHUB_CLIENT_ID=
 GITHUB_CLIENT_SECRET=
 
