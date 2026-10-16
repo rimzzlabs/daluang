@@ -63,13 +63,14 @@ jobs:
 
       - run: pnpm build
 
-  docs:
-    name: Build the docs site
+  web:
+    name: Build the landing page and the docs site
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
 
       - uses: ./.github/actions/install
 
-      # `vocs build` fails on a dead link.
-      - run: pnpm docs:build
+      # `vocs build` runs first and fails on a dead link. The landing page build then
+      # copies the docs site into `apps/web/dist/docs`.
+      - run: pnpm web:build

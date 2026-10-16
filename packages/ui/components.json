@@ -9,7 +9,7 @@
 		"baseColor": "stone",
 		"cssVariables": true
 	},
-	"iconLibrary": "hugeicons",
+	"iconLibrary": "phosphor",
 	"aliases": {
 		"components": "@daluang/ui/components",
 		"ui": "@daluang/ui/components",

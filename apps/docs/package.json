@@ -8,8 +8,7 @@
 		"dev": "vocs dev",
 		"build": "vocs build",
 		"preview": "vocs preview",
-		"typecheck": "tsc",
-		"deploy": "vocs build && wrangler deploy"
+		"typecheck": "tsc"
 	},
 	"dependencies": {
 		"react": "catalog:",
@@ -24,7 +23,6 @@
 		"@fontsource-variable/jetbrains-mono": "catalog:",
 		"@fontsource-variable/lora": "catalog:",
 		"@daluang/tsconfig": "workspace:*",
-		"typescript": "catalog:",
-		"wrangler": "catalog:"
+		"typescript": "catalog:"
 	}
 }

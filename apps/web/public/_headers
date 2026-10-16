@@ -1,0 +1,5 @@
+# The file names of these assets have a content hash, so a browser can keep them.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+/docs/assets/*
+  Cache-Control: public, max-age=31536000, immutable

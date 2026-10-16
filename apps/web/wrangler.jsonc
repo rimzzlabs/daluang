@@ -1,0 +1,16 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "daluang-web",
+	"compatibility_date": "2026-10-01",
+	// A static site with no server code: the landing page, and the docs site at `/docs`.
+	"assets": {
+		"directory": "./dist",
+		// A missing page gets the nearest `404.html`. Below `/docs`, that is the 404 page of
+		// the docs site.
+		"not_found_handling": "404-page",
+		// The links of the docs site have no trailing slash: `/docs/guide/local-development`.
+		// This serves such a URL with no redirect.
+		"html_handling": "drop-trailing-slash"
+	},
+	"routes": [{ "pattern": "daluang.rimzzlabs.com", "custom_domain": true }]
+}

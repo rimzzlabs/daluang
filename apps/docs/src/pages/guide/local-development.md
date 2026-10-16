@@ -24,6 +24,14 @@ The CMS runs in workerd, the runtime of Cloudflare Workers.
 1. Run `pnpm docs:dev`.
 2. Open the URL that the command prints.
 
+## Run the landing page
+
+1. Run `pnpm docs:dev`.
+2. Run `pnpm web:dev` in a second terminal.
+3. Open `http://localhost:4322`.
+
+The landing page sends each request for `/docs` to the dev server of this site.
+
 ## Check a change
 
 | Command           | Does                                                 |
@@ -32,4 +40,5 @@ The CMS runs in workerd, the runtime of Cloudflare Workers.
 | `pnpm fix`        | Biome and Prettier, with write                       |
 | `pnpm typecheck`  | The type check of each workspace                     |
 | `pnpm build`      | The build of the CMS                                 |
+| `pnpm web:build`  | The build of this site, then of the landing page     |
 | `pnpm docs:build` | The build of this site. A dead link fails the build. |

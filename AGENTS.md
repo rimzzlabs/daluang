@@ -43,13 +43,16 @@ the `catalog` in `pnpm-workspace.yaml`.
 
 - `apps/cms` (`@daluang/cms`): the CMS. Astro pages, React islands, and endpoints. It
   deploys as a Cloudflare Worker. `wrangler.jsonc` has its config.
+- `apps/web` (`@daluang/web`): the landing page. Static Astro pages, with React islands.
+  Its build also holds the docs site at `/docs`. See "Hosting".
 - `apps/docs` (`@daluang/docs`): the documentation site on Vocs 2. It tells a developer
   how to host Daluang. Its pages are the Markdown files in `src/pages/`. The build is
-  static HTML in `dist/public`, which deploys as Cloudflare static assets.
+  static HTML in `dist/public`. The docs site has no Worker of its own.
 - `packages/ui` (`@daluang/ui`): the UI primitives on Base UI and the Tailwind CSS 4
   theme, with the font tokens. Each app loads the font files. `src/assets/` holds the
   masters of the mark (the Sundanese letter da) and of the app icon. `DaluangMark` is the
   mark as a component. Each app keeps its own copy of the icon files in `public/`.
+  `ThemeToggle` and `lib/theme.ts` switch the light and the dark theme.
 - `packages/tsconfig` (`@daluang/tsconfig`): the TypeScript base that each workspace
   extends.
 
@@ -59,19 +62,42 @@ To use a workspace package, write `"@daluang/<name>": "workspace:*"` in the
 
 Run each script from the root:
 
-| Command           | Does                                                |
-| ----------------- | --------------------------------------------------- |
-| `pnpm dev`        | `astro dev` in `apps/cms`                           |
-| `pnpm build`      | `astro build` in `apps/cms`                         |
-| `pnpm docs:dev`   | `vocs dev` in `apps/docs`                           |
-| `pnpm docs:build` | `vocs build` in `apps/docs`. A dead link fails it.  |
-| `pnpm typecheck`  | The type check of each workspace                    |
-| `pnpm check`      | Biome (lint and format) and Prettier, with no write |
-| `pnpm fix`        | Biome and Prettier, with write                      |
-| `pnpm commit`     | The commit prompt of commitlint                     |
+| Command            | Does                                                                              |
+| ------------------ | --------------------------------------------------------------------------------- |
+| `pnpm dev`         | `astro dev` in `apps/cms`                                                         |
+| `pnpm build`       | `astro build` in `apps/cms`                                                       |
+| `pnpm web:dev`     | `astro dev` in `apps/web`, at `http://localhost:4322`                             |
+| `pnpm web:build`   | The docs site, then the landing page with the docs site in `dist/docs`            |
+| `pnpm web:preview` | `wrangler dev` on the build of `apps/web`: the same files and rules as production |
+| `pnpm docs:dev`    | `vocs dev` in `apps/docs`, at `http://localhost:5173/docs/`                       |
+| `pnpm docs:build`  | `vocs build` in `apps/docs`. A dead link fails it.                                |
+| `pnpm typecheck`   | The type check of each workspace                                                  |
+| `pnpm check`       | Biome (lint and format) and Prettier, with no write                               |
+| `pnpm fix`         | Biome and Prettier, with write                                                    |
+| `pnpm commit`      | The commit prompt of commitlint                                                   |
 
-Each app also has a `deploy` script: a build, then `wrangler deploy`. Run it only when
-the person tells you to.
+`apps/cms` and `apps/web` each have a `cf:deploy` script, which runs `wrangler deploy`.
+Run it only when the person tells you to. The name is not `deploy`, because `pnpm deploy`
+is a command of pnpm.
+
+## Hosting
+
+| URL                          | Served by                                            | Worker        |
+| ---------------------------- | ---------------------------------------------------- | ------------- |
+| `daluang.rimzzlabs.com`      | `apps/web`                                           | `daluang-web` |
+| `daluang.rimzzlabs.com/docs` | `apps/docs`, in the build of `apps/web`              | `daluang-web` |
+| `cms.rimzzlabs.com`          | `apps/cms`: the copy of the CMS that the owner hosts | `daluang-cms` |
+
+- `daluang-web` serves static files only. It has no server code.
+- `apps/docs` has `basePath: "/docs"`. Each of its URLs starts with `/docs/`.
+- `apps/web/scripts/copy-docs.ts` copies `apps/docs/dist/public` into
+  `apps/web/dist/docs`. Run `pnpm web:build`, which builds the docs site first.
+- A missing page gets the nearest `404.html`: below `/docs`, the 404 page of Vocs.
+- In development, `astro dev` of `apps/web` sends `/docs` to the Vocs dev server. Run
+  `pnpm docs:dev` and `pnpm web:dev` together.
+- Vocs does not add `basePath` to `iconUrl` and `logoUrl`. Write these URLs with `/docs`
+  in `apps/docs/vocs.config.ts`.
+- `apps/cms/wrangler.jsonc` has no domain. A developer who hosts Daluang adds their own.
 
 ## Tech stack
 
@@ -88,8 +114,8 @@ the person tells you to.
   `packages/ui` only.
 - `cn` (the package of shadcn) to merge class names: `import { cn } from "cn"`. No `clsx`
   and no `tailwind-merge`.
-- Hugeicons for icons: `HugeiconsIcon` of `@hugeicons/react`, with an icon of
-  `@hugeicons/core-free-icons`.
+- Phosphor for icons: `@phosphor-icons/react`. Import the name with the `Icon` suffix,
+  for example `SunIcon`.
 - Comark for Markdown: `comark` parses, `@comark/react` and `@comark/html` render.
 - Vocs 2 (with Waku) for the documentation site. `react-server-dom-webpack` has the exact
   version of `react`, for the RSC runtime of Waku.
@@ -315,9 +341,9 @@ disagree, obey this file.
 | `typescript`: a hand-written `Result` union                   | The `R` module of ts-belt                          |
 | `typescript` and `react`: destructure a maximum of five keys  | A maximum of three keys                            |
 | `react`: ask before you enable the React Compiler             | The compiler is on in `apps/cms`.                  |
-| `tailwind-design-system`: Radix UI, `asChild`, `lucide-react` | Base UI, the `render` prop, and Hugeicons          |
+| `tailwind-design-system`: Radix UI, `asChild`, `lucide-react` | Base UI, the `render` prop, and Phosphor           |
 | `tailwind-design-system`: `clsx` with `tailwind-merge`        | The package `cn`                                   |
 
-Biome refuses an import of Radix UI, `lucide-react`, `clsx`, `tailwind-merge`, lodash,
+Biome refuses an import of Radix UI, `lucide-react`, Hugeicons, `clsx`, `tailwind-merge`, lodash,
 `radash`, `ramda`, and `remeda`. In `apps/`, Biome also refuses an import of
 `@base-ui/react`.

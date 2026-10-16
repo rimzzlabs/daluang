@@ -34,7 +34,9 @@
 							"remeda": "@mobily/ts-belt is the one utility library.",
 							"clsx": "The class merge library is the package cn: import { cn } from \"cn\".",
 							"tailwind-merge": "The class merge library is the package cn: import { cn } from \"cn\".",
-							"lucide-react": "The icon library is Hugeicons: @hugeicons/react with @hugeicons/core-free-icons."
+							"lucide-react": "The icon library is Phosphor: @phosphor-icons/react.",
+							"@hugeicons/react": "The icon library is Phosphor: @phosphor-icons/react.",
+							"@hugeicons/core-free-icons": "The icon library is Phosphor: @phosphor-icons/react."
 						},
 						"patterns": [
 							{
@@ -103,7 +105,9 @@
 									"remeda": "@mobily/ts-belt is the one utility library.",
 									"clsx": "The class merge library is the package cn: import { cn } from \"cn\".",
 									"tailwind-merge": "The class merge library is the package cn: import { cn } from \"cn\".",
-									"lucide-react": "The icon library is Hugeicons: @hugeicons/react with @hugeicons/core-free-icons."
+									"lucide-react": "The icon library is Phosphor: @phosphor-icons/react.",
+									"@hugeicons/react": "The icon library is Phosphor: @phosphor-icons/react.",
+									"@hugeicons/core-free-icons": "The icon library is Phosphor: @phosphor-icons/react."
 								},
 								"patterns": [
 									{

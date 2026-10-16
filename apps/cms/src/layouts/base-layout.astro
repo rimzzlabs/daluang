@@ -24,7 +24,7 @@ const { title } = Astro.props;
 		<Font cssVariable="--font-inter" preload />
 		<Font cssVariable="--font-lora" />
 		<Font cssVariable="--font-jetbrains-mono" />
-		<!-- Set the theme before the first paint. `src/lib/theme.ts` uses the same key. -->
+		<!-- Set the theme before the first paint. `@daluang/ui/lib/theme` uses the same key. -->
 		<script is:inline>
 			try {
 				const stored = localStorage.getItem("theme");

@@ -23,15 +23,16 @@
 	},
 	"dependencies": {
 		"@base-ui/react": "catalog:",
+		"@phosphor-icons/react": "catalog:",
 		"class-variance-authority": "catalog:",
 		"cn": "catalog:",
 		"tailwindcss": "catalog:",
 		"tw-animate-css": "catalog:"
 	},
 	"devDependencies": {
+		"@daluang/tsconfig": "workspace:*",
 		"@types/react": "catalog:",
 		"@types/react-dom": "catalog:",
-		"@daluang/tsconfig": "workspace:*",
 		"react": "catalog:",
 		"react-dom": "catalog:",
 		"typescript": "catalog:"

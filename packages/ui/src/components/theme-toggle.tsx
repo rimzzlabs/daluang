@@ -1,8 +1,12 @@
-import { Button } from "@daluang/ui/components/button";
-import { Moon02Icon, Sun03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+import { MoonIcon, SunIcon } from "@phosphor-icons/react";
 import { useSyncExternalStore } from "react";
-import { readTheme, subscribeTheme, type Theme, writeTheme } from "@/lib/theme";
+import {
+	readTheme,
+	subscribeTheme,
+	type Theme,
+	writeTheme,
+} from "../lib/theme";
+import { Button } from "./button";
 
 function readServerTheme(): Theme {
 	return "light";
@@ -23,7 +27,7 @@ export function ThemeToggle() {
 			aria-label={`Use the ${next} theme`}
 			onClick={() => writeTheme(next)}
 		>
-			<HugeiconsIcon icon={theme === "dark" ? Sun03Icon : Moon02Icon} />
+			{theme === "dark" ? <SunIcon /> : <MoonIcon />}
 		</Button>
 	);
 }

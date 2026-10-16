@@ -11,7 +11,7 @@ Cloudflare account.
 ## Status
 
 Daluang is in early development. The repository has the workspace, the CMS app shell,
-and this site. The editor, the note storage, and the deploy guide come in later
+the landing page, and this site. The editor, the note storage, and the deploy guide come in later
 releases.
 
 ## The parts
@@ -19,6 +19,7 @@ releases.
 | Part          | Does                                                    |
 | ------------- | ------------------------------------------------------- |
 | `apps/cms`    | The CMS. An Astro app that runs as a Cloudflare Worker. |
+| `apps/web`    | The landing page. It serves this site at `/docs`.       |
 | `apps/docs`   | This site, on Vocs.                                     |
 | `packages/ui` | The UI components, the theme, and the fonts.            |
 

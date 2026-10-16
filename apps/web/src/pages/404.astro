@@ -1,0 +1,14 @@
+---
+import { buttonVariants } from "@daluang/ui/components/button";
+import BaseLayout from "@/layouts/base-layout.astro";
+---
+
+<BaseLayout title="Page not found · Daluang" description="This page does not exist.">
+	<main class="mx-auto flex w-full max-w-3xl flex-1 flex-col items-start justify-center px-6 py-24">
+		<p class="font-mono text-xs tracking-wide text-muted-foreground uppercase">404</p>
+		<h1 class="mt-4 font-serif text-4xl font-semibold tracking-tight">Page not found.</h1>
+		<a href="/" class={buttonVariants({ variant: "outline", size: "lg", className: "mt-8" })}>
+			Go to the home page
+		</a>
+	</main>
+</BaseLayout>

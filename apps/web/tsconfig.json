@@ -1,0 +1,12 @@
+{
+	"extends": ["astro/tsconfigs/strict", "@daluang/tsconfig/base.json"],
+	"compilerOptions": {
+		"jsxImportSource": "react",
+		"types": ["node"],
+		"paths": {
+			"@/*": ["./src/*"]
+		}
+	},
+	"include": [".astro/types.d.ts", "**/*"],
+	"exclude": ["dist"]
+}

@@ -4,22 +4,22 @@ packages:
 
 # `pnpm add` writes each new version here, so all workspaces use one version.
 catalog:
-  "@astrojs/check": ^0.9.10
-  "@astrojs/cloudflare": ^14.4.0
-  "@astrojs/react": ^7.1.0
-  "@base-ui/react": ^1.9.0
-  "@biomejs/biome": ^2.5.15
-  "@commitlint/cli": ^21.2.3
-  "@commitlint/config-conventional": ^21.2.3
-  "@commitlint/prompt-cli": ^21.2.3
-  "@fontsource-variable/inter": ^5.3.0
-  "@fontsource-variable/jetbrains-mono": ^5.3.0
-  "@fontsource-variable/lora": ^5.3.0
-  "@hugeicons/core-free-icons": ^4.3.5
-  "@hugeicons/react": ^1.1.10
-  "@tailwindcss/vite": ^4.3.3
-  "@types/react": ^19.3.0
-  "@types/react-dom": ^19.3.0
+  '@astrojs/check': ^0.9.10
+  '@astrojs/cloudflare': ^14.4.0
+  '@astrojs/react': ^7.1.0
+  '@base-ui/react': ^1.9.0
+  '@biomejs/biome': ^2.5.15
+  '@commitlint/cli': ^21.2.3
+  '@commitlint/config-conventional': ^21.2.3
+  '@commitlint/prompt-cli': ^21.2.3
+  '@fontsource-variable/inter': ^5.3.0
+  '@fontsource-variable/jetbrains-mono': ^5.3.0
+  '@fontsource-variable/lora': ^5.3.0
+  '@phosphor-icons/react': ^2.1.10
+  '@tailwindcss/vite': ^4.3.3
+  '@types/node': ^24.19.2
+  '@types/react': ^19.3.0
+  '@types/react-dom': ^19.3.0
   astro: ^7.4.0
   class-variance-authority: ^0.7.1
   cn: ^0.4.0
@@ -63,4 +63,4 @@ allowBuilds:
 # runs the React Compiler, `@vitejs/plugin-react` 6.1.2, needs 0.152.
 peerDependencyRules:
   allowedVersions:
-    "@astrojs/react>oxc-transform-react": ^0.152.0
+    '@astrojs/react>oxc-transform-react': ^0.152.0
