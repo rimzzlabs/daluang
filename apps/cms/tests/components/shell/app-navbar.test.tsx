@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { SidebarProvider } from "@daluang/ui/components/sidebar";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";

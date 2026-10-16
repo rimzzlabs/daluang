@@ -448,7 +448,8 @@ Apply each rule to a file that you write or change.
 - A test calls a function with parameters. Do not mock a framework module, for example
   `astro:middleware`. A test can replace a module of its own workspace with `vi.mock`, as
   the component tests of `packages/auth` do with `src/client.ts`.
-- A React component test uses `@testing-library/react` with the `jsdom` environment.
+- The tests run in the `node` environment, in the `vmThreads` pool. A React component test
+  uses `@testing-library/react`, and its first line is `// @vitest-environment jsdom`.
 - `packages/auth/tests/fake-d1.ts` is a D1 binding on `node:sqlite`, with the migrations
   of `apps/cms/migrations`. A test of `createAuth` uses it, and a test checks that the
   migrations match the schema of Better Auth.

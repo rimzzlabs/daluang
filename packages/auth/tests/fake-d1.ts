@@ -3,8 +3,7 @@ import { join } from "node:path";
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
 
 // The migration of the auth tables. The app owns the migration folder, and the tests check
-// that the migration matches the schema of `createAuth`. It is a path, not a URL: jsdom
-// replaces the URL class of Node.js in these tests.
+// that the migration matches the schema of `createAuth`.
 const MIGRATION = join(
 	import.meta.dirname,
 	"../../../apps/cms/migrations/0001_auth.sql",
