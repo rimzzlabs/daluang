@@ -11,10 +11,10 @@
 	},
 	"iconLibrary": "hugeicons",
 	"aliases": {
-		"components": "@wcontent/ui/components",
-		"ui": "@wcontent/ui/components",
+		"components": "@daluang/ui/components",
+		"ui": "@daluang/ui/components",
 		"utils": "cn",
-		"lib": "@wcontent/ui/lib",
-		"hooks": "@wcontent/ui/hooks"
+		"lib": "@daluang/ui/lib",
+		"hooks": "@daluang/ui/hooks"
 	}
 }

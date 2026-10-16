@@ -8,7 +8,7 @@ export default defineConfig({
 	// `astro dev` runs the app in workerd, with the bindings of `wrangler.jsonc`.
 	adapter: cloudflare(),
 	integrations: [react({ compiler: true })],
-	// Each font sets a CSS variable. `@wcontent/ui/styles/theme.css` gives the variables
+	// Each font sets a CSS variable. `@daluang/ui/styles/theme.css` gives the variables
 	// to `font-sans`, `font-serif`, and `font-mono`.
 	fonts: [
 		{

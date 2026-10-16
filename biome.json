@@ -26,7 +26,7 @@
 					"level": "error",
 					"options": {
 						"paths": {
-							"radix-ui": "Radix UI is not permitted. Use a component from @wcontent/ui, which is built on Base UI (@base-ui/react).",
+							"radix-ui": "Radix UI is not permitted. Use a component from @daluang/ui, which is built on Base UI (@base-ui/react).",
 							"lodash": "@mobily/ts-belt is the one utility library.",
 							"lodash-es": "@mobily/ts-belt is the one utility library.",
 							"radash": "@mobily/ts-belt is the one utility library.",
@@ -39,7 +39,7 @@
 						"patterns": [
 							{
 								"group": ["@radix-ui/*"],
-								"message": "Radix UI is not permitted. Use a component from @wcontent/ui, which is built on Base UI (@base-ui/react)."
+								"message": "Radix UI is not permitted. Use a component from @daluang/ui, which is built on Base UI (@base-ui/react)."
 							}
 						]
 					}
@@ -94,8 +94,8 @@
 							"level": "error",
 							"options": {
 								"paths": {
-									"radix-ui": "Radix UI is not permitted. Use a component from @wcontent/ui, which is built on Base UI (@base-ui/react).",
-									"@base-ui/react": "Only packages/ui imports Base UI. Use the component from @wcontent/ui, or add it there.",
+									"radix-ui": "Radix UI is not permitted. Use a component from @daluang/ui, which is built on Base UI (@base-ui/react).",
+									"@base-ui/react": "Only packages/ui imports Base UI. Use the component from @daluang/ui, or add it there.",
 									"lodash": "@mobily/ts-belt is the one utility library.",
 									"lodash-es": "@mobily/ts-belt is the one utility library.",
 									"radash": "@mobily/ts-belt is the one utility library.",
@@ -108,11 +108,11 @@
 								"patterns": [
 									{
 										"group": ["@radix-ui/*"],
-										"message": "Radix UI is not permitted. Use a component from @wcontent/ui, which is built on Base UI (@base-ui/react)."
+										"message": "Radix UI is not permitted. Use a component from @daluang/ui, which is built on Base UI (@base-ui/react)."
 									},
 									{
 										"group": ["@base-ui/react/*"],
-										"message": "Only packages/ui imports Base UI. Use the component from @wcontent/ui, or add it there."
+										"message": "Only packages/ui imports Base UI. Use the component from @daluang/ui, or add it there."
 									}
 								]
 							}

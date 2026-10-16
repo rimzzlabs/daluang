@@ -1,5 +1,5 @@
 {
-	"name": "@wcontent/docs",
+	"name": "@daluang/docs",
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
@@ -23,7 +23,7 @@
 		"@fontsource-variable/inter": "catalog:",
 		"@fontsource-variable/jetbrains-mono": "catalog:",
 		"@fontsource-variable/lora": "catalog:",
-		"@wcontent/tsconfig": "workspace:*",
+		"@daluang/tsconfig": "workspace:*",
 		"typescript": "catalog:",
 		"wrangler": "catalog:"
 	}

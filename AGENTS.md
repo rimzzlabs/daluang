@@ -1,11 +1,14 @@
 # AGENTS.md
 
-## wcontent
+## Daluang
 
-wcontent is a content management system (CMS) for writing. A writer edits notes in
+Daluang is a content management system (CMS) for writing. A writer edits notes in
 Markdown, and the CMS keeps and publishes them. The CMS runs as a Cloudflare Worker.
 
-wcontent is open source under the MIT license. A developer can host a copy on their own
+The name comes from daluang, the bark paper of old Sundanese manuscripts. Write the name
+as "Daluang" in text, and as `daluang` in code, package names, and Worker names.
+
+Daluang is open source under the MIT license. A developer can host a copy on their own
 Cloudflare account in three steps: set the environment, fork the repository, and deploy.
 The documentation site in `apps/docs` is the guide for these steps.
 
@@ -38,17 +41,17 @@ A pnpm workspace. The shared tools (Biome, Prettier, lefthook, commitlint,
 release-please) are at the root. A version that more than one workspace uses comes from
 the `catalog` in `pnpm-workspace.yaml`.
 
-- `apps/cms` (`@wcontent/cms`): the CMS. Astro pages, React islands, and endpoints. It
+- `apps/cms` (`@daluang/cms`): the CMS. Astro pages, React islands, and endpoints. It
   deploys as a Cloudflare Worker. `wrangler.jsonc` has its config.
-- `apps/docs` (`@wcontent/docs`): the documentation site on Vocs 2. It tells a developer
-  how to host wcontent. Its pages are the Markdown files in `src/pages/`. The build is
+- `apps/docs` (`@daluang/docs`): the documentation site on Vocs 2. It tells a developer
+  how to host Daluang. Its pages are the Markdown files in `src/pages/`. The build is
   static HTML in `dist/public`, which deploys as Cloudflare static assets.
-- `packages/ui` (`@wcontent/ui`): the UI primitives on Base UI and the Tailwind CSS 4
+- `packages/ui` (`@daluang/ui`): the UI primitives on Base UI and the Tailwind CSS 4
   theme, with the font tokens. Each app loads the font files.
-- `packages/tsconfig` (`@wcontent/tsconfig`): the TypeScript base that each workspace
+- `packages/tsconfig` (`@daluang/tsconfig`): the TypeScript base that each workspace
   extends.
 
-To use a workspace package, write `"@wcontent/<name>": "workspace:*"` in the
+To use a workspace package, write `"@daluang/<name>": "workspace:*"` in the
 `package.json` by hand. Then run `pnpm install`. `pnpm add` puts a package in the
 `catalog`, which is for versions.
 
@@ -110,8 +113,8 @@ own words and its own rules: for example, the editor, the notes, or the media.
 3. **Packages are source-only.** `exports` points at `.ts` and `.tsx` files, and Vite
    compiles them with the app. A package has no build step.
 4. **A package does not import an app.** Across workspaces, import by package name.
-5. **Dependencies go in one direction.** `@wcontent/tsconfig` and `@wcontent/ui` import
-   no domain package. A domain package can import `@wcontent/ui` and another domain
+5. **Dependencies go in one direction.** `@daluang/tsconfig` and `@daluang/ui` import
+   no domain package. A domain package can import `@daluang/ui` and another domain
    package. Do not make a cycle.
 6. **The app is thin.** `apps/cms` holds pages, islands, and wiring. Logic that handles
    data goes in the package of its domain.
@@ -216,7 +219,7 @@ Apply each rule to a file that you write or change.
 ### UI primitives
 
 - A primitive is in `packages/ui/src/components`. Import it as
-  `@wcontent/ui/components/<name>`.
+  `@daluang/ui/components/<name>`.
 - `packages/ui/components.json` is the one config of the shadcn CLI. `apps/cms` has no
   `components.json` and no file from the registry.
 - To add a primitive, run `pnpm dlx shadcn@latest add <name> -c packages/ui` from the root.
@@ -225,8 +228,8 @@ Apply each rule to a file that you write or change.
 - A file from the registry keeps the classes of the registry, also an arbitrary value.
   The look of `base-maia` is the look of the product.
 - Only `packages/ui` imports `@base-ui/react`. The app uses the primitive from
-  `@wcontent/ui` and changes its look with `className`.
-- If `@wcontent/ui` has no such primitive, add one there. Do not write it in the app.
+  `@daluang/ui` and changes its look with `className`.
+- If `@daluang/ui` has no such primitive, add one there. Do not write it in the app.
 - `render` replaces the `asChild` prop of Radix UI. Do not install or import Radix UI.
 
 ### Styles

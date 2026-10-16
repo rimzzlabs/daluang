@@ -1,6 +1,6 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
-	"name": "wcontent-docs",
+	"name": "daluang-docs",
 	"compatibility_date": "2026-10-01",
 	// The site is static. `vocs build` writes the HTML files into this folder.
 	"assets": {

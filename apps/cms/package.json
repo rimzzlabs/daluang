@@ -1,5 +1,5 @@
 {
-	"name": "@wcontent/cms",
+	"name": "@daluang/cms",
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
@@ -18,7 +18,7 @@
 		"@hugeicons/core-free-icons": "catalog:",
 		"@hugeicons/react": "catalog:",
 		"@tailwindcss/vite": "catalog:",
-		"@wcontent/ui": "workspace:*",
+		"@daluang/ui": "workspace:*",
 		"astro": "catalog:",
 		"react": "catalog:",
 		"react-dom": "catalog:",
@@ -28,7 +28,7 @@
 		"@astrojs/check": "catalog:",
 		"@types/react": "catalog:",
 		"@types/react-dom": "catalog:",
-		"@wcontent/tsconfig": "workspace:*",
+		"@daluang/tsconfig": "workspace:*",
 		"oxc-transform-react": "catalog:",
 		"typescript": "catalog:",
 		"wrangler": "catalog:"

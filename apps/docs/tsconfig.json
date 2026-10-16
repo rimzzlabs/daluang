@@ -1,4 +1,4 @@
 {
-	"extends": "@wcontent/tsconfig/base.json",
+	"extends": "@daluang/tsconfig/base.json",
 	"include": ["vocs.config.ts"]
 }

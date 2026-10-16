@@ -1,6 +1,6 @@
+import { Button } from "@daluang/ui/components/button";
 import { Moon02Icon, Sun03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@wcontent/ui/components/button";
 import { useSyncExternalStore } from "react";
 import { readTheme, subscribeTheme, type Theme, writeTheme } from "@/lib/theme";
 

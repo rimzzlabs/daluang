@@ -1,5 +1,5 @@
 /*
- * The theme of wcontent. Each app imports this file from its global stylesheet.
+ * The theme of Daluang. Each app imports this file from its global stylesheet.
  * The tokens have the names of the shadcn registry, so a registry component reads them.
  */
 @import "tailwindcss";

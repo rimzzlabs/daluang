@@ -1,5 +1,5 @@
 {
-	"name": "wcontent",
+	"name": "daluang",
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
@@ -9,12 +9,12 @@
 		"node": ">=24"
 	},
 	"scripts": {
-		"dev": "pnpm --filter @wcontent/cms dev",
-		"build": "pnpm --filter @wcontent/cms build",
-		"preview": "pnpm --filter @wcontent/cms preview",
-		"docs:dev": "pnpm --filter @wcontent/docs dev",
-		"docs:build": "pnpm --filter @wcontent/docs build",
-		"docs:preview": "pnpm --filter @wcontent/docs preview",
+		"dev": "pnpm --filter @daluang/cms dev",
+		"build": "pnpm --filter @daluang/cms build",
+		"preview": "pnpm --filter @daluang/cms preview",
+		"docs:dev": "pnpm --filter @daluang/docs dev",
+		"docs:build": "pnpm --filter @daluang/docs build",
+		"docs:preview": "pnpm --filter @daluang/docs preview",
 		"typecheck": "pnpm --recursive --if-present typecheck",
 		"check": "biome check . && prettier --check \"**/*.{md,yml,yaml}\"",
 		"fix": "biome check --write . && prettier --write \"**/*.{md,yml,yaml}\"",
@@ -26,7 +26,7 @@
 		"@commitlint/cli": "catalog:",
 		"@commitlint/config-conventional": "catalog:",
 		"@commitlint/prompt-cli": "catalog:",
-		"@wcontent/tsconfig": "workspace:*",
+		"@daluang/tsconfig": "workspace:*",
 		"lefthook": "catalog:",
 		"prettier": "catalog:",
 		"typescript": "catalog:"
