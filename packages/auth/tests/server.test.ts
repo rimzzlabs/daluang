@@ -102,6 +102,16 @@ describe("createAuth", () => {
 		await expect(response.json()).resolves.toBeNull();
 	});
 
+	it("sends an error of Better Auth to the sign-in page", async () => {
+		const response = await makeAuth().handler(
+			new Request("http://localhost:4321/api/auth/error?error=state_mismatch"),
+		);
+		expect(response.status).toBe(302);
+		expect(response.headers.get("Location")).toBe(
+			"/sign-in?error=state_mismatch",
+		);
+	});
+
 	it("encrypts the GitHub tokens in D1", () => {
 		expect(makeAuth().options.account?.encryptOAuthTokens).toBe(true);
 	});

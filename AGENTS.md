@@ -226,6 +226,8 @@ own words and its own rules: for example, the editor, the notes, or the media.
 - Two database hooks of `packages/auth/src/server.ts` check the list: one when the user
   row is made, and one at each new session. A refused sign-in returns to
   `/sign-in?error=github_user_not_allowed`.
+- Each error of Better Auth opens `/sign-in?error=<code>` (`onAPIError.errorURL`).
+  `signInError` of `packages/auth/src/sign-in-error.ts` gives the message of each code.
 - `githubLogin` comes from the GitHub profile, and the allow list trusts it. Better Auth
   drops a field with `input: false` from a profile, so the field takes input.
 - **Only the endpoints of `OPEN_AUTH_PATHS` answer.** The plugin `openPathsOnly` of

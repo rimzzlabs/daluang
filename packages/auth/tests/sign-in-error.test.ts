@@ -13,6 +13,20 @@ describe("signInError", () => {
 		expect(error?.code).toBeNull();
 	});
 
+	it.each(["state_mismatch", "state_not_found", "please_restart_the_process"])(
+		"tells the person that the sign-in expired for %s",
+		(code) => {
+			expect(signInError(code)).toEqual({
+				message: "The sign-in expired. Try again.",
+				code: null,
+			});
+		},
+	);
+
+	it("tells the person to add an email address on GitHub", () => {
+		expect(signInError("email_not_found")?.message).toContain("email address");
+	});
+
 	it("gives a general message and the code for a code with no message", () => {
 		expect(signInError("MISSING_FIELD")).toEqual({
 			message: "The sign-in with GitHub failed. Try again.",

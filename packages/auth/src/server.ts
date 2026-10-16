@@ -2,7 +2,7 @@ import { type BetterAuthPlugin, betterAuth } from "better-auth";
 import { APIError } from "better-auth/api";
 import { isAllowedGitHubUser, parseAllowList } from "./allow-list";
 import type { AuthEnv } from "./env";
-import { isOpenAuthPath } from "./paths";
+import { isOpenAuthPath, SIGN_IN_PATH } from "./paths";
 import { NOT_ALLOWED_ERROR_CODE } from "./sign-in-error";
 
 /** The GitHub username of a user row. `findUserById` types the row without `githubLogin`. */
@@ -69,6 +69,9 @@ export function createAuth(env: AuthEnv) {
 			// D1 keeps the GitHub tokens of each account. The secret encrypts them.
 			encryptOAuthTokens: true,
 		},
+		// A failed sign-in opens the sign-in page with `?error=<code>`, and the page shows the
+		// message of the code. Better Auth then shows no error page of its own.
+		onAPIError: { errorURL: SIGN_IN_PATH },
 		socialProviders: {
 			github: {
 				clientId: env.GITHUB_CLIENT_ID,
