@@ -1,11 +1,12 @@
 name: Checks
 
 # The gates that a change passes before it reaches `main`: lint, format, type
-# check, and build. Nothing in this file deploys.
+# check, tests, and build. Nothing in this file deploys.
+#
+# Pull requests only. A squash merge puts the tested tree on `main`, so a run
+# on the push to `main` repeats this run. On `main`, only `release.yml` runs.
 on:
   pull_request:
-    branches: [main]
-  push:
     branches: [main]
 
 permissions:
@@ -13,21 +14,32 @@ permissions:
 
 # A new push to the same pull request replaces the run in progress.
 concurrency:
-  group: checks-${{ github.event.pull_request.number || github.sha }}
+  group: checks-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 env:
   # Git hooks belong to a working copy, not to a runner.
   LEFTHOOK: 0
+  # actions/checkout runs `git init`. With no default branch set, Git prints a
+  # hint of 13 lines in each job.
+  GIT_CONFIG_COUNT: 1
+  GIT_CONFIG_KEY_0: init.defaultBranch
+  GIT_CONFIG_VALUE_0: main
 
+# A pinned image, not `ubuntu-latest`: a new image arrives in a pull request
+# that changes this line, not in a run that nobody changed.
 jobs:
   lint:
     name: Lint and format
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
+      # After a change to the lockfile, this job saves the new node_modules for
+      # the next push to the pull request.
       - uses: ./.github/actions/install
+        with:
+          save: "true"
 
       # Biome for code, Prettier for Markdown and YAML. The same tools run in
       # the pre-commit hook on the staged files.
@@ -37,14 +49,13 @@ jobs:
       # and release-please reads that subject. The title is text that a
       # contributor wrote, so it goes through the environment.
       - name: Lint the pull request title
-        if: ${{ github.event_name == 'pull_request' }}
         env:
           TITLE: ${{ github.event.pull_request.title }}
         run: echo "$TITLE" | pnpm exec commitlint
 
   typecheck:
     name: Type check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
@@ -55,19 +66,20 @@ jobs:
 
   test:
     name: Unit tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
       - uses: ./.github/actions/install
 
       # All tests, with coverage. A number below its threshold in vitest.config.ts
-      # fails the job, so code with no test cannot pass.
-      - run: pnpm test
+      # fails the job, so code with no test cannot pass. The dot reporter prints
+      # one dot for each test, and the full report of each failure.
+      - run: pnpm test --reporter=dot
 
   build:
     name: Build the CMS
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
@@ -77,7 +89,7 @@ jobs:
 
   web:
     name: Build the landing page and the docs site
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 

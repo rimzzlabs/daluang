@@ -1,0 +1,44 @@
+name: Cache
+
+# Saves node_modules in the cache of `main`. A pull request reads the cache of
+# its own branch and of `main`, but not the cache of another pull request. So
+# after a change to the dependencies reaches `main`, this workflow installs them
+# once, and each new pull request starts with a hit. It runs no check.
+on:
+  push:
+    branches: [main]
+    paths:
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - package.json
+      - .github/actions/install/action.yml
+      - .github/workflows/cache.yml
+  # GitHub removes a cache that nobody reads for 7 days. Run this workflow from
+  # the Actions tab to save the cache again.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cache
+  cancel-in-progress: true
+
+env:
+  LEFTHOOK: 0
+  # actions/checkout runs `git init`. With no default branch set, Git prints a
+  # hint of 13 lines in each job.
+  GIT_CONFIG_COUNT: 1
+  GIT_CONFIG_KEY_0: init.defaultBranch
+  GIT_CONFIG_VALUE_0: main
+
+jobs:
+  node-modules:
+    name: Save node_modules
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/install
+        with:
+          save: "true"

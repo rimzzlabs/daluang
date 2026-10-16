@@ -1,21 +1,54 @@
 name: Install
 description: >-
-  pnpm from the `packageManager` field, Node.js from .nvmrc, and the pnpm store
-  from a cache keyed on pnpm-lock.yaml.
+  pnpm from the `packageManager` field, Node.js from .nvmrc, and node_modules
+  from a cache keyed on the lockfile. `pnpm install` runs only on a cache miss.
+
+inputs:
+  save:
+    description: >-
+      Save node_modules to the cache after a miss. Set it in one job of a
+      workflow only, so the parallel jobs do not race for the same key.
+    default: "false"
 
 runs:
   using: composite
   steps:
-    # Before setup-node, because `cache: pnpm` asks pnpm for the store path. No
-    # `version` input: the action reads `packageManager` in package.json.
-    - uses: pnpm/action-setup@v6
+    # v6.1.0, not v6: the v6 tag is v6.0.10. That version installs pnpm 11,
+    # and then switches to pnpm 12 with a warning. No `version` input: the
+    # action reads `packageManager` in package.json.
+    - uses: pnpm/action-setup@v6.1.0
 
     - uses: actions/setup-node@v7
       with:
         node-version-file: .nvmrc
-        cache: pnpm
 
-    # `--frozen-lockfile` fails the job when package.json and pnpm-lock.yaml do
-    # not agree.
-    - shell: bash
+    # All of node_modules, not the pnpm store. From the store, each job links
+    # 1069 packages again, and pnpm checks the lockfile against its
+    # supply-chain policies: about 20 s, with a request to the registry for
+    # each entry. The key has the OS and the CPU, because Biome and workerd
+    # install a binary for each platform. The lockfile and the settings in
+    # pnpm-workspace.yaml set the content. package.json sets the pnpm version.
+    - id: cache
+      uses: actions/cache/restore@v6
+      with:
+        path: |
+          node_modules
+          apps/*/node_modules
+          packages/*/node_modules
+        key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml', 'pnpm-workspace.yaml', 'package.json') }}
+
+    # A miss means a new lockfile, so pnpm checks it against the policies.
+    # `--frozen-lockfile` fails the job when package.json and pnpm-lock.yaml
+    # do not agree.
+    - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+      shell: bash
       run: pnpm install --frozen-lockfile
+
+    - if: ${{ inputs.save == 'true' && steps.cache.outputs.cache-hit != 'true' }}
+      uses: actions/cache/save@v6
+      with:
+        path: |
+          node_modules
+          apps/*/node_modules
+          packages/*/node_modules
+        key: ${{ steps.cache.outputs.cache-primary-key }}

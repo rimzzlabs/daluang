@@ -30,13 +30,18 @@ concurrency:
 
 env:
   LEFTHOOK: 0
+  # actions/checkout runs `git init`. With no default branch set, Git prints a hint of 13
+  # lines in each job.
+  GIT_CONFIG_COUNT: 1
+  GIT_CONFIG_KEY_0: init.defaultBranch
+  GIT_CONFIG_VALUE_0: main
   CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
 jobs:
   cms:
     name: Deploy the CMS
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: production
     env:
       CMS_DOMAIN: ${{ vars.CMS_DOMAIN }}
@@ -106,7 +111,7 @@ jobs:
     name: Deploy the landing page and the docs site
     # The landing page is the site of the project. A fork deploys only its CMS.
     if: ${{ github.repository == 'rimzzlabs/daluang' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: production
     steps:
       - name: Check the settings of the repository
