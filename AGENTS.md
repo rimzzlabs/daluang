@@ -62,19 +62,19 @@ To use a workspace package, write `"@daluang/<name>": "workspace:*"` in the
 
 Run each script from the root:
 
-| Command            | Does                                                                              |
-| ------------------ | --------------------------------------------------------------------------------- |
-| `pnpm dev`         | `astro dev` in `apps/cms`                                                         |
-| `pnpm build`       | `astro build` in `apps/cms`                                                       |
-| `pnpm web:dev`     | `astro dev` in `apps/web`, at `http://localhost:4322`                             |
-| `pnpm web:build`   | The docs site, then the landing page with the docs site in `dist/docs`            |
-| `pnpm web:preview` | `wrangler dev` on the build of `apps/web`: the same files and rules as production |
-| `pnpm docs:dev`    | `vocs dev` in `apps/docs`, at `http://localhost:5173/docs/`                       |
-| `pnpm docs:build`  | `vocs build` in `apps/docs`. A dead link fails it.                                |
-| `pnpm typecheck`   | The type check of each workspace                                                  |
-| `pnpm check`       | Biome (lint and format) and Prettier, with no write                               |
-| `pnpm fix`         | Biome and Prettier, with write                                                    |
-| `pnpm commit`      | The commit prompt of commitlint                                                   |
+| Command            | Does                                                                                         |
+| ------------------ | -------------------------------------------------------------------------------------------- |
+| `pnpm dev`         | `astro dev` in `apps/cms`                                                                    |
+| `pnpm build`       | `astro build` in `apps/cms`                                                                  |
+| `pnpm web:dev`     | `vocs dev` and `astro dev` together, with hot reload for both. Open `http://localhost:4322`. |
+| `pnpm web:build`   | The docs site, then the landing page with the docs site in `dist/docs`                       |
+| `pnpm web:preview` | `wrangler dev` on the build of `apps/web`: the same files and rules as production            |
+| `pnpm docs:dev`    | `vocs dev` in `apps/docs` only, at `http://localhost:4323/docs/`                             |
+| `pnpm docs:build`  | `vocs build` in `apps/docs`. A dead link fails it.                                           |
+| `pnpm typecheck`   | The type check of each workspace                                                             |
+| `pnpm check`       | Biome (lint and format) and Prettier, with no write                                          |
+| `pnpm fix`         | Biome and Prettier, with write                                                               |
+| `pnpm commit`      | The commit prompt of commitlint                                                              |
 
 `apps/cms` and `apps/web` each have a `cf:deploy` script, which runs `wrangler deploy`.
 Run it only when the person tells you to. The name is not `deploy`, because `pnpm deploy`
@@ -93,8 +93,11 @@ is a command of pnpm.
 - `apps/web/scripts/copy-docs.ts` copies `apps/docs/dist/public` into
   `apps/web/dist/docs`. Run `pnpm web:build`, which builds the docs site first.
 - A missing page gets the nearest `404.html`: below `/docs`, the 404 page of Vocs.
-- In development, `astro dev` of `apps/web` sends `/docs` to the Vocs dev server. Run
-  `pnpm docs:dev` and `pnpm web:dev` together.
+- In development, `astro dev` of `apps/web` sends `/docs` to the Vocs dev server, also
+  the socket of the hot reload. `pnpm web:dev` starts the two servers.
+- The dev ports are fixed: `apps/cms` 4321, `apps/web` 4322, and `apps/docs` 4323. Vocs
+  takes the next free port when 4323 is in use, and the proxy then fails. If `/docs`
+  fails in development, stop the process on port 4323.
 - Vocs does not add `basePath` to `iconUrl` and `logoUrl`. Write these URLs with `/docs`
   in `apps/docs/vocs.config.ts`.
 - `apps/cms/wrangler.jsonc` has no domain. A developer who hosts Daluang adds their own.

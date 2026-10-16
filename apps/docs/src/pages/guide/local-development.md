@@ -19,18 +19,19 @@ The install also adds the Git hooks.
 
 The CMS runs in workerd, the runtime of Cloudflare Workers.
 
-## Run this site
+## Run this site only
 
 1. Run `pnpm docs:dev`.
-2. Open the URL that the command prints.
+2. Open `http://localhost:4323/docs/`.
 
 ## Run the landing page
 
-1. Run `pnpm docs:dev`.
-2. Run `pnpm web:dev` in a second terminal.
-3. Open `http://localhost:4322`.
+1. Run `pnpm web:dev`.
+2. Open `http://localhost:4322`.
 
-The landing page sends each request for `/docs` to the dev server of this site.
+The command starts the landing page and this site. The landing page sends each request
+for `/docs` to the dev server of this site. A change to a page of either site shows at
+once.
 
 ## Check a change
 

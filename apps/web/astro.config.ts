@@ -6,7 +6,8 @@ import { defineConfig, fontProviders } from "astro/config";
 // copies the docs site into `dist/docs`, and one Worker serves the two.
 export default defineConfig({
 	site: "https://daluang.rimzzlabs.com",
-	// `apps/cms` uses the default port, 4321.
+	// The ports: `apps/cms` 4321, `apps/web` 4322, and `apps/docs` 4323. Vocs takes the next
+	// free port when 4323 is in use, and the proxy below then fails.
 	server: { port: 4322 },
 	// The same rule as `html_handling: "drop-trailing-slash"` in `wrangler.jsonc`.
 	trailingSlash: "never",
@@ -42,14 +43,16 @@ export default defineConfig({
 	vite: {
 		plugins: [tailwindcss()],
 		server: {
-			// In development, `pnpm docs:dev` serves the docs site. This proxy sends `/docs`
-			// to it, so that a link from the landing page to the docs works.
+			// In development, `vocs dev` serves the docs site. `pnpm web:dev` starts it with
+			// this server. The proxy sends `/docs` to it, and `ws` also sends the hot reload
+			// socket of the docs pages.
 			// The proxy runs before the router of Astro, so `trailingSlash` has no effect
 			// here. The Vocs dev server answers `/docs/`, not `/docs`. In production, the
 			// Worker serves `/docs` itself.
 			proxy: {
 				"/docs": {
-					target: "http://localhost:5173",
+					target: "http://localhost:4323",
+					ws: true,
 					rewrite: (path) => (path === "/docs" ? "/docs/" : path),
 				},
 			},
