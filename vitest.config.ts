@@ -38,6 +38,11 @@ export default defineConfig({
 				"packages/settings/src/astro/route.ts",
 				"packages/settings/src/astro/middleware.ts",
 				"packages/settings/src/astro/integration.ts",
+				// The Astro layer of the API tokens package is wiring also. The route gives the
+				// request to `handleTokensRequest`, which has tests.
+				"packages/api-tokens/src/astro/env.ts",
+				"packages/api-tokens/src/astro/route.ts",
+				"packages/api-tokens/src/astro/integration.ts",
 				// The security layer of the CMS app is wiring. The middleware needs
 				// `astro:middleware` to load, and the integration is one call of the setup hook.
 				// They give each response to `withSecurityHeaders`, which has tests.

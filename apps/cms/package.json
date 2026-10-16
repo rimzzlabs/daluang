@@ -17,6 +17,7 @@
 	"dependencies": {
 		"@astrojs/cloudflare": "catalog:",
 		"@astrojs/react": "catalog:",
+		"@daluang/api-tokens": "workspace:*",
 		"@daluang/auth": "workspace:*",
 		"@daluang/settings": "workspace:*",
 		"@daluang/ui": "workspace:*",

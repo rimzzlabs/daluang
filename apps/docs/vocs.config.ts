@@ -25,6 +25,7 @@ export default defineConfig({
 				{ text: "Local development", link: "/guide/local-development" },
 				{ text: "Deploy", link: "/guide/deploy" },
 				{ text: "First sign-in", link: "/guide/first-sign-in" },
+				{ text: "API tokens", link: "/guide/api-tokens" },
 			],
 		},
 	],

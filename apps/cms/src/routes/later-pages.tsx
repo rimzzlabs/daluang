@@ -11,15 +11,6 @@ export function MediaPage() {
 	);
 }
 
-export function ApiTokensPage() {
-	return (
-		<LaterPage
-			title="API tokens"
-			description="A token lets your site read the published notes through the API of Daluang."
-		/>
-	);
-}
-
 export function WebhooksPage() {
 	return (
 		<LaterPage
