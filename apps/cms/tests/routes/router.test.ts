@@ -28,6 +28,7 @@ describe("createAppRouter", () => {
 				"/settings/webhooks",
 				"/settings/site",
 				"/settings/languages",
+				"/settings/fields",
 			]),
 		);
 	});

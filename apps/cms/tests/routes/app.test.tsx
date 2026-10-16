@@ -90,7 +90,7 @@ describe("App", () => {
 			vi.fn(() =>
 				Promise.resolve(
 					Response.json({
-						settings: { site, languages: SETTINGS.languages },
+						settings: { site, languages: SETTINGS.languages, fields: null },
 					}),
 				),
 			),

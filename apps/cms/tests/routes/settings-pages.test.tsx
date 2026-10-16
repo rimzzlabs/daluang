@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { LanguagesPage, SitePage } from "@/routes/settings-pages";
+import { FieldsPage, LanguagesPage, SitePage } from "@/routes/settings-pages";
 import { settingsStore } from "../settings";
 
 describe("settings pages", () => {
@@ -22,5 +22,11 @@ describe("settings pages", () => {
 				.getByRole("radio", { name: "English" })
 				.getAttribute("aria-checked"),
 		).toBe("true");
+	});
+
+	it("shows the core fields on the Fields page", () => {
+		render(<FieldsPage settings={settingsStore()} />);
+		expect(screen.getByRole("heading", { name: "Fields" })).toBeTruthy();
+		expect(screen.getByText("publishedAt")).toBeTruthy();
 	});
 });

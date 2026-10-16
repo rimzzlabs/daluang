@@ -5,7 +5,7 @@ import { type AppPagePath, findAppPage } from "@/lib/app-pages";
 import { ApiTokensPage } from "./api-tokens-page";
 import { MediaPage, WebhooksPage } from "./later-pages";
 import { NotesPage } from "./notes-page";
-import { LanguagesPage, SitePage } from "./settings-pages";
+import { FieldsPage, LanguagesPage, SitePage } from "./settings-pages";
 
 /** What each page gets: the server and the router give the same values. */
 export interface AppPageProps {
@@ -23,6 +23,7 @@ export const PAGE_COMPONENTS: Record<
 	"/settings/webhooks": WebhooksPage,
 	"/settings/site": SitePage,
 	"/settings/languages": LanguagesPage,
+	"/settings/fields": FieldsPage,
 };
 
 export interface PageContentProps extends AppPageProps {

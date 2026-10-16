@@ -7,6 +7,7 @@ import {
 export const SETTINGS = {
 	site: { name: "rimzzlabs", url: "https://rimzzlabs.com" },
 	languages: { languages: ["en", "id"], defaultLanguage: "en" },
+	fields: [],
 };
 
 /** A new store with `SETTINGS`, so a write in one test does not reach the next one. */

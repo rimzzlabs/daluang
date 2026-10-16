@@ -8,6 +8,7 @@ export const APP_PAGES = [
 	{ path: "/settings/webhooks", title: "Webhooks" },
 	{ path: "/settings/site", title: "Site" },
 	{ path: "/settings/languages", title: "Languages" },
+	{ path: "/settings/fields", title: "Fields" },
 ] as const;
 
 export type AppPagePath = (typeof APP_PAGES)[number]["path"];

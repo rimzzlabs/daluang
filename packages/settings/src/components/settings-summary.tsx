@@ -3,7 +3,7 @@ import { languageLabel } from "../language-label";
 import type { CmsSettings } from "../settings";
 
 export interface SettingsSummaryProps {
-	settings: CmsSettings;
+	settings: Pick<CmsSettings, "site" | "languages">;
 }
 
 /** The answers of the onboarding, as a list of terms and values. */

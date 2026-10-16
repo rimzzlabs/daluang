@@ -1,3 +1,4 @@
+import { FieldsSettings } from "@daluang/settings/components/fields-settings";
 import { LanguagesSettings } from "@daluang/settings/components/languages-settings";
 import { SiteSettings } from "@daluang/settings/components/site-settings";
 import type { AppPageProps } from "./page-content";
@@ -8,4 +9,8 @@ export function SitePage(props: AppPageProps) {
 
 export function LanguagesPage(props: AppPageProps) {
 	return <LanguagesSettings store={props.settings} />;
+}
+
+export function FieldsPage(props: AppPageProps) {
+	return <FieldsSettings store={props.settings} />;
 }

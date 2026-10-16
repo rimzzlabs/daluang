@@ -15,12 +15,13 @@ export const extraValueSchema = z.union([
 	z.array(z.string().max(200)).max(50),
 ]);
 
-function isCoreField(key: string): boolean {
+/** True for the name of a core field: an extra field cannot use it. */
+export function isCoreField(key: string): boolean {
 	return A.some(CORE_FIELDS, (field) => field === key);
 }
 
 /** True when the name of an extra field has the form of a frontmatter key. */
-function isFieldName(key: string): boolean {
+export function isFieldName(key: string): boolean {
 	return EXTRA_KEY_PATTERN.test(key);
 }
 

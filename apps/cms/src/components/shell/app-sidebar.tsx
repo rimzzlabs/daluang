@@ -20,6 +20,7 @@ import {
 	GlobeSimpleIcon,
 	ImagesIcon,
 	KeyIcon,
+	ListDashesIcon,
 	NotePencilIcon,
 	TranslateIcon,
 	WebhooksLogoIcon,
@@ -60,6 +61,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 		items: [
 			{ label: "Site", href: "/settings/site", icon: GlobeSimpleIcon },
 			{ label: "Languages", href: "/settings/languages", icon: TranslateIcon },
+			{ label: "Fields", href: "/settings/fields", icon: ListDashesIcon },
 		],
 	},
 ];

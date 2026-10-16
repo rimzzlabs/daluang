@@ -12,6 +12,7 @@ describe("readSettings", () => {
 		await expect(readSettings(db)).resolves.toEqual({
 			site: null,
 			languages: null,
+			fields: null,
 		});
 	});
 
@@ -24,6 +25,7 @@ describe("readSettings", () => {
 		await expect(readSettings(db)).resolves.toEqual({
 			site: null,
 			languages: null,
+			fields: null,
 		});
 		expect(log).toHaveBeenCalledWith(
 			'The setting "site" in D1 is not valid. The CMS asks for it again.',
@@ -39,6 +41,7 @@ describe("readSettings", () => {
 		await expect(readSettings(db)).resolves.toEqual({
 			site: null,
 			languages: null,
+			fields: null,
 		});
 	});
 });
@@ -54,6 +57,7 @@ describe("writeSettings", () => {
 		await expect(readSettings(db)).resolves.toEqual({
 			site: SITE,
 			languages: LANGUAGES,
+			fields: null,
 		});
 	});
 
@@ -70,6 +74,7 @@ describe("writeSettings", () => {
 		await expect(readSettings(db)).resolves.toEqual({
 			site: renamed,
 			languages: LANGUAGES,
+			fields: null,
 		});
 		expect(
 			database
@@ -87,6 +92,7 @@ describe("writeSettings", () => {
 		await expect(readSettings(db)).resolves.toEqual({
 			site: null,
 			languages: null,
+			fields: null,
 		});
 	});
 });
