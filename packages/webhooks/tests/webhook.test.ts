@@ -17,6 +17,12 @@ describe("isWebhookUrl", () => {
 		["an IPv6 address", "https://[::1]/hook"],
 		["a host with no dot", "https://intranet/hook"],
 		["a user name", "https://me:secret@example.com/hook"],
+		["localhost with its last dot", "https://localhost./hook"],
+		["a name below localhost with its last dot", "https://cms.localhost./hook"],
+		["a name of a cloud network", "https://metadata.google.internal/hook"],
+		["a name of mDNS", "https://printer.local/hook"],
+		["a name of a home network", "https://router.home.arpa/hook"],
+		["an address with its last dot", "https://127.0.0.1./hook"],
 		["a value that is not a URL", "deploy hook"],
 	])("refuses %s", (_name, url) => {
 		expect(isWebhookUrl(url)).toBe(false);

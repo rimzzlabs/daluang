@@ -32,5 +32,5 @@ of each webhook.
 The URL of a deploy hook is its secret: each person with the URL can start a build. The
 list of webhooks shows only the host and the last 4 characters of each URL.
 
-The CMS accepts only an `https` URL with the name of a host. It refuses `localhost` and an
-IP address.
+The CMS accepts only an `https` URL with a public host name. It refuses `localhost`, an IP
+address, and a name of a local network, for example `printer.local`.

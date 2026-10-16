@@ -1,4 +1,4 @@
-import { O, pipe, R, S } from "@mobily/ts-belt";
+import { A, O, pipe, R, S } from "@mobily/ts-belt";
 import { z } from "zod";
 
 export const WEBHOOK_NAME_MAX_LENGTH = 60;
@@ -20,10 +20,29 @@ export const WEBHOOKS_API_PATH = "/api/webhooks";
 // A host that is an address, not a name: `127.0.0.1`, `[::1]`. A deploy hook has a name.
 const ADDRESS_HOST = /^(\d{1,3}(\.\d{1,3}){3}|\[[0-9a-f:.]+\])$/i;
 
+// The endings of the names that only a local network resolves.
+const LOCAL_NAME_ENDINGS = [
+	".localhost",
+	".local",
+	".internal",
+	".home.arpa",
+	".lan",
+];
+
+/** True for a host name that the public DNS can resolve: it has a dot and no local ending. */
+function isPublicName(hostname: string): boolean {
+	// `localhost.` with its last dot is the name `localhost`.
+	const name = S.replaceByRe(hostname, /\.+$/, "");
+	if (!S.includes(name, ".") || ADDRESS_HOST.test(name)) return false;
+	return !A.some(LOCAL_NAME_ENDINGS, (ending) => S.endsWith(name, ending));
+}
+
 /**
- * True for a URL that the CMS sends a webhook to: `https`, with the name of a host. The
- * check refuses `localhost`, an address, and a URL with a user name, so a webhook cannot
- * reach the network of the computer that runs the CMS.
+ * True for a URL that the CMS sends a webhook to: `https`, with a public host name and no
+ * user name. The check refuses `localhost`, an IP address, and a name of a local network.
+ * It reads no DNS, so a public name of a local address passes, for example
+ * `127.0.0.1.nip.io`. On Cloudflare, a Worker cannot reach a private network. The check is
+ * for a CMS on another host, for example `astro dev`.
  */
 export function isWebhookUrl(value: string): boolean {
 	return pipe(
@@ -31,13 +50,7 @@ export function isWebhookUrl(value: string): boolean {
 		R.toOption,
 		O.filter((url) => url.protocol === "https:"),
 		O.filter((url) => url.username === "" && url.password === ""),
-		O.filter((url) => !ADDRESS_HOST.test(url.hostname)),
-		O.filter(
-			(url) =>
-				S.includes(url.hostname, ".") &&
-				!S.endsWith(url.hostname, ".localhost") &&
-				url.hostname !== "localhost",
-		),
+		O.filter((url) => isPublicName(url.hostname)),
 		O.isSome,
 	);
 }
