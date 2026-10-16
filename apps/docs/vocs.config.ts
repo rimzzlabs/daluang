@@ -26,6 +26,7 @@ export default defineConfig({
 				{ text: "Deploy", link: "/guide/deploy" },
 				{ text: "First sign-in", link: "/guide/first-sign-in" },
 				{ text: "API tokens", link: "/guide/api-tokens" },
+				{ text: "Webhooks", link: "/guide/webhooks" },
 			],
 		},
 	],

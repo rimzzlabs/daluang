@@ -3,9 +3,10 @@ import { O } from "@mobily/ts-belt";
 import type { ReactElement } from "react";
 import { type AppPagePath, findAppPage } from "@/lib/app-pages";
 import { ApiTokensPage } from "./api-tokens-page";
-import { MediaPage, WebhooksPage } from "./later-pages";
+import { MediaPage } from "./later-pages";
 import { NotesPage } from "./notes-page";
 import { FieldsPage, LanguagesPage, SitePage } from "./settings-pages";
+import { WebhooksPage } from "./webhooks-page";
 
 /** What each page gets: the server and the router give the same values. */
 export interface AppPageProps {
