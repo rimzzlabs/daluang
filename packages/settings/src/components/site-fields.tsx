@@ -76,3 +76,15 @@ export function SiteFields(props: SiteFieldsProps) {
 		</FieldGroup>
 	);
 }
+
+export interface SiteErrorFocus {
+	form: HTMLFormElement;
+	errors: SiteErrors;
+}
+
+/** Moves the focus to the first field with an error, so the writer can correct it at once. */
+export function focusSiteError(focus: SiteErrorFocus) {
+	const name = focus.errors.name === undefined ? "url" : "name";
+	const field = focus.form.elements.namedItem(name);
+	if (field instanceof HTMLInputElement) field.focus();
+}

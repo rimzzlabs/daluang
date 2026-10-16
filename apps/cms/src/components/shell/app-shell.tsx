@@ -1,4 +1,5 @@
 import type { UserMenuProps } from "@daluang/auth/components/user-menu";
+import type { SettingsStore } from "@daluang/settings/settings-store";
 import { SidebarInset, SidebarProvider } from "@daluang/ui/components/sidebar";
 import { TooltipProvider } from "@daluang/ui/components/tooltip";
 import type { ReactNode } from "react";
@@ -16,6 +17,7 @@ export interface AppShellProps {
 	defaultWidth: number;
 	/** `router` inside the app island, `anchor` in the HTML of the server. */
 	linkKind: NavLinkKind;
+	settings: SettingsStore;
 	children?: ReactNode;
 }
 
@@ -31,7 +33,11 @@ export function AppShell(props: AppShellProps) {
 				defaultOpen={props.defaultOpen}
 				defaultWidth={props.defaultWidth}
 			>
-				<AppSidebar pathname={props.pathname} linkKind={props.linkKind} />
+				<AppSidebar
+					pathname={props.pathname}
+					linkKind={props.linkKind}
+					settings={props.settings}
+				/>
 				<SidebarInset>
 					<AppNavbar title={props.title} user={props.user} />
 					<div className="flex flex-1 flex-col">{props.children}</div>

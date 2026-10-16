@@ -1,11 +1,13 @@
 // @vitest-environment jsdom
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { App } from "@/routes/app";
+import { SETTINGS } from "../settings";
 
 const props = {
 	user: { name: "Rizki Citra", githubLogin: "rimzzlabs", image: null },
+	settings: SETTINGS,
 };
 
 function openAt(path: string) {
@@ -79,5 +81,29 @@ describe("App", () => {
 		);
 		expect(wrapper?.style.getPropertyValue("--sidebar-width")).toBe("20rem");
 		localStorage.clear();
+	});
+
+	it("shows a new site name in the sidebar after a save on the Site page", async () => {
+		const site = { name: "Catatan", url: null };
+		vi.stubGlobal(
+			"fetch",
+			vi.fn(() =>
+				Promise.resolve(
+					Response.json({
+						settings: { site, languages: SETTINGS.languages },
+					}),
+				),
+			),
+		);
+		openAt("/settings/site");
+		const name = await screen.findByLabelText("Site name");
+		await userEvent.clear(name);
+		await userEvent.type(name, "Catatan");
+		await userEvent.clear(screen.getByLabelText(/Site address/));
+		await userEvent.click(screen.getByRole("button", { name: "Save" }));
+		expect(
+			await screen.findByRole("link", { name: /Daluang\s*Catatan/ }),
+		).toBeTruthy();
+		vi.unstubAllGlobals();
 	});
 });

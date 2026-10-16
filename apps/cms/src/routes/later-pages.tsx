@@ -28,12 +28,3 @@ export function WebhooksPage() {
 		/>
 	);
 }
-
-export function LanguagesPage() {
-	return (
-		<LaterPage
-			title="Languages"
-			description="The languages that you write in. Each note has one language, and a note can have a translation in each other language."
-		/>
-	);
-}

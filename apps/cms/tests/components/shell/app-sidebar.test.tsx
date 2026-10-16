@@ -1,19 +1,21 @@
 // @vitest-environment jsdom
 import { SidebarProvider } from "@daluang/ui/components/sidebar";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import {
 	AppSidebar,
 	isActivePath,
 	NAV_GROUPS,
 } from "@/components/shell/app-sidebar";
+import { SETTINGS, settingsStore } from "../../settings";
 
-function renderAt(pathname: string) {
+function renderAt(pathname: string, store = settingsStore()) {
 	render(
 		<SidebarProvider>
-			<AppSidebar pathname={pathname} linkKind="anchor" />
+			<AppSidebar pathname={pathname} linkKind="anchor" settings={store} />
 		</SidebarProvider>,
 	);
+	return store;
 }
 
 describe("AppSidebar", () => {
@@ -58,10 +60,29 @@ describe("AppSidebar", () => {
 	it("links the wordmark to the home page and has a rail to resize", () => {
 		renderAt("/");
 		expect(
-			screen.getByRole("link", { name: "Daluang" }).getAttribute("href"),
+			screen.getByRole("link", { name: /^Daluang/ }).getAttribute("href"),
 		).toBe("/");
 		expect(
 			screen.getByRole("separator", { name: "Resize the sidebar" }),
+		).toBeTruthy();
+	});
+});
+
+describe("AppSidebar site name", () => {
+	it("shows the name of the site under the wordmark", () => {
+		renderAt("/");
+		expect(
+			screen.getByRole("link", { name: /Daluang\s*rimzzlabs/ }),
+		).toBeTruthy();
+	});
+
+	it("shows a new name after a write to the store", () => {
+		const store = renderAt("/");
+		act(() => {
+			store.write({ ...SETTINGS, site: { name: "Catatan", url: null } });
+		});
+		expect(
+			screen.getByRole("link", { name: /Daluang\s*Catatan/ }),
 		).toBeTruthy();
 	});
 });

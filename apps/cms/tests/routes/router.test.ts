@@ -2,10 +2,12 @@
 import { createMemoryHistory } from "@tanstack/react-router";
 import { describe, expect, it } from "vitest";
 import { createAppRouter } from "@/routes/router";
+import { settingsStore } from "../settings";
 
 const context = {
 	user: { name: "Rizki Citra", githubLogin: "rimzzlabs", image: null },
 	sidebar: { open: true, width: 16 },
+	settings: settingsStore(),
 };
 
 describe("createAppRouter", () => {
@@ -24,6 +26,7 @@ describe("createAppRouter", () => {
 				"/media",
 				"/settings/api-tokens",
 				"/settings/webhooks",
+				"/settings/site",
 				"/settings/languages",
 			]),
 		);

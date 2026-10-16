@@ -2,6 +2,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { AppShell } from "@/components/shell/app-shell";
+import { settingsStore } from "../../settings";
 
 const user = { name: "Rizki Citra", githubLogin: "rimzzlabs", image: null };
 
@@ -15,6 +16,7 @@ describe("AppShell", () => {
 				defaultOpen
 				defaultWidth={18}
 				linkKind="anchor"
+				settings={settingsStore()}
 			>
 				<p>No notes yet</p>
 			</AppShell>,
@@ -39,6 +41,7 @@ describe("AppShell", () => {
 				defaultOpen={false}
 				defaultWidth={16}
 				linkKind="anchor"
+				settings={settingsStore()}
 			/>,
 		);
 		expect(

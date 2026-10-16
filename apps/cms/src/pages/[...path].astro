@@ -1,6 +1,7 @@
 ---
 import { SIGN_IN_PATH } from "@daluang/auth/paths";
 import { ONBOARDING_PATH } from "@daluang/settings/onboarding";
+import { createSettingsStore } from "@daluang/settings/settings-store";
 import { SIDEBAR_WIDTH_REM } from "@daluang/ui/lib/sidebar-preferences";
 import { AppShell } from "@/components/shell/app-shell";
 import BaseLayout from "@/layouts/base-layout.astro";
@@ -24,6 +25,8 @@ if (findAppPage(pathname) === undefined) Astro.response.status = 404;
 
 const title = pageTitle(pathname);
 const menuUser = { name: user.name, githubLogin: user.githubLogin, image: user.image ?? null };
+// The HTML of the server reads the settings from a store, as the island does.
+const store = createSettingsStore(settings.settings);
 ---
 
 <BaseLayout title={documentTitle(title)}>
@@ -35,10 +38,11 @@ const menuUser = { name: user.name, githubLogin: user.githubLogin, image: user.i
 			defaultOpen={true}
 			defaultWidth={SIDEBAR_WIDTH_REM.default}
 			linkKind="anchor"
+			settings={store}
 		>
-			<PageContent pathname={pathname} />
+			<PageContent pathname={pathname} settings={store} />
 		</AppShell>
 	</div>
 	<!-- `client:only`: the client router reads the browser history when it starts. -->
-	<App client:only="react" user={menuUser} />
+	<App client:only="react" user={menuUser} settings={settings.settings} />
 </BaseLayout>
