@@ -12,7 +12,11 @@ function readServerTheme(): Theme {
 	return "light";
 }
 
-export function ThemeToggle() {
+export interface ThemeToggleProps {
+	className?: string;
+}
+
+export function ThemeToggle(props: ThemeToggleProps) {
 	const theme = useSyncExternalStore(
 		subscribeTheme,
 		readTheme,
@@ -22,6 +26,7 @@ export function ThemeToggle() {
 
 	return (
 		<Button
+			className={props.className}
 			variant="ghost"
 			size="icon"
 			aria-label={`Use the ${next} theme`}
