@@ -3,13 +3,21 @@ import { S } from "@mobily/ts-belt";
 /** The error code that the allow list gives. The OAuth callback puts it in `?error=`. */
 export const NOT_ALLOWED_ERROR_CODE = "github_user_not_allowed";
 
+const EXPIRED_MESSAGE = "The sign-in expired. Try again.";
+
 const MESSAGES: Record<string, string> = {
 	[NOT_ALLOWED_ERROR_CODE]:
 		"This GitHub account has no access to this CMS. Ask the owner to add your username to ALLOWED_GITHUB_USERS.",
 	access_denied:
 		"You cancelled the sign-in on GitHub. Try again when you are ready.",
-	invalid_code: "The sign-in expired. Try again.",
-	state_mismatch: "The sign-in expired. Try again.",
+	email_not_found:
+		"GitHub gave no email address for this account. Add a verified email address on GitHub, then try again.",
+	invalid_code: EXPIRED_MESSAGE,
+	no_code: EXPIRED_MESSAGE,
+	please_restart_the_process: EXPIRED_MESSAGE,
+	state_mismatch: EXPIRED_MESSAGE,
+	state_not_found: EXPIRED_MESSAGE,
+	state_security_mismatch: EXPIRED_MESSAGE,
 };
 
 const FALLBACK_MESSAGE = "The sign-in with GitHub failed. Try again.";
