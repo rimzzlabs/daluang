@@ -72,6 +72,16 @@ export function createAuth(env: AuthEnv) {
 		// A failed sign-in opens the sign-in page with `?error=<code>`, and the page shows the
 		// message of the code. Better Auth then shows no error page of its own.
 		onAPIError: { errorURL: SIGN_IN_PATH },
+		// Better Auth turns the limit on only when `NODE_ENV` is `production`, and a Worker
+		// has no `NODE_ENV`. The sign-in allows 3 requests in 10 seconds from one address.
+		rateLimit: { enabled: true },
+		advanced: {
+			ipAddress: {
+				// Cloudflare sets `CF-Connecting-IP` to the address of the client. A client can
+				// set `X-Forwarded-For`, the default header of Better Auth.
+				ipAddressHeaders: ["cf-connecting-ip"],
+			},
+		},
 		socialProviders: {
 			github: {
 				clientId: env.GITHUB_CLIENT_ID,

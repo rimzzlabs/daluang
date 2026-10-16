@@ -240,6 +240,11 @@ own words and its own rules: for example, the editor, the notes, or the media.
   writes a user or gives the GitHub access token.
 - D1 keeps the GitHub tokens of an account encrypted with `BETTER_AUTH_SECRET`
   (`encryptOAuthTokens`).
+- **The rate limit of Better Auth is on** (`rateLimit.enabled`). Better Auth turns it on
+  only when `NODE_ENV` is `production`, and a Worker has no `NODE_ENV`. The sign-in allows
+  3 requests in 10 seconds from one address. The count is in the memory of each isolate.
+- Better Auth reads the address of the client from `CF-Connecting-IP`. Cloudflare sets
+  it, and a client cannot. Do not add `X-Forwarded-For`: a client can set it.
 - A session that exists stays valid after its user leaves the list, until it expires.
   To end it now, delete its row from the `session` table.
 - The guard (`packages/auth/src/astro/middleware.ts`) needs a session for each page and
