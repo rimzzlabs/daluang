@@ -10,12 +10,3 @@ export function MediaPage() {
 		/>
 	);
 }
-
-export function WebhooksPage() {
-	return (
-		<LaterPage
-			title="Webhooks"
-			description="A webhook tells your site to rebuild when you publish a note. Each delivery shows here with its status."
-		/>
-	);
-}

@@ -71,6 +71,9 @@ the `catalog` in `pnpm-workspace.yaml`.
 - `packages/api-tokens` (`@daluang/api-tokens`): the API tokens that let a site read the
   published notes. Make, list, revoke, and check a token, the endpoint `/api/tokens`, and
   the page of the tokens. See "API tokens".
+- `packages/webhooks` (`@daluang/webhooks`): the webhooks that tell a site to rebuild,
+  their deliveries, the endpoint `/api/webhooks`, and the page of the webhooks. See
+  "Webhooks".
 - `packages/settings` (`@daluang/settings`): the settings of a CMS (the site and the
   languages), their store in D1, the endpoint `/api/settings`, the onboarding of the first
   sign-in, and the Astro integration (`src/astro/`). See "Settings and onboarding".
@@ -332,6 +335,22 @@ own words and its own rules: for example, the editor, the notes, or the media.
   minute, so a site build that reads many notes writes D1 one time.
 - The page reads the tokens from the server in an effect, the only effect of the page:
   the server is an external system. The HTML of the server shows the loading state.
+
+## Webhooks
+
+- A webhook is a URL that gets a POST with `{ "event", "sentAt" }`, for example the
+  deploy hook of a site on Cloudflare Pages. The only event now is `test`, from the button
+  "Send a test". The publish of a note comes with the notes.
+- **The URL of a deploy hook is its secret.** The list shows only its host and its last 4
+  characters (`urlHint`). Only a delivery reads the URL from D1.
+- `isWebhookUrl` accepts only `https` with the name of a host. It refuses `localhost`, an
+  IP address, and a user name. A delivery does not follow a redirect, and it stops after
+  10 seconds.
+- A delivery is `delivered` for a status of 2xx, and `failed` for another status or for
+  no answer. D1 keeps the 20 newest deliveries of each webhook
+  (`apps/cms/migrations/0004_webhooks.sql`), and the list shows 5.
+- `sendWebhook` calls `fetch` with no `this`, in an async function. Workers refuses a call
+  of `fetch` as the method of another object ("Illegal invocation").
 
 ## Menus
 

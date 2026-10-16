@@ -20,6 +20,7 @@
 		"@daluang/api-tokens": "workspace:*",
 		"@daluang/auth": "workspace:*",
 		"@daluang/settings": "workspace:*",
+		"@daluang/webhooks": "workspace:*",
 		"@daluang/ui": "workspace:*",
 		"@mobily/ts-belt": "catalog:",
 		"@phosphor-icons/react": "catalog:",
