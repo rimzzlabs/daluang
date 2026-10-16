@@ -53,6 +53,18 @@ jobs:
       # `tsc` in each package, and `astro check` in `apps/cms`.
       - run: pnpm typecheck
 
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/install
+
+      # All tests, with coverage. A number below its threshold in vitest.config.ts
+      # fails the job, so code with no test cannot pass.
+      - run: pnpm test
+
   build:
     name: Build the CMS
     runs-on: ubuntu-latest

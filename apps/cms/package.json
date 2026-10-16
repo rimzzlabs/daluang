@@ -30,10 +30,16 @@
 		"@astrojs/check": "catalog:",
 		"@cloudflare/workers-types": "catalog:",
 		"@daluang/tsconfig": "workspace:*",
+		"@testing-library/dom": "catalog:",
+		"@testing-library/react": "catalog:",
+		"@testing-library/user-event": "catalog:",
+		"@types/node": "catalog:",
 		"@types/react": "catalog:",
 		"@types/react-dom": "catalog:",
+		"jsdom": "catalog:",
 		"oxc-transform-react": "catalog:",
 		"typescript": "catalog:",
+		"vitest": "catalog:",
 		"wrangler": "catalog:"
 	}
 }

@@ -20,6 +20,8 @@
 		"docs:build": "pnpm --filter @daluang/docs build",
 		"docs:preview": "pnpm --filter @daluang/docs preview",
 		"typecheck": "pnpm --recursive --if-present typecheck",
+		"test": "vitest run --coverage",
+		"test:watch": "vitest",
 		"check": "biome check . && prettier --check \"**/*.{md,yml,yaml}\"",
 		"fix": "biome check --write . && prettier --write \"**/*.{md,yml,yaml}\"",
 		"prepare": "lefthook install",
@@ -31,8 +33,10 @@
 		"@commitlint/config-conventional": "catalog:",
 		"@commitlint/prompt-cli": "catalog:",
 		"@daluang/tsconfig": "workspace:*",
+		"@vitest/coverage-v8": "catalog:",
 		"lefthook": "catalog:",
 		"prettier": "catalog:",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"vitest": "catalog:"
 	}
 }

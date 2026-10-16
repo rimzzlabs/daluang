@@ -27,6 +27,10 @@ commit-msg:
       run: pnpm exec commitlint --edit {1}
 
 pre-push:
+  parallel: true
   jobs:
     - name: typecheck
       run: pnpm typecheck
+
+    - name: test
+      run: pnpm test

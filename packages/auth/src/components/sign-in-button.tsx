@@ -2,8 +2,7 @@ import { Button } from "@daluang/ui/components/button";
 import { pipe, R } from "@mobily/ts-belt";
 import { GithubLogoIcon } from "@phosphor-icons/react";
 import { useState } from "react";
-import { authClient } from "../client";
-import { SIGN_IN_PATH } from "../paths";
+import { startGitHubSignIn } from "../client";
 
 export interface SignInButtonProps {
 	/** The path to open after the sign-in. Give it a value from `safeNext`. */
@@ -22,13 +21,7 @@ export function SignInButton(props: SignInButtonProps) {
 
 	async function signIn() {
 		setState({ status: "pending" });
-		const result = await R.fromPromise(
-			authClient.signIn.social({
-				provider: "github",
-				callbackURL: props.next,
-				errorCallbackURL: SIGN_IN_PATH,
-			}),
-		);
+		const result = await R.fromPromise(startGitHubSignIn(props.next));
 		// On success the browser leaves for GitHub, so only a failure changes the state.
 		const failed = pipe(
 			result,

@@ -55,6 +55,7 @@ once.
 | `pnpm check`      | Biome (lint and format) and Prettier, with no write  |
 | `pnpm fix`        | Biome and Prettier, with write                       |
 | `pnpm typecheck`  | The type check of each workspace                     |
+| `pnpm test`       | The unit tests, with coverage                        |
 | `pnpm build`      | The build of the CMS                                 |
 | `pnpm web:build`  | The build of this site, then of the landing page     |
 | `pnpm docs:build` | The build of this site. A dead link fails the build. |

@@ -15,8 +15,7 @@ import {
 } from "@daluang/ui/components/dropdown-menu";
 import { A, pipe, S } from "@mobily/ts-belt";
 import { SignOutIcon } from "@phosphor-icons/react";
-import { authClient } from "../client";
-import { SIGN_IN_PATH } from "../paths";
+import { signOut } from "../client";
 
 export interface UserMenuProps {
 	name: string;
@@ -34,12 +33,6 @@ function initials(name: string): string {
 		A.map(S.toUpperCase),
 		A.join(""),
 	);
-}
-
-function signOut() {
-	authClient.signOut({
-		fetchOptions: { onSuccess: () => window.location.assign(SIGN_IN_PATH) },
-	});
 }
 
 /** The avatar of the signed-in person, with a menu to sign out. */

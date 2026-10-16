@@ -1,12 +1,9 @@
 import { z } from "zod";
 
+// Better Auth finds a D1 binding by these three methods. The schema checks the same ones.
 function isD1Database(value: unknown): value is D1Database {
-	return (
-		typeof value === "object" &&
-		value !== null &&
-		"prepare" in value &&
-		"batch" in value
-	);
+	if (typeof value !== "object" || value === null) return false;
+	return "prepare" in value && "batch" in value && "exec" in value;
 }
 
 /** The variables and the binding that the auth domain reads. `.dev.vars.example` lists each one. */

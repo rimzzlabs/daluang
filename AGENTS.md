@@ -79,6 +79,7 @@ Run each script from the root:
 | `pnpm check`            | Biome (lint and format) and Prettier, with no write                                          |
 | `pnpm fix`              | Biome and Prettier, with write                                                               |
 | `pnpm commit`           | The commit prompt of commitlint                                                              |
+| `pnpm test`             | The unit tests, with coverage. A number below its threshold fails it.                        |
 | `pnpm db:migrate:local` | Apply `apps/cms/migrations` to the local D1 database                                         |
 
 `apps/cms` and `apps/web` each have a `cf:deploy` script, which runs `wrangler deploy`.
@@ -340,6 +341,32 @@ Apply each rule to a file that you write or change.
 - `font-sans` is Inter, `font-serif` is Lora, and `font-mono` is JetBrains Mono. The body
   text of a note uses `font-serif`.
 
+## Tests
+
+- Each source file of `apps/*/src` and `packages/*/src` has a unit test, with the
+  exception of `packages/ui`. A change to code comes with its test, in the same commit.
+- `packages/ui` has no tests. Its primitives come from the shadcn registry.
+- Each workspace keeps its tests in `tests/`, next to `src/`, with the same structure as
+  `src/`. The test of `src/guard.ts` is `tests/guard.test.ts`.
+- `pnpm test` runs Vitest with coverage. Each source file counts, also a file that no test
+  imports. The totals must reach 90% statements, functions, and lines, and 80% branches.
+  Each file must reach 80% statements, functions, and lines, and 70% branches.
+- Do not lower a threshold. `vitest.config.ts` lists each file that coverage does not
+  count, with the reason. Add a file to the list only when it is wiring with no logic: it
+  connects a framework to functions that have tests, and it has no branch.
+- If a wiring file gets logic, move the logic into a function in its own file and test
+  that function. `decideAccess` of `packages/auth/src/guard.ts` came out of the middleware
+  in this way.
+- A test calls a function with parameters. Do not mock a framework module, for example
+  `astro:middleware`. A test can replace a module of its own workspace with `vi.mock`, as
+  the component tests of `packages/auth` do with `src/client.ts`.
+- A React component test uses `@testing-library/react` with the `jsdom` environment.
+- `packages/auth/tests/fake-d1.ts` is a D1 binding on `node:sqlite`, with the migrations
+  of `apps/cms/migrations`. A test of `createAuth` uses it, and a test checks that the
+  migrations match the schema of Better Auth.
+- A test that passes prints nothing. A test of a failure collects the log it expects with
+  `vi.spyOn(console, "error")` and checks it.
+
 ## Tools
 
 - **Biome** lints and formats JavaScript, TypeScript, JSON, CSS, and Astro files. Do not
@@ -349,7 +376,7 @@ Apply each rule to a file that you write or change.
 - **lefthook** runs the Git hooks. `pnpm install` installs them.
   - `pre-commit`: Biome and Prettier on the staged files. The hook stages each fix.
   - `commit-msg`: commitlint on the message.
-  - `pre-push`: `pnpm typecheck`.
+  - `pre-push`: `pnpm typecheck` and `pnpm test`.
 - Do not skip a hook with `LEFTHOOK=0` or `--no-verify`.
 
 ## Git

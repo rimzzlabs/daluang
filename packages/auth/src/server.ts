@@ -11,8 +11,17 @@ function readGitHubLogin(user: unknown): string {
 	return typeof user.githubLogin === "string" ? user.githubLogin : "";
 }
 
-function refuse(login: string): APIError {
-	return new APIError("FORBIDDEN", {
+/**
+ * Throws when the GitHub username of a user row is not on the allow list. The OAuth callback
+ * turns the error into `/sign-in?error=github_user_not_allowed`.
+ */
+export function assertAllowedUser(
+	user: unknown,
+	allowList: readonly string[],
+): void {
+	const login = readGitHubLogin(user);
+	if (isAllowedGitHubUser({ login, allowList })) return;
+	throw new APIError("FORBIDDEN", {
 		code: NOT_ALLOWED_ERROR_CODE,
 		message: `The GitHub user ${login} has no access to this CMS.`,
 	});
@@ -58,8 +67,7 @@ export function createAuth(env: AuthEnv) {
 			user: {
 				create: {
 					before: async (user) => {
-						const login = readGitHubLogin(user);
-						if (!isAllowedGitHubUser({ login, allowList })) throw refuse(login);
+						assertAllowedUser(user, allowList);
 						return { data: user };
 					},
 				},
@@ -70,8 +78,7 @@ export function createAuth(env: AuthEnv) {
 						const found = await context?.context.internalAdapter.findUserById(
 							session.userId,
 						);
-						const login = readGitHubLogin(found);
-						if (!isAllowedGitHubUser({ login, allowList })) throw refuse(login);
+						assertAllowedUser(found, allowList);
 						return { data: session };
 					},
 				},
