@@ -22,7 +22,11 @@ The first site that reads the notes is rimzzlabs.com. Its source is in
 - **Markdown is the one content format.** The CMS does not keep HTML, MDX, or rich text.
   Comark ([comark.dev](https://comark.dev)) parses and renders the Markdown.
 - **A note is text only, for now.** Images and videos in a note come in a later step.
-- **A note has metadata,** and the language is part of it. A writer can write in more than
+- **A note has core metadata and extra fields.** The core fields are the same for each
+  site: title, slug, language, description, keywords, status, publishedAt, and
+  updatedAt. A site adds its own fields, for example `featured` or `relatedPosts`, and
+  Daluang keeps them as they are. `packages/notes` has the schemas.
+- **The language is part of the metadata.** A writer can write in more than
   one language. Each note has one language, as a BCP 47 tag, for example `en` or `id`.
   The languages of a CMS are a setting.
 - Each step of this list has a plan before its code. "Open decisions" has the questions
@@ -38,7 +42,6 @@ Do not decide these in code. Ask the person you work for.
 | Where do the bytes of an image or a video go?   | R2 keeps the bytes. A Durable Object can keep the state of an upload. A Durable Object does not keep the bytes: one stored value has a size limit of 2 MB.                                                                                       |
 | Where does the CMS keep the Markdown of a note? | D1 is the database of the CMS, and it holds the auth tables. Where the Markdown of a note lives is not decided.                                                                                                                                  |
 | How does a translation link to its note?        | Two notes with the same slug and different languages are translations of each other, as on rimzzlabs.com: `notes/en/<slug>` and `notes/id/<slug>`.                                                                                               |
-| Which metadata fields does a note have?         | Not decided. The old site has title, description, keywords, publishedAt, updatedAt, status, featured, author, and relatedPosts.                                                                                                                  |
 
 ## Repository layout
 
@@ -62,6 +65,9 @@ the `catalog` in `pnpm-workspace.yaml`.
   list, the sign-in guard, the session types, the auth env schema, the sign-in button, the
   user menu, and the Astro integration that adds `/api/auth/*` and the guard
   (`src/astro/`). See "Auth".
+- `packages/notes` (`@daluang/notes`): the model of a note. The language tag, the
+  languages setting, the slug, the core metadata, the extra fields, and the rule of a
+  translation.
 - `packages/tsconfig` (`@daluang/tsconfig`): the TypeScript base that each workspace
   extends.
 
