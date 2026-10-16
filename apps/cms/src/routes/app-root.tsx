@@ -34,6 +34,7 @@ export function AppRoot() {
 			defaultOpen={context.sidebar.open}
 			defaultWidth={context.sidebar.width}
 			linkKind="router"
+			settings={context.settings}
 		>
 			<Outlet />
 		</AppShell>

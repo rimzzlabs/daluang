@@ -26,7 +26,10 @@ slug and two languages are translations of each other.
 
 ## Change an answer
 
-To ask the questions again, delete the rows of the table `setting`:
+Open **Settings → Site** or **Settings → Languages** in the sidebar. Change the answer,
+then select **Save**. The sidebar shows a new site name at once.
+
+To see the questions again, delete the rows of the table `setting`. Then open the CMS:
 
 ```sh
 pnpm --filter @daluang/cms exec wrangler d1 execute DB --local --command 'delete from "setting"'

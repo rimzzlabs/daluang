@@ -1,3 +1,7 @@
+import {
+	type SettingsStore,
+	useSettings,
+} from "@daluang/settings/settings-store";
 import { DaluangMark } from "@daluang/ui/components/daluang-mark";
 import { Sidebar, SidebarRail } from "@daluang/ui/components/sidebar";
 import {
@@ -13,6 +17,7 @@ import {
 	SidebarHeader,
 } from "@daluang/ui/components/sidebar-sections";
 import {
+	GlobeSimpleIcon,
 	ImagesIcon,
 	KeyIcon,
 	NotePencilIcon,
@@ -53,6 +58,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 	{
 		label: "Settings",
 		items: [
+			{ label: "Site", href: "/settings/site", icon: GlobeSimpleIcon },
 			{ label: "Languages", href: "/settings/languages", icon: TranslateIcon },
 		],
 	},
@@ -67,9 +73,11 @@ export function isActivePath(pathname: string, href: string): boolean {
 export interface AppSidebarProps {
 	pathname: string;
 	linkKind: NavLinkKind;
+	settings: SettingsStore;
 }
 
 export function AppSidebar(props: AppSidebarProps) {
+	const { site } = useSettings(props.settings);
 	return (
 		<Sidebar collapsible="icon">
 			<SidebarHeader>
@@ -78,12 +86,17 @@ export function AppSidebar(props: AppSidebarProps) {
 						<SidebarMenuButton
 							size="lg"
 							render={navLinkElement({ kind: props.linkKind, href: "/" })}
-							tooltip="Daluang"
+							tooltip={site.name}
 						>
 							<span className="flex size-8 shrink-0 items-center justify-center">
 								<DaluangMark className="h-5 w-auto" />
 							</span>
-							<span className="font-semibold">Daluang</span>
+							<span className="grid min-w-0 flex-1 leading-tight">
+								<span className="truncate font-semibold">Daluang</span>
+								<span className="truncate text-xs text-muted-foreground">
+									{site.name}
+								</span>
+							</span>
 						</SidebarMenuButton>
 					</SidebarMenuItem>
 				</SidebarMenu>

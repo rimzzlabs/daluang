@@ -1,9 +1,14 @@
+import type { CmsSettings } from "@daluang/settings/settings";
+import { createSettingsStore } from "@daluang/settings/settings-store";
 import { readSidebarPreferences } from "@daluang/ui/lib/sidebar-preferences";
 import { RouterProvider } from "@tanstack/react-router";
 import { useState } from "react";
 import { type AppRouterContext, createAppRouter } from "./router";
 
-export type AppProps = Pick<AppRouterContext, "user">;
+export interface AppProps extends Pick<AppRouterContext, "user"> {
+	/** The settings of the server. The island keeps them in a store. */
+	settings: CmsSettings;
+}
 
 /**
  * The root of the app island. The client router shows the page of the path in the frame of
@@ -12,7 +17,11 @@ export type AppProps = Pick<AppRouterContext, "user">;
 export function App(props: AppProps) {
 	const [router] = useState(() =>
 		createAppRouter({
-			context: { user: props.user, sidebar: readSidebarPreferences() },
+			context: {
+				user: props.user,
+				sidebar: readSidebarPreferences(),
+				settings: createSettingsStore(props.settings),
+			},
 		}),
 	);
 	return <RouterProvider router={router} />;

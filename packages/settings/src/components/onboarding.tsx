@@ -23,7 +23,7 @@ import { parseSiteDraft, type SiteDraft, type SiteErrors } from "../site-draft";
 import { LanguagesField } from "./languages-field";
 import { OnboardingProgress } from "./onboarding-progress";
 import { SettingsSummary } from "./settings-summary";
-import { SiteFields } from "./site-fields";
+import { focusSiteError, SiteFields } from "./site-fields";
 
 const STEPS = ["site", "languages", "ready"] as const;
 
@@ -123,7 +123,7 @@ export function Onboarding(props: OnboardingProps) {
 			},
 			(errors) => {
 				setSiteErrors(errors);
-				focusField({ form, name: errors.name === undefined ? "url" : "name" });
+				focusSiteError({ form, errors });
 			},
 		);
 	}
@@ -241,17 +241,6 @@ export function Onboarding(props: OnboardingProps) {
 				.exhaustive()}
 		</div>
 	);
-}
-
-interface FieldFocus {
-	form: HTMLFormElement;
-	name: string;
-}
-
-/** Moves the focus to a field of the form, so the writer can correct it at once. */
-function focusField(focus: FieldFocus) {
-	const field = focus.form.elements.namedItem(focus.name);
-	if (field instanceof HTMLInputElement) field.focus();
 }
 
 function welcomeTitle(writerName: string): string {

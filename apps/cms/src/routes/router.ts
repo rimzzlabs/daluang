@@ -1,4 +1,5 @@
 import type { UserMenuProps } from "@daluang/auth/components/user-menu";
+import type { SettingsStore } from "@daluang/settings/settings-store";
 import {
 	createRootRouteWithContext,
 	createRoute,
@@ -7,13 +8,15 @@ import {
 } from "@tanstack/react-router";
 import { AppRoot } from "./app-root";
 import { NotFoundPage } from "./not-found-page";
-import { PAGE_COMPONENTS } from "./page-content";
+import { routePage } from "./route-page";
 
 /** What each route can read from the router, from the props of the island. */
 export interface AppRouterContext {
 	user: UserMenuProps;
 	/** The stored open state and width of the sidebar. */
 	sidebar: { open: boolean; width: number };
+	/** The settings of the CMS. A settings page writes to it after a save. */
+	settings: SettingsStore;
 }
 
 // The root route is the frame: the sidebar and the navbar stay while the page changes.
@@ -25,31 +28,37 @@ const rootRoute = createRootRouteWithContext<AppRouterContext>()({
 const notesRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/",
-	component: PAGE_COMPONENTS["/"],
+	component: routePage("/"),
 });
 
 const mediaRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/media",
-	component: PAGE_COMPONENTS["/media"],
+	component: routePage("/media"),
 });
 
 const apiTokensRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/settings/api-tokens",
-	component: PAGE_COMPONENTS["/settings/api-tokens"],
+	component: routePage("/settings/api-tokens"),
 });
 
 const webhooksRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/settings/webhooks",
-	component: PAGE_COMPONENTS["/settings/webhooks"],
+	component: routePage("/settings/webhooks"),
+});
+
+const siteRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/settings/site",
+	component: routePage("/settings/site"),
 });
 
 const languagesRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/settings/languages",
-	component: PAGE_COMPONENTS["/settings/languages"],
+	component: routePage("/settings/languages"),
 });
 
 export const routeTree = rootRoute.addChildren([
@@ -57,6 +66,7 @@ export const routeTree = rootRoute.addChildren([
 	mediaRoute,
 	apiTokensRoute,
 	webhooksRoute,
+	siteRoute,
 	languagesRoute,
 ]);
 

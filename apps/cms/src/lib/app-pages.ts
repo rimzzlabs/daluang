@@ -6,6 +6,7 @@ export const APP_PAGES = [
 	{ path: "/media", title: "Media" },
 	{ path: "/settings/api-tokens", title: "API tokens" },
 	{ path: "/settings/webhooks", title: "Webhooks" },
+	{ path: "/settings/site", title: "Site" },
 	{ path: "/settings/languages", title: "Languages" },
 ] as const;
 

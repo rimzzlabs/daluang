@@ -296,6 +296,9 @@ own words and its own rules: for example, the editor, the notes, or the media.
 - `GET /api/settings` gives the stored settings. `PATCH /api/settings` writes one setting
   or more, each with its full value, in one D1 batch. A refused value answers 422 with the
   message of each field.
+- The settings pages `/settings/site` and `/settings/languages` change the answers of the
+  onboarding. `SiteSettings` and `LanguagesSettings` of the settings package are their
+  components.
 - To add a setting, add its key to `SETTING_KEYS` and its schema to `SETTING_SCHEMAS`,
   `storedSettingsSchema`, and `settingsPatchSchema`. If a writer needs it before the first
   note, add a step to the onboarding.
@@ -303,8 +306,8 @@ own words and its own rules: for example, the editor, the notes, or the media.
 ## Menus
 
 - `NAV_GROUPS` in `apps/cms/src/components/shell/app-sidebar.tsx` holds the menus of the
-  sidebar: Write (Notes, Media), Publish (API tokens, Webhooks), and Settings
-  (Languages).
+  sidebar: Write (Notes, Media), Publish (API tokens, Webhooks), and Settings (Site,
+  Languages).
 - Each item has a page in `APP_PAGES` (`apps/cms/src/lib/app-pages.ts`), a component in
   `PAGE_COMPONENTS` (`routes/page-content.tsx`), and a route in `routes/router.ts`. Add
   the three together. Do not add an item with no page.
@@ -347,6 +350,12 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
 - A menu link is `<Link>` of the router in the island, and `<a>` in the HTML of the server
   (`navLinkElement`).
 - `routes/` holds the router, the root of the island, and a component for each page.
+- **Each page gets `AppPageProps`**: `settings`, a `SettingsStore`. `PageContent` of the
+  server and `routePage` of the router give the same values. A route component is
+  `routePage(path)`.
+- The island makes one `SettingsStore` from the settings of the server, and puts it in the
+  router context. A settings page writes the saved settings to it, and `useSettings`
+  renders each reader again. The sidebar shows the new site name at once.
 
 ## Pages and islands
 
