@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "react": {
+      "source": "rimzzlabs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/react/SKILL.md",
+      "computedHash": "3d05b00a38a119649e091217c9b00b2dbc9b4cba087c46255d214ca828293845"
+    },
+    "shadcn": {
+      "source": "shadcn/ui",
+      "sourceType": "github",
+      "skillPath": "skills/shadcn/SKILL.md",
+      "computedHash": "b864a958765563321f485a96f4d59c0bb6539f4286ab6d8b8b66895b7ebd302d"
+    },
+    "ste": {
+      "source": "rimzzlabs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/ste/SKILL.md",
+      "computedHash": "ca630c228f00312e0759651f193a63f8c1230b46b655351c06e1d20f6a723ab8"
+    },
+    "tailwind-design-system": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "skillPath": "plugins/frontend-mobile-development/skills/tailwind-design-system/SKILL.md",
+      "computedHash": "4e5bfe5af9b5da504752432dc45ed605af350cf1489a58419afad4123a514f89"
+    },
+    "typescript": {
+      "source": "rimzzlabs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/typescript/SKILL.md",
+      "computedHash": "34fa4d8c15ccf6f42f3542f19e82c2afe7ef5764c81d2d575f8b0f30ca3b3e33"
+    }
+  }
+}
