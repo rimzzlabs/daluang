@@ -1,16 +1,21 @@
-import { cleanup } from "@testing-library/react";
 import { afterEach, vi } from "vitest";
 
-// jsdom has no matchMedia. The sidebar asks for the width of a phone.
-vi.stubGlobal("matchMedia", (query: string) => ({
-	matches: false,
-	media: query,
-	addEventListener: () => {},
-	removeEventListener: () => {},
-}));
+// The tests run in Node.js. A test file that renders a component sets jsdom in its first
+// line, and only such a file has a document. The other files skip this setup.
+if (typeof document !== "undefined") {
+	const { cleanup } = await import("@testing-library/react");
 
-// jsdom has no scrolling. The router scrolls to the top after each navigation.
-vi.stubGlobal("scrollTo", () => {});
+	// jsdom has no matchMedia. The sidebar asks for the width of a phone.
+	vi.stubGlobal("matchMedia", (query: string) => ({
+		matches: false,
+		media: query,
+		addEventListener: () => {},
+		removeEventListener: () => {},
+	}));
 
-// Each test starts with an empty document.
-afterEach(cleanup);
+	// jsdom has no scrolling. The router scrolls to the top after each navigation.
+	vi.stubGlobal("scrollTo", () => {});
+
+	// Each test starts with an empty document.
+	afterEach(cleanup);
+}

@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { createMemoryHistory } from "@tanstack/react-router";
 import { describe, expect, it } from "vitest";
 import { createAppRouter } from "@/routes/router";
