@@ -61,6 +61,12 @@ const languagesRoute = createRoute({
 	component: routePage("/settings/languages"),
 });
 
+const fieldsRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/settings/fields",
+	component: routePage("/settings/fields"),
+});
+
 export const routeTree = rootRoute.addChildren([
 	notesRoute,
 	mediaRoute,
@@ -68,6 +74,7 @@ export const routeTree = rootRoute.addChildren([
 	webhooksRoute,
 	siteRoute,
 	languagesRoute,
+	fieldsRoute,
 ]);
 
 export interface AppRouterOptions {

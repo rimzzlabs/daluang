@@ -24,7 +24,7 @@ describe("handleSettingsRequest", () => {
 		});
 		expect(response.status).toBe(200);
 		await expect(response.json()).resolves.toEqual({
-			settings: { site: null, languages: null },
+			settings: { site: null, languages: null, fields: null },
 		});
 	});
 
@@ -37,7 +37,7 @@ describe("handleSettingsRequest", () => {
 		});
 		expect(response.status).toBe(200);
 		await expect(response.json()).resolves.toEqual({
-			settings: { site: SITE, languages: LANGUAGES },
+			settings: { site: SITE, languages: LANGUAGES, fields: null },
 		});
 	});
 

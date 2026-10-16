@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { openPage, saveSettings } from "../src/client";
 
 const SITE = { name: "rimzzlabs", url: null };
-const STORED = { site: SITE, languages: null };
+const STORED = { site: SITE, languages: null, fields: null };
 
 function answer(response: Response | Error) {
 	const fetch = vi.fn(() =>

@@ -6,6 +6,7 @@ import { createSettingsStore, useSettings } from "../src/settings-store";
 const SETTINGS = {
 	site: { name: "rimzzlabs", url: null },
 	languages: { languages: ["en"], defaultLanguage: "en" },
+	fields: [],
 };
 const RENAMED = { ...SETTINGS, site: { name: "Catatan", url: null } };
 

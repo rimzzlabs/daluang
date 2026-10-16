@@ -24,6 +24,22 @@ the questions again.
 A note has one language, as a BCP 47 tag: `en`, `id`, or `pt-BR`. Two notes with the same
 slug and two languages are translations of each other.
 
+## Add the fields of your site
+
+Each note has the core fields: `title`, `slug`, `language`, `description`, `keywords`,
+`status`, `publishedAt`, and `updatedAt`. If your site reads more fields, add them:
+
+1. Open **Settings → Fields** in the sidebar.
+2. Select **Add a field**, or a common field such as `featured`.
+3. Type the label. The CMS makes the frontmatter name from it, for example
+   `relatedPosts` for "Related posts". You can change the name.
+4. Select the type: text, number, yes or no, or a list of text.
+5. Select **Required** if each note must have a value.
+6. Select **Save**.
+
+The questions of the first sign-in do not ask for the fields. A site with no extra fields
+needs no change.
+
 ## Change an answer
 
 Open **Settings → Site** or **Settings → Languages** in the sidebar. Change the answer,

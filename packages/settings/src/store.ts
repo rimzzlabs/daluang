@@ -1,3 +1,4 @@
+import { fieldDefinitionsSchema } from "@daluang/notes/field-definitions";
 import { languagesSettingSchema } from "@daluang/notes/languages-setting";
 import { A, O, pipe } from "@mobily/ts-belt";
 import { z } from "zod";
@@ -48,6 +49,11 @@ export async function readSettings(db: D1Database): Promise<StoredSettings> {
 			rows,
 			key: "languages",
 			schema: languagesSettingSchema,
+		}),
+		fields: readSetting({
+			rows,
+			key: "fields",
+			schema: fieldDefinitionsSchema,
 		}),
 	};
 }

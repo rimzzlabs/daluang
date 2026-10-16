@@ -66,8 +66,8 @@ the `catalog` in `pnpm-workspace.yaml`.
   user menu, and the Astro integration that adds `/api/auth/*` and the guard
   (`src/astro/`). See "Auth".
 - `packages/notes` (`@daluang/notes`): the model of a note. The language tag, the
-  languages setting, the slug, the core metadata, the extra fields, and the rule of a
-  translation.
+  languages setting, the slug, the core metadata, the extra fields and their definitions,
+  and the rule of a translation.
 - `packages/api-tokens` (`@daluang/api-tokens`): the API tokens that let a site read the
   published notes. Make, list, revoke, and check a token, the endpoint `/api/tokens`, and
   the page of the tokens. See "API tokens".
@@ -288,11 +288,12 @@ own words and its own rules: for example, the editor, the notes, or the media.
 ## Settings and onboarding
 
 - **The settings are in the D1 table `setting`** (`apps/cms/migrations/0002_settings.sql`):
-  one row for each key of `SETTING_KEYS` (`site`, `languages`), with a JSON value. Each
+  one row for each key of `SETTING_KEYS` (`site`, `languages`, `fields`), with a JSON value. Each
   read validates the value with the schema of its key. A value that the schema refuses
   reads as `null`, and the log names the key.
-- The settings are complete when each key has a valid value. `settingsState` gives
-  `complete` or `needed`.
+- The settings are complete when the site and the languages have a valid value.
+  `settingsState` gives `complete` or `needed`. The fields are optional: no value is no
+  extra field.
 - **The middleware of the settings reads them for each page**, after the sign-in guard,
   and puts them in `Astro.locals.settings`. The value is `null` for `/sign-in` and for an
   endpoint.
@@ -308,6 +309,11 @@ own words and its own rules: for example, the editor, the notes, or the media.
 - The settings pages `/settings/site` and `/settings/languages` change the answers of the
   onboarding. `SiteSettings` and `LanguagesSettings` of the settings package are their
   components.
+- **`/settings/fields` defines the extra fields of the site**: a label, a frontmatter
+  name, a type (`FIELD_TYPES`), and if a note needs a value. `fieldDefinitionsSchema` of
+  `packages/notes/src/field-definitions.ts` refuses a core name and a second field with
+  the same name. The name follows the label (`fieldNameFromLabel`) until the writer types
+  one. `FIELD_SUGGESTIONS` adds a common field with one click.
 - To add a setting, add its key to `SETTING_KEYS` and its schema to `SETTING_SCHEMAS`,
   `storedSettingsSchema`, and `settingsPatchSchema`. If a writer needs it before the first
   note, add a step to the onboarding.
@@ -331,7 +337,7 @@ own words and its own rules: for example, the editor, the notes, or the media.
 
 - `NAV_GROUPS` in `apps/cms/src/components/shell/app-sidebar.tsx` holds the menus of the
   sidebar: Write (Notes, Media), Publish (API tokens, Webhooks), and Settings (Site,
-  Languages).
+  Languages, Fields).
 - Each item has a page in `APP_PAGES` (`apps/cms/src/lib/app-pages.ts`), a component in
   `PAGE_COMPONENTS` (`routes/page-content.tsx`), and a route in `routes/router.ts`. Add
   the three together. Do not add an item with no page.

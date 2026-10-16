@@ -1,3 +1,4 @@
+import { fieldDefinitionsSchema } from "@daluang/notes/field-definitions";
 import { languagesSettingSchema } from "@daluang/notes/languages-setting";
 import { z } from "zod";
 import { siteSettingSchema } from "./site";
@@ -6,7 +7,7 @@ import { siteSettingSchema } from "./site";
 export const SETTINGS_API_PATH = "/api/settings";
 
 /** The names of the settings, as the keys of the `setting` table. */
-export const SETTING_KEYS = ["site", "languages"] as const;
+export const SETTING_KEYS = ["site", "languages", "fields"] as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[number];
 
@@ -14,9 +15,13 @@ export type SettingKey = (typeof SETTING_KEYS)[number];
 export const SETTING_SCHEMAS = {
 	site: siteSettingSchema,
 	languages: languagesSettingSchema,
+	fields: fieldDefinitionsSchema,
 } as const;
 
-/** The settings of a CMS that a writer can use: each setting has a value. */
+/**
+ * The settings of a CMS that a writer can use: each setting has a value. A CMS with no
+ * fields setting has no extra fields.
+ */
 export const cmsSettingsSchema = z.object(SETTING_SCHEMAS);
 
 export type CmsSettings = z.infer<typeof cmsSettingsSchema>;
@@ -25,6 +30,7 @@ export type CmsSettings = z.infer<typeof cmsSettingsSchema>;
 export const storedSettingsSchema = z.object({
 	site: siteSettingSchema.nullable(),
 	languages: languagesSettingSchema.nullable(),
+	fields: fieldDefinitionsSchema.nullable(),
 });
 
 export type StoredSettings = z.infer<typeof storedSettingsSchema>;
@@ -34,9 +40,13 @@ export const settingsPatchSchema = z
 	.strictObject({
 		site: siteSettingSchema.optional(),
 		languages: languagesSettingSchema.optional(),
+		fields: fieldDefinitionsSchema.optional(),
 	})
 	.refine(
-		(patch) => patch.site !== undefined || patch.languages !== undefined,
+		(patch) =>
+			patch.site !== undefined ||
+			patch.languages !== undefined ||
+			patch.fields !== undefined,
 		"Give one setting or more.",
 	);
 
@@ -44,7 +54,8 @@ export type SettingsPatch = z.input<typeof settingsPatchSchema>;
 
 /**
  * The state of the settings of a CMS. The writer answers the onboarding questions before
- * the first note, so each page of the app can read `complete` settings.
+ * the first note, so each page of the app can read `complete` settings. The onboarding
+ * asks for the site and the languages. The fields are optional.
  */
 export type SettingsState =
 	| { status: "complete"; settings: CmsSettings }
@@ -53,5 +64,8 @@ export type SettingsState =
 export function settingsState(stored: StoredSettings): SettingsState {
 	const { site, languages } = stored;
 	if (site === null || languages === null) return { status: "needed", stored };
-	return { status: "complete", settings: { site, languages } };
+	return {
+		status: "complete",
+		settings: { site, languages, fields: stored.fields ?? [] },
+	};
 }

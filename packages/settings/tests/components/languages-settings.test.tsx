@@ -20,6 +20,7 @@ vi.mock("../../src/client", () => client);
 const SETTINGS = {
 	site: { name: "rimzzlabs", url: null },
 	languages: { languages: ["en", "id"], defaultLanguage: "en" },
+	fields: [],
 };
 
 function renderPage() {
