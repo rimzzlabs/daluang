@@ -34,6 +34,15 @@ describe("signInError", () => {
 		});
 	});
 
+	it.each(["valueOf", "constructor", "hasOwnProperty", "__proto__"])(
+		"gives the general message for %s, a name of Object.prototype",
+		(code) => {
+			expect(signInError(code)?.message).toBe(
+				"The sign-in with GitHub failed. Try again.",
+			);
+		},
+	);
+
 	it("does not show a code that is not a plain code", () => {
 		expect(signInError("<script>alert(1)</script>")?.code).toBeNull();
 	});

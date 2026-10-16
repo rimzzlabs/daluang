@@ -35,8 +35,10 @@ export interface SignInError {
 /** The error of an `?error=` value of the sign-in page, or `null` when there is no value. */
 export function signInError(code: string | null): SignInError | null {
 	if (code === null || S.isEmpty(code)) return null;
-	const message = MESSAGES[code];
-	if (message !== undefined) return { message, code: null };
+	// The value comes from the URL. `Object.hasOwn` refuses a name of `Object.prototype`,
+	// for example `valueOf`, which a plain lookup finds.
+	if (Object.hasOwn(MESSAGES, code))
+		return { message: MESSAGES[code] ?? "", code: null };
 	return {
 		message: FALLBACK_MESSAGE,
 		code: CODE_PATTERN.test(code) ? code : null,
