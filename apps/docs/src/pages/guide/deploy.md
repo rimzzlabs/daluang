@@ -60,3 +60,8 @@ The workflow does these steps:
 
 After that, each release deploys again. release-please opens a pull request for each
 release, and a merge of that pull request makes the release.
+
+## Sign in
+
+Open the domain of the CMS, and sign in with GitHub. At the first sign-in, the CMS asks
+for your site and your languages. [First sign-in](/guide/first-sign-in) tells you more.

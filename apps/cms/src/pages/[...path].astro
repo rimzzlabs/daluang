@@ -1,5 +1,6 @@
 ---
 import { SIGN_IN_PATH } from "@daluang/auth/paths";
+import { ONBOARDING_PATH } from "@daluang/settings/onboarding";
 import { SIDEBAR_WIDTH_REM } from "@daluang/ui/lib/sidebar-preferences";
 import { AppShell } from "@/components/shell/app-shell";
 import BaseLayout from "@/layouts/base-layout.astro";
@@ -13,6 +14,10 @@ const user = Astro.locals.user;
 // The sign-in guard sends a request with no session to the sign-in page, so a user exists
 // here. The check keeps the type narrow.
 if (user === null) return Astro.redirect(SIGN_IN_PATH);
+// The middleware of the settings sends a page to the onboarding when the settings are not
+// complete. The check keeps the type narrow.
+const settings = Astro.locals.settings;
+if (settings?.status !== "complete") return Astro.redirect(ONBOARDING_PATH);
 
 const { pathname } = Astro.url;
 if (findAppPage(pathname) === undefined) Astro.response.status = 404;
