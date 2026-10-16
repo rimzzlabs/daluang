@@ -21,6 +21,7 @@
 		"react-dom": "catalog:"
 	},
 	"dependencies": {
+		"@daluang/auth": "workspace:*",
 		"@daluang/notes": "workspace:*",
 		"@daluang/ui": "workspace:*",
 		"@mobily/ts-belt": "catalog:",
