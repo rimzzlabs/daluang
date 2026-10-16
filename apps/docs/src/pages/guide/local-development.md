@@ -57,5 +57,6 @@ once.
 | `pnpm typecheck`  | The type check of each workspace                     |
 | `pnpm test`       | The unit tests, with coverage                        |
 | `pnpm build`      | The build of the CMS                                 |
+| `pnpm preview`    | The build of the CMS in workerd, with its CSP        |
 | `pnpm web:build`  | The build of this site, then of the landing page     |
 | `pnpm docs:build` | The build of this site. A dead link fails the build. |
