@@ -68,6 +68,9 @@ the `catalog` in `pnpm-workspace.yaml`.
 - `packages/notes` (`@daluang/notes`): the model of a note. The language tag, the
   languages setting, the slug, the core metadata, the extra fields, and the rule of a
   translation.
+- `packages/api-tokens` (`@daluang/api-tokens`): the API tokens that let a site read the
+  published notes. Make, list, revoke, and check a token, the endpoint `/api/tokens`, and
+  the page of the tokens. See "API tokens".
 - `packages/settings` (`@daluang/settings`): the settings of a CMS (the site and the
   languages), their store in D1, the endpoint `/api/settings`, the onboarding of the first
   sign-in, and the Astro integration (`src/astro/`). See "Settings and onboarding".
@@ -308,6 +311,21 @@ own words and its own rules: for example, the editor, the notes, or the media.
 - To add a setting, add its key to `SETTING_KEYS` and its schema to `SETTING_SCHEMAS`,
   `storedSettingsSchema`, and `settingsPatchSchema`. If a writer needs it before the first
   note, add a step to the onboarding.
+
+## API tokens
+
+- A site reads the published notes with a token: `Authorization: Bearer dlg_…`. The
+  content API that reads the notes comes in a later step. `verifyApiToken` of
+  `packages/api-tokens/src/verify.ts` is its check.
+- **D1 keeps the SHA-256 hash of a token, never the token**
+  (`apps/cms/migrations/0003_api_tokens.sql`). A token has 32 random bytes, so a fast hash
+  is safe. The column `start` keeps the prefix and 4 characters, to tell the tokens apart.
+- `POST /api/tokens` gives the token one time. The page shows it once, with a copy button.
+  `GET /api/tokens` gives the tokens with no hash. `DELETE /api/tokens/<id>` revokes one.
+- A CMS can have 20 tokens (`TOKENS_MAX`). A check records the last use at most once a
+  minute, so a site build that reads many notes writes D1 one time.
+- The page reads the tokens from the server in an effect, the only effect of the page:
+  the server is an external system. The HTML of the server shows the loading state.
 
 ## Menus
 

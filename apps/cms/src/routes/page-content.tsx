@@ -2,7 +2,8 @@ import type { SettingsStore } from "@daluang/settings/settings-store";
 import { O } from "@mobily/ts-belt";
 import type { ReactElement } from "react";
 import { type AppPagePath, findAppPage } from "@/lib/app-pages";
-import { ApiTokensPage, MediaPage, WebhooksPage } from "./later-pages";
+import { ApiTokensPage } from "./api-tokens-page";
+import { MediaPage, WebhooksPage } from "./later-pages";
 import { NotesPage } from "./notes-page";
 import { LanguagesPage, SitePage } from "./settings-pages";
 
