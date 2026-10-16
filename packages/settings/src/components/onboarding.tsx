@@ -9,7 +9,7 @@ import { Spinner } from "@daluang/ui/components/spinner";
 import { A, O, pipe, R, S } from "@mobily/ts-belt";
 import { ArrowLeftIcon, ArrowRightIcon } from "@phosphor-icons/react";
 import type { FormEvent, ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { match } from "ts-pattern";
 import {
 	openPage,
@@ -63,13 +63,16 @@ interface StepFrameProps {
 }
 
 function StepFrame(props: StepFrameProps) {
+	const heading = useRef<HTMLHeadingElement>(null);
+	// Focus is a state of the browser. A screen reader then reads the new step.
+	useEffect(() => {
+		if (props.focus) heading.current?.focus();
+	}, [props.focus]);
 	return (
 		<form className="flex flex-col gap-8" noValidate onSubmit={props.onSubmit}>
 			<div className="flex flex-col gap-2">
 				<h1
-					ref={(node) => {
-						if (props.focus) node?.focus();
-					}}
+					ref={heading}
 					tabIndex={-1}
 					className="font-serif text-2xl font-semibold tracking-tight outline-none"
 				>
