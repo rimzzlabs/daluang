@@ -135,7 +135,10 @@ Do not run it. The workflow `deploy.yml` deploys, after a release. The name is n
 
 - release-please (`release.yml`) reads the Conventional Commits on `main`, and keeps a
   release pull request open. A merge of that pull request cuts the tag and the GitHub
-  release. Its title is `chore(release): release <version>`, which commitlint accepts.
+  release. Its title is `chore(release): v<version>`, which commitlint accepts.
+- The first release is v0.1.0 (`initial-version`). Before 1.0.0, a `feat` raises the
+  minor number and a `fix` the patch number. A breaking change raises the minor number,
+  so a release does not jump to 1.0.0.
 - After a release, `release.yml` calls `deploy.yml` with the tag. A person can also run
   `deploy.yml` from the Actions tab, with a tag or a branch.
 - `deploy.yml` deploys the CMS: it makes the D1 database `daluang` if it is missing,
