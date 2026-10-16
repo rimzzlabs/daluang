@@ -1,6 +1,6 @@
 import { Button } from "@daluang/ui/components/button";
 import { Spinner } from "@daluang/ui/components/spinner";
-import { A, R } from "@mobily/ts-belt";
+import { R } from "@mobily/ts-belt";
 import { PaperPlaneTiltIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import {
@@ -9,12 +9,13 @@ import {
 	WEBHOOKS_ERROR_MESSAGES,
 	type WebhooksError,
 } from "../client";
-import type { Webhook } from "../webhook";
+import type { Delivery, Webhook } from "../webhook";
 import { DeliveryList } from "./delivery-list";
 
 export interface WebhookCardProps {
 	webhook: Webhook;
-	onChange: (next: Webhook) => void;
+	/** A test ended. The page puts the delivery first in the list of the webhook. */
+	onDelivered: (delivery: Delivery) => void;
 	onRemoved: (id: string) => void;
 }
 
@@ -38,10 +39,7 @@ export function WebhookCard(props: WebhookCardProps) {
 			result,
 			(delivery) => {
 				setAction({ status: "idle" });
-				props.onChange({
-					...webhook,
-					deliveries: A.take([delivery, ...webhook.deliveries], 5),
-				});
+				props.onDelivered(delivery);
 			},
 			(error) => setAction({ status: "failed", error }),
 		);

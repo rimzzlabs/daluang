@@ -87,6 +87,30 @@ describe("ApiTokens", () => {
 		expect(screen.queryByText("dlg_secret")).toBeNull();
 	});
 
+	it("removes both tokens of two revokes at the same time", async () => {
+		const other = { ...TOKEN, id: "t2", name: "Other" };
+		client.listApiTokens.mockResolvedValue(R.Ok([TOKEN, other]));
+		const first = Promise.withResolvers<unknown>();
+		const second = Promise.withResolvers<unknown>();
+		client.revokeApiToken
+			.mockReturnValueOnce(first.promise)
+			.mockReturnValueOnce(second.promise);
+		render(<ApiTokens />);
+		await userEvent.click(
+			await screen.findByRole("button", { name: "Revoke Build" }),
+		);
+		await userEvent.click(
+			screen.getByRole("button", { name: "Revoke Build now" }),
+		);
+		await userEvent.click(screen.getByRole("button", { name: "Revoke Other" }));
+		await userEvent.click(
+			screen.getByRole("button", { name: "Revoke Other now" }),
+		);
+		first.resolve(R.Ok(true));
+		second.resolve(R.Ok(true));
+		expect(await screen.findByText(/No tokens yet/)).toBeTruthy();
+	});
+
 	it("shows a new token also when the list did not load", async () => {
 		client.listApiTokens.mockResolvedValue(R.Error("server"));
 		client.createApiToken.mockResolvedValue(

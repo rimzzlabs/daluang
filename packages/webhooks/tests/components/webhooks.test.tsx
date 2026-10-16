@@ -102,6 +102,50 @@ describe("Webhooks", () => {
 		expect(screen.queryByText("example.com/…c3d4")).toBeNull();
 	});
 
+	it("keeps the 5 newest deliveries after a test", async () => {
+		const old = [1, 2, 3, 4, 5].map((index) => ({
+			...DELIVERY,
+			id: `d${index}`,
+		}));
+		client.listWebhooksOfCms.mockResolvedValue(
+			R.Ok([{ ...WEBHOOK, deliveries: old }]),
+		);
+		client.testWebhookOfCms.mockResolvedValue(
+			R.Ok({ ...DELIVERY, id: "new", status: "failed", statusCode: 500 }),
+		);
+		render(<Webhooks />);
+		await userEvent.click(
+			await screen.findByRole("button", { name: "Send a test to Site" }),
+		);
+		expect(await screen.findByText(/HTTP 500/)).toBeTruthy();
+		expect(screen.getAllByText("Delivered")).toHaveLength(4);
+	});
+
+	it("does not bring back a removed webhook when a slow test ends", async () => {
+		const other = {
+			...WEBHOOK,
+			id: "w2",
+			name: "Other",
+			urlHint: "b.com/…zzzz",
+		};
+		client.listWebhooksOfCms.mockResolvedValue(R.Ok([WEBHOOK, other]));
+		const test = Promise.withResolvers<unknown>();
+		client.testWebhookOfCms.mockReturnValue(test.promise);
+		client.removeWebhook.mockResolvedValue(R.Ok(true));
+		render(<Webhooks />);
+		await userEvent.click(
+			await screen.findByRole("button", { name: "Send a test to Site" }),
+		);
+		await userEvent.click(screen.getByRole("button", { name: "Remove Other" }));
+		await userEvent.click(
+			screen.getByRole("button", { name: "Remove Other now" }),
+		);
+		expect(screen.queryByText("b.com/…zzzz")).toBeNull();
+		test.resolve(R.Ok(DELIVERY));
+		expect(await screen.findByText("Delivered")).toBeTruthy();
+		expect(screen.queryByText("b.com/…zzzz")).toBeNull();
+	});
+
 	it("shows the delivery of a test, and removes the webhook", async () => {
 		client.listWebhooksOfCms.mockResolvedValue(R.Ok([WEBHOOK]));
 		client.testWebhookOfCms.mockResolvedValue(R.Ok(DELIVERY));

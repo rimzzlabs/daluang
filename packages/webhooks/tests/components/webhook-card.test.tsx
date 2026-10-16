@@ -44,31 +44,28 @@ beforeEach(() => {
 });
 
 function renderCard() {
-	const onChange = vi.fn();
+	const onDelivered = vi.fn();
 	const onRemoved = vi.fn();
 	render(
 		<ul>
 			<WebhookCard
 				webhook={WEBHOOK}
-				onChange={onChange}
+				onDelivered={onDelivered}
 				onRemoved={onRemoved}
 			/>
 		</ul>,
 	);
-	return { onChange, onRemoved };
+	return { onDelivered, onRemoved };
 }
 
 describe("WebhookCard", () => {
-	it("puts the delivery of a test first, and keeps 5", async () => {
+	it("gives the delivery of a test to the page", async () => {
 		client.testWebhookOfCms.mockResolvedValue(R.Ok(delivery(0)));
-		const { onChange } = renderCard();
+		const { onDelivered } = renderCard();
 		await userEvent.click(
 			screen.getByRole("button", { name: "Send a test to Site" }),
 		);
-		expect(onChange).toHaveBeenCalledWith({
-			...WEBHOOK,
-			deliveries: [0, 1, 2, 3, 4].map(delivery),
-		});
+		expect(onDelivered).toHaveBeenCalledWith(delivery(0));
 	});
 
 	it("shows why a test failed", async () => {

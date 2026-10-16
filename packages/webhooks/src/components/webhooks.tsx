@@ -8,7 +8,7 @@ import {
 	WEBHOOKS_ERROR_MESSAGES,
 	type WebhooksError,
 } from "../client";
-import type { Webhook } from "../webhook";
+import type { Delivery, Webhook } from "../webhook";
 import { NewWebhookForm } from "./new-webhook-form";
 import { WebhookCard } from "./webhook-card";
 
@@ -25,6 +25,22 @@ function listState(
 		(webhooks): ListState => ({ status: "ready", webhooks }),
 		(error): ListState => ({ status: "failed", error }),
 	);
+}
+
+interface DeliveryAdd {
+	webhook: Webhook;
+	/** The webhook of the delivery. Another webhook stays as it is. */
+	id: string;
+	delivery: Delivery;
+}
+
+/** The webhook with a new delivery first, and the newest deliveries of the list. */
+function withDelivery(add: DeliveryAdd): Webhook {
+	if (add.webhook.id !== add.id) return add.webhook;
+	return {
+		...add.webhook,
+		deliveries: A.take([add.delivery, ...add.webhook.deliveries], 5),
+	};
 }
 
 /** The page of the webhooks: add one, send a test, see the deliveries, and remove one. */
@@ -47,11 +63,15 @@ export function Webhooks() {
 		setList(listState(await listWebhooksOfCms()));
 	}
 
+	// A test can take 10 seconds, and the writer can remove a webhook during it. Each
+	// change reads the state when it applies, not the state of the click.
 	function update(
 		change: (webhooks: readonly Webhook[]) => readonly Webhook[],
 	) {
-		if (list.status === "ready")
-			setList({ status: "ready", webhooks: change(list.webhooks) });
+		setList((current) => {
+			if (current.status !== "ready") return current;
+			return { status: "ready", webhooks: change(current.webhooks) };
+		});
 	}
 
 	return (
@@ -97,10 +117,14 @@ export function Webhooks() {
 								<WebhookCard
 									key={webhook.id}
 									webhook={webhook}
-									onChange={(next) =>
+									onDelivered={(delivery) =>
 										update((webhooks) =>
 											A.map(webhooks, (item) =>
-												item.id === next.id ? next : item,
+												withDelivery({
+													webhook: item,
+													id: webhook.id,
+													delivery,
+												}),
 											),
 										)
 									}
