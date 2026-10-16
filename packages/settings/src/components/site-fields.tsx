@@ -47,7 +47,7 @@ export function SiteFields(props: SiteFieldsProps) {
 			</Field>
 			<Field data-invalid={errors.url !== undefined}>
 				<FieldLabel htmlFor={`${id}-url`}>
-					Site address
+					Site address{" "}
 					<span className="font-normal text-muted-foreground">(optional)</span>
 				</FieldLabel>
 				<Input

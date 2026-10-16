@@ -34,6 +34,19 @@ describe("SiteFields", () => {
 	});
 });
 
+describe("SiteFields labels", () => {
+	it("names the address field with a space before (optional)", () => {
+		render(
+			<SiteFields
+				value={{ name: "", url: "" }}
+				errors={{}}
+				onChange={() => {}}
+			/>,
+		);
+		expect(screen.getByLabelText("Site address (optional)")).toBeTruthy();
+	});
+});
+
 describe("focusSiteError", () => {
 	it("focuses the name first, then the address", () => {
 		render(
