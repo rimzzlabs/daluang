@@ -68,6 +68,9 @@ the `catalog` in `pnpm-workspace.yaml`.
 - `packages/notes` (`@daluang/notes`): the model of a note. The language tag, the
   languages setting, the slug, the core metadata, the extra fields, and the rule of a
   translation.
+- `packages/settings` (`@daluang/settings`): the settings of a CMS (the site and the
+  languages), their store in D1, the endpoint `/api/settings`, the onboarding of the first
+  sign-in, and the Astro integration (`src/astro/`). See "Settings and onboarding".
 - `packages/tsconfig` (`@daluang/tsconfig`): the TypeScript base that each workspace
   extends.
 
@@ -273,6 +276,30 @@ own words and its own rules: for example, the editor, the notes, or the media.
   `avatars.githubusercontent.com`.
 - `astro dev` sends no policy. To check the policy, run `pnpm build`, then `pnpm preview`.
 
+## Settings and onboarding
+
+- **The settings are in the D1 table `setting`** (`apps/cms/migrations/0002_settings.sql`):
+  one row for each key of `SETTING_KEYS` (`site`, `languages`), with a JSON value. Each
+  read validates the value with the schema of its key. A value that the schema refuses
+  reads as `null`, and the log names the key.
+- The settings are complete when each key has a valid value. `settingsState` gives
+  `complete` or `needed`.
+- **The middleware of the settings reads them for each page**, after the sign-in guard,
+  and puts them in `Astro.locals.settings`. The value is `null` for `/sign-in` and for an
+  endpoint.
+- **With no complete settings, each page opens `/welcome`.** With complete settings,
+  `/welcome` opens `/`. `decideOnboarding` of `packages/settings/src/onboarding.ts` has
+  the rule. The app page `[...path].astro` gets complete settings.
+- `/welcome` (`apps/cms/src/pages/welcome.astro`) is the onboarding: the site, the
+  languages, and a summary. The island `Onboarding` saves the answers in one request, then
+  opens `/` with a full page load. The first languages come from `Accept-Language`.
+- `GET /api/settings` gives the stored settings. `PATCH /api/settings` writes one setting
+  or more, each with its full value, in one D1 batch. A refused value answers 422 with the
+  message of each field.
+- To add a setting, add its key to `SETTING_KEYS` and its schema to `SETTING_SCHEMAS`,
+  `storedSettingsSchema`, and `settingsPatchSchema`. If a writer needs it before the first
+  note, add a step to the onboarding.
+
 ## Menus
 
 - `NAV_GROUPS` in `apps/cms/src/components/shell/app-sidebar.tsx` holds the menus of the
@@ -449,6 +476,9 @@ Apply each rule to a file that you write or change.
   element with the class `dark`.
 - Use a token of the theme: `bg-background`, `text-muted-foreground`, `border-border`. Do
   not write a color value in a class.
+- **Tailwind CSS scans only the files that it knows.** `theme.css` adds `packages/ui`.
+  `apps/cms/src/styles/global.css` adds each domain package with components, with an
+  `@source` line. Add the line for a new domain package, or its classes are missing.
 - Do not write an arbitrary value in a class: `w-[400px]`, `text-[15px]`, `bg-[#fff]`. Use
   a step of the scale, or add a token to `theme.css`.
 - A variant in square brackets is correct only when Tailwind CSS has no named variant for

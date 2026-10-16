@@ -31,8 +31,11 @@ An empty `ALLOWED_GITHUB_USERS` allows nobody to sign in. Git ignores `.dev.vars
 
 1. Run `pnpm dev`.
 2. Open the URL that the command prints.
+3. Sign in with GitHub, and answer the questions of the [first sign-in](/guide/first-sign-in).
 
 The CMS runs in workerd, the runtime of Cloudflare Workers.
+
+If a pull adds a file to `apps/cms/migrations`, run `pnpm db:migrate:local` again.
 
 ## Run this site only
 

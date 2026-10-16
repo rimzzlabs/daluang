@@ -1,0 +1,48 @@
+{
+	"name": "@daluang/settings",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"license": "MIT",
+	"exports": {
+		"./astro/locals": {
+			"types": "./src/astro/locals.d.ts"
+		},
+		"./astro/*": "./src/astro/*.ts",
+		"./components/*": "./src/components/*.tsx",
+		"./*": "./src/*.ts"
+	},
+	"scripts": {
+		"typecheck": "tsc"
+	},
+	"peerDependencies": {
+		"astro": "catalog:",
+		"react": "catalog:",
+		"react-dom": "catalog:"
+	},
+	"dependencies": {
+		"@daluang/notes": "workspace:*",
+		"@daluang/ui": "workspace:*",
+		"@mobily/ts-belt": "catalog:",
+		"@phosphor-icons/react": "catalog:",
+		"cn": "catalog:",
+		"ts-pattern": "catalog:",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "catalog:",
+		"@daluang/tsconfig": "workspace:*",
+		"@testing-library/dom": "catalog:",
+		"@testing-library/react": "catalog:",
+		"@testing-library/user-event": "catalog:",
+		"@types/node": "catalog:",
+		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:",
+		"astro": "catalog:",
+		"jsdom": "catalog:",
+		"react": "catalog:",
+		"react-dom": "catalog:",
+		"typescript": "catalog:",
+		"vitest": "catalog:"
+	}
+}

@@ -10,9 +10,10 @@ Cloudflare account.
 
 ## Status
 
-Daluang is in early development. The CMS has sign-in with GitHub and the frame of the app.
-The editor and the note storage come in later releases. [Deploy](/guide/deploy) tells you
-how to host your own copy.
+Daluang is in early development. The CMS has sign-in with GitHub, the questions of the
+[first sign-in](/guide/first-sign-in), and the frame of the app. The editor and the note
+storage come in later releases. [Deploy](/guide/deploy) tells you how to host your own
+copy.
 
 ## The parts
 
@@ -22,6 +23,7 @@ how to host your own copy.
 | `apps/web`    | The landing page. It serves this site at `/docs`.       |
 | `apps/docs`   | This site, on Vocs.                                     |
 | `packages/ui` | The UI components, the theme, and the fonts.            |
+| `packages/*`  | One package for each domain: auth, notes, and settings. |
 
 ## Markdown only
 

@@ -1,0 +1,37 @@
+---
+import { SIGN_IN_PATH } from "@daluang/auth/paths";
+import { Onboarding } from "@daluang/settings/components/onboarding";
+import { siteDraft } from "@daluang/settings/site-draft";
+import { initialLanguages } from "@daluang/settings/suggested-languages";
+import { DaluangMark } from "@daluang/ui/components/daluang-mark";
+import BaseLayout from "@/layouts/base-layout.astro";
+
+// The onboarding of the first sign-in. The middleware of the settings opens this page while
+// the settings are not complete, and sends it to the notes after.
+const user = Astro.locals.user;
+const settings = Astro.locals.settings;
+// The sign-in guard and the middleware of the settings run first. The checks keep the types
+// narrow.
+if (user === null) return Astro.redirect(SIGN_IN_PATH);
+if (settings === null || settings.status === "complete") return Astro.redirect("/");
+
+const { stored } = settings;
+const languages = initialLanguages({
+	stored: stored.languages,
+	acceptLanguage: Astro.request.headers.get("accept-language"),
+});
+---
+
+<BaseLayout title="Welcome · Daluang">
+	<main class="flex min-h-dvh justify-center px-6 py-16 sm:items-center">
+		<div class="w-full max-w-md">
+			<DaluangMark className="mb-10 h-8 w-auto" />
+			<Onboarding
+				client:load
+				writerName={user.name}
+				site={siteDraft(stored.site)}
+				languages={languages}
+			/>
+		</div>
+	</main>
+</BaseLayout>

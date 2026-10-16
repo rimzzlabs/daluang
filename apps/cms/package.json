@@ -18,6 +18,7 @@
 		"@astrojs/cloudflare": "catalog:",
 		"@astrojs/react": "catalog:",
 		"@daluang/auth": "workspace:*",
+		"@daluang/settings": "workspace:*",
 		"@daluang/ui": "workspace:*",
 		"@mobily/ts-belt": "catalog:",
 		"@phosphor-icons/react": "catalog:",

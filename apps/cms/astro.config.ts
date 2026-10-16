@@ -1,6 +1,7 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import { daluangAuth } from "@daluang/auth/astro/integration";
+import { daluangSettings } from "@daluang/settings/astro/integration";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, fontProviders } from "astro/config";
 import { CMS_CSP } from "./src/security/csp";
@@ -14,10 +15,17 @@ export default defineConfig({
 	// Better Auth keeps the sessions in D1. With no Astro sessions, the adapter adds no KV
 	// namespace, and a deploy makes none in the account.
 	session: false,
-	// `securityHeaders` is first, so its middleware adds the headers to each response, also
-	// to a redirect of the guard. `daluangAuth` adds the `/api/auth` endpoints and the
-	// sign-in guard. The app has no auth route file.
-	integrations: [securityHeaders(), react({ compiler: true }), daluangAuth()],
+	// The order is the order of the middleware. `securityHeaders` is first, so it adds the
+	// headers to each response, also to a redirect of the guard. `daluangAuth` adds the
+	// `/api/auth` endpoints and the sign-in guard. `daluangSettings` adds `/api/settings`,
+	// and reads the settings for each page after the guard. The app has no route file for
+	// an endpoint.
+	integrations: [
+		securityHeaders(),
+		react({ compiler: true }),
+		daluangAuth(),
+		daluangSettings(),
+	],
 	// Astro sends the policy as a header of each page, with the hash of each script that it
 	// renders. `astro dev` sends no policy.
 	security: { csp: CMS_CSP },
