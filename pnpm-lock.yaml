@@ -597,6 +597,9 @@ importers:
 
   packages/settings:
     dependencies:
+      '@daluang/auth':
+        specifier: workspace:*
+        version: link:../auth
       '@daluang/notes':
         specifier: workspace:*
         version: link:../notes
