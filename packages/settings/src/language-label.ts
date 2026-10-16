@@ -14,7 +14,8 @@ const OWN_NAMES: Readonly<Record<string, string>> = {
  */
 export function languageLabel(tag: string): string {
 	const name = pipe(
-		O.fromNullable(OWN_NAMES[tag]),
+		O.fromPredicate(tag, (key) => Object.hasOwn(OWN_NAMES, key)),
+		O.flatMap((key) => O.fromNullable(OWN_NAMES[key])),
 		O.getWithDefault(languageName({ tag, displayIn: tag })),
 	);
 	// ts-belt has no locale-aware capital letter. The first letter of a name in its own
