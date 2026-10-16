@@ -12,6 +12,21 @@
 
 The install also adds the Git hooks.
 
+## Set up sign-in
+
+The CMS uses sign-in with GitHub. Only the GitHub users on its allow list can sign in.
+
+1. Open [the developer settings of GitHub](https://github.com/settings/developers) and make a new OAuth app.
+2. Set the homepage URL to `http://localhost:4321`.
+3. Set the callback URL to `http://localhost:4321/api/auth/callback/github`.
+4. Copy `apps/cms/.dev.vars.example` to `apps/cms/.dev.vars`.
+5. Put the client ID and a new client secret of the OAuth app in `.dev.vars`.
+6. Set `BETTER_AUTH_SECRET` to the output of `openssl rand -base64 32`.
+7. Set `ALLOWED_GITHUB_USERS` to your GitHub username.
+8. Run `pnpm db:migrate:local` to make the tables in the local database.
+
+An empty `ALLOWED_GITHUB_USERS` allows nobody to sign in. Git ignores `.dev.vars`.
+
 ## Run the CMS
 
 1. Run `pnpm dev`.

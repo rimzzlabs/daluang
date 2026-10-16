@@ -29,11 +29,11 @@ The first site that reads the notes is rimzzlabs.com. Its source is in
 
 Do not decide these in code. Ask the person you work for.
 
-| Question                                      | Current direction                                                                                                                                                                                                                                |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| How does a static site get a changed note?    | The site stays static. A publish in the CMS starts a rebuild of the site. The site reads the notes at build time through a content loader package. `experimental.incrementalBuild` of Astro 7.2 skips each page whose `cacheKey` did not change. |
-| Where do the bytes of an image or a video go? | R2 keeps the bytes. A Durable Object can keep the state of an upload. A Durable Object does not keep the bytes: one stored value has a size limit of 2 MB.                                                                                       |
-| Where does the CMS keep notes?                | Not decided.                                                                                                                                                                                                                                     |
+| Question                                        | Current direction                                                                                                                                                                                                                                |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| How does a static site get a changed note?      | The site stays static. A publish in the CMS starts a rebuild of the site. The site reads the notes at build time through a content loader package. `experimental.incrementalBuild` of Astro 7.2 skips each page whose `cacheKey` did not change. |
+| Where do the bytes of an image or a video go?   | R2 keeps the bytes. A Durable Object can keep the state of an upload. A Durable Object does not keep the bytes: one stored value has a size limit of 2 MB.                                                                                       |
+| Where does the CMS keep the Markdown of a note? | D1 is the database of the CMS, and it holds the auth tables. Where the Markdown of a note lives is not decided.                                                                                                                                  |
 
 ## Repository layout
 
@@ -53,6 +53,10 @@ the `catalog` in `pnpm-workspace.yaml`.
   masters of the mark (the Sundanese letter da) and of the app icon. `DaluangMark` is the
   mark as a component. Each app keeps its own copy of the icon files in `public/`.
   `ThemeToggle` and `lib/theme.ts` switch the light and the dark theme.
+- `packages/auth` (`@daluang/auth`): sign-in with GitHub through Better Auth, the allow
+  list, the sign-in guard, the session types, the auth env schema, the sign-in button, the
+  user menu, and the Astro integration that adds `/api/auth/*` and the guard
+  (`src/astro/`). See "Auth".
 - `packages/tsconfig` (`@daluang/tsconfig`): the TypeScript base that each workspace
   extends.
 
@@ -62,19 +66,20 @@ To use a workspace package, write `"@daluang/<name>": "workspace:*"` in the
 
 Run each script from the root:
 
-| Command            | Does                                                                                         |
-| ------------------ | -------------------------------------------------------------------------------------------- |
-| `pnpm dev`         | `astro dev` in `apps/cms`                                                                    |
-| `pnpm build`       | `astro build` in `apps/cms`                                                                  |
-| `pnpm web:dev`     | `vocs dev` and `astro dev` together, with hot reload for both. Open `http://localhost:4322`. |
-| `pnpm web:build`   | The docs site, then the landing page with the docs site in `dist/docs`                       |
-| `pnpm web:preview` | `wrangler dev` on the build of `apps/web`: the same files and rules as production            |
-| `pnpm docs:dev`    | `vocs dev` in `apps/docs` only, at `http://localhost:4323/docs/`                             |
-| `pnpm docs:build`  | `vocs build` in `apps/docs`. A dead link fails it.                                           |
-| `pnpm typecheck`   | The type check of each workspace                                                             |
-| `pnpm check`       | Biome (lint and format) and Prettier, with no write                                          |
-| `pnpm fix`         | Biome and Prettier, with write                                                               |
-| `pnpm commit`      | The commit prompt of commitlint                                                              |
+| Command                 | Does                                                                                         |
+| ----------------------- | -------------------------------------------------------------------------------------------- |
+| `pnpm dev`              | `astro dev` in `apps/cms`                                                                    |
+| `pnpm build`            | `astro build` in `apps/cms`                                                                  |
+| `pnpm web:dev`          | `vocs dev` and `astro dev` together, with hot reload for both. Open `http://localhost:4322`. |
+| `pnpm web:build`        | The docs site, then the landing page with the docs site in `dist/docs`                       |
+| `pnpm web:preview`      | `wrangler dev` on the build of `apps/web`: the same files and rules as production            |
+| `pnpm docs:dev`         | `vocs dev` in `apps/docs` only, at `http://localhost:4323/docs/`                             |
+| `pnpm docs:build`       | `vocs build` in `apps/docs`. A dead link fails it.                                           |
+| `pnpm typecheck`        | The type check of each workspace                                                             |
+| `pnpm check`            | Biome (lint and format) and Prettier, with no write                                          |
+| `pnpm fix`              | Biome and Prettier, with write                                                               |
+| `pnpm commit`           | The commit prompt of commitlint                                                              |
+| `pnpm db:migrate:local` | Apply `apps/cms/migrations` to the local D1 database                                         |
 
 `apps/cms` and `apps/web` each have a `cf:deploy` script, which runs `wrangler deploy`.
 Run it only when the person tells you to. The name is not `deploy`, because `pnpm deploy`
@@ -126,6 +131,8 @@ is a command of pnpm.
   and no `tailwind-merge`.
 - Phosphor for icons: `@phosphor-icons/react`. Import the name with the `Icon` suffix,
   for example `SunIcon`.
+- Better Auth (`better-auth`) for sign-in with GitHub, with Cloudflare D1 as its database.
+- Cloudflare D1 is the database of the CMS. The binding is `DB`.
 - Comark for Markdown: `comark` parses, `@comark/react` and `@comark/html` render.
 - Vocs 2 (with Waku) for the documentation site. `react-server-dom-webpack` has the exact
   version of `react`, for the RSC runtime of Waku.
@@ -163,8 +170,35 @@ own words and its own rules: for example, the editor, the notes, or the media.
 9. **A package with endpoints has an Astro layer.** `packages/<domain>/src/astro/` holds
    an Astro integration, the route entry files, and the wiring. The app adds the
    integration in `astro.config.ts`.
-10. **One module reads the environment.** The Cloudflare bindings and the variables come
-    into `apps/cms` in one module. All other code gets a value as a parameter.
+10. **One module reads the environment of a domain.** A module reads the bindings and the
+    variables from `cloudflare:workers` and validates them with a zod schema.
+    `packages/auth/src/astro/env.ts` reads the auth variables and the `DB` binding with
+    the schema of `@daluang/auth/env`. All other code gets a value as a parameter. Do not
+    read `import.meta.env` or `process.env` for a server value.
+
+## Auth
+
+- Sign-in is with GitHub only, through Better Auth. Better Auth keeps the users, the
+  accounts, and the sessions in D1.
+- **Only the GitHub users of `ALLOWED_GITHUB_USERS` can sign in.** The value is a list of
+  usernames, separated by commas, compared in lower case. An empty list allows nobody.
+- Two database hooks of `packages/auth/src/server.ts` check the list: one when the user
+  row is made, and one at each new session. A refused sign-in returns to
+  `/sign-in?error=github_user_not_allowed`.
+- A session that exists stays valid after its user leaves the list, until it expires.
+  To end it now, delete its row from the `session` table.
+- The guard (`packages/auth/src/astro/middleware.ts`) needs a session for each page and
+  each endpoint, with two exceptions: `/sign-in`, and `/api/auth/*`. A page with no
+  session redirects to `/sign-in?next=<path>`. An endpoint with no session answers 401.
+- A page reads the signed-in user from `Astro.locals.user`.
+- Give each `next` value to `safeNext` before a redirect. It refuses a URL that leaves
+  the app.
+- `apps/cms/migrations/0001_auth.sql` holds the tables of Better Auth. If the auth config
+  changes the schema (a plugin, a field), make the SQL with `getMigrations` of
+  `better-auth/db/migration`, and add it as a new migration file. Do not edit an applied
+  migration.
+- `apps/cms/.dev.vars.example` lists each variable. In production, set each one with
+  `wrangler secret put`.
 
 ## Pages and islands
 
@@ -218,8 +252,13 @@ Apply each rule to a file that you write or change.
 
 ### Data and branches
 
-- Transform arrays, strings, and objects with `pipe` and the modules of
-  `@mobily/ts-belt`. Write each transform as a pipeline, with the data first.
+- Transform arrays, strings, and objects with the modules of `@mobily/ts-belt`.
+- **A transform of two or more steps is a pipeline:**
+  `pipe(users, A.filter(isActive), A.map(toName))`. The data comes first, and each step is
+  one line.
+- **One ts-belt call needs no pipe.** Give it the data first: `A.map(users, toName)`.
+- Do not nest ts-belt calls. `S.toLowerCase(S.trim(name))` is two steps, so write
+  `pipe(name, S.trim, S.toLowerCase)`.
 - Do not write `.filter(Boolean)` or a `.sort()` with no comparator.
 - For one condition, use `if` with an early return. A ternary is for two short values on
   one line. Do not nest a ternary.
@@ -268,6 +307,17 @@ Apply each rule to a file that you write or change.
 - Only `packages/ui` imports `@base-ui/react`. The app uses the primitive from
   `@daluang/ui` and changes its look with `className`.
 - If `@daluang/ui` has no such primitive, add one there. Do not write it in the app.
+- A registry file of more than 600 lines is split by concern. The sidebar is three files:
+  `sidebar.tsx` (the provider, the frame, the trigger, the rail, and the inset),
+  `sidebar-sections.tsx`, and `sidebar-menu.tsx`. `shadcn add sidebar --overwrite`
+  writes one file again: split it again, and keep the rail of `sidebar.tsx`.
+- The sidebar rail resizes the sidebar. It is a window splitter of WAI-ARIA: drag it,
+  or use the arrow keys, Home, and End. A click, Enter, or Space collapses the sidebar to
+  its icons. The width stays between 13 rem and 24 rem.
+- The sidebar keeps its open state and its width in the cookies `sidebar_state` and
+  `sidebar_width`. A page reads them with `parseSidebarOpen` and `parseSidebarWidth` of
+  `@daluang/ui/lib/sidebar-cookies` and gives them to `SidebarProvider`, so the server
+  renders the saved state with no flash.
 - `render` replaces the `asChild` prop of Radix UI. Do not install or import Radix UI.
 
 ### Styles

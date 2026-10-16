@@ -1,5 +1,6 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
+import { daluangAuth } from "@daluang/auth/astro/integration";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, fontProviders } from "astro/config";
 
@@ -7,7 +8,9 @@ export default defineConfig({
 	output: "server",
 	// `astro dev` runs the app in workerd, with the bindings of `wrangler.jsonc`.
 	adapter: cloudflare(),
-	integrations: [react({ compiler: true })],
+	// `daluangAuth` adds the `/api/auth` endpoints and the sign-in guard. The app has no
+	// auth route file.
+	integrations: [react({ compiler: true }), daluangAuth()],
 	// Each font sets a CSS variable. `@daluang/ui/styles/theme.css` gives the variables
 	// to `font-sans`, `font-serif`, and `font-mono`.
 	fonts: [

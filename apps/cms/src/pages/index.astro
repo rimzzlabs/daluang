@@ -1,22 +1,14 @@
 ---
-import { DaluangMark } from "@daluang/ui/components/daluang-mark";
-import { ThemeToggle } from "@daluang/ui/components/theme-toggle";
-import BaseLayout from "@/layouts/base-layout.astro";
+import AppLayout from "@/layouts/app-layout.astro";
 ---
 
-<BaseLayout title="Daluang">
-	<header class="mx-auto flex max-w-2xl items-center justify-between px-6 py-4">
-		<a href="/" class="flex items-center gap-2 font-semibold">
-			<DaluangMark className="h-5 w-auto" />
-			Daluang
-		</a>
-		<ThemeToggle client:load />
-	</header>
-	<main class="mx-auto max-w-2xl px-6 py-12">
-		<h1 class="text-3xl font-semibold tracking-tight">Write in Markdown.</h1>
-		<p class="mt-4 font-serif text-lg text-muted-foreground">
-			The CMS keeps your notes and publishes them to your site.
+<AppLayout title="Notes">
+	<section
+		class="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center px-6 py-24 text-center"
+	>
+		<h1 class="font-serif text-2xl font-semibold tracking-tight">No notes yet</h1>
+		<p class="mt-2 text-pretty text-muted-foreground">
+			The editor comes in the next step. Your notes will show here.
 		</p>
-		<p class="mt-6 font-mono text-sm text-muted-foreground">pnpm dev</p>
-	</main>
-</BaseLayout>
+	</section>
+</AppLayout>

@@ -1,0 +1,16 @@
+# Copy this file to `.dev.vars` for `astro dev`. Git ignores `.dev.vars`.
+# In production, set each value with `wrangler secret put <NAME>`.
+
+# 32 or more random characters. Make one with: openssl rand -base64 32
+BETTER_AUTH_SECRET=
+
+# The URL of the CMS.
+BETTER_AUTH_URL=http://localhost:4321
+
+# A GitHub OAuth app: https://github.com/settings/developers
+# Its callback URL is <BETTER_AUTH_URL>/api/auth/callback/github
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+
+# The GitHub usernames that can sign in, separated by commas. Empty allows nobody.
+ALLOWED_GITHUB_USERS=

@@ -1,0 +1,33 @@
+---
+import { SignInButton } from "@daluang/auth/components/sign-in-button";
+import { safeNext } from "@daluang/auth/safe-next";
+import { signInErrorMessage } from "@daluang/auth/sign-in-error";
+import { Alert, AlertDescription, AlertTitle } from "@daluang/ui/components/alert";
+import { DaluangMark } from "@daluang/ui/components/daluang-mark";
+import BaseLayout from "@/layouts/base-layout.astro";
+
+const next = safeNext(Astro.url.searchParams.get("next"));
+const error = signInErrorMessage(Astro.url.searchParams.get("error"));
+---
+
+<BaseLayout title="Sign in · Daluang">
+	<main class="flex min-h-dvh items-center justify-center px-6 py-16">
+		<div class="w-full max-w-sm">
+			<DaluangMark className="h-8 w-auto" />
+			<h1 class="mt-6 font-serif text-2xl font-semibold tracking-tight">Sign in to Daluang</h1>
+			<p class="mt-2 text-sm text-pretty text-muted-foreground">
+				GitHub tells Daluang who you are. Only the GitHub users on the allow list of this CMS
+				can sign in.
+			</p>
+			{
+				error && (
+					<Alert variant="destructive" className="mt-6">
+						<AlertTitle>Could not sign you in</AlertTitle>
+						<AlertDescription>{error}</AlertDescription>
+					</Alert>
+				)
+			}
+			<SignInButton client:load next={next} className="mt-6" />
+		</div>
+	</main>
+</BaseLayout>

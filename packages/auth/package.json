@@ -1,0 +1,40 @@
+{
+	"name": "@daluang/auth",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"license": "MIT",
+	"exports": {
+		"./astro/locals": {
+			"types": "./src/astro/locals.d.ts"
+		},
+		"./astro/*": "./src/astro/*.ts",
+		"./components/*": "./src/components/*.tsx",
+		"./*": "./src/*.ts"
+	},
+	"scripts": {
+		"typecheck": "tsc"
+	},
+	"peerDependencies": {
+		"astro": "catalog:",
+		"react": "catalog:",
+		"react-dom": "catalog:"
+	},
+	"dependencies": {
+		"@daluang/ui": "workspace:*",
+		"@mobily/ts-belt": "catalog:",
+		"@phosphor-icons/react": "catalog:",
+		"better-auth": "catalog:",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "catalog:",
+		"@daluang/tsconfig": "workspace:*",
+		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:",
+		"astro": "catalog:",
+		"react": "catalog:",
+		"react-dom": "catalog:",
+		"typescript": "catalog:"
+	}
+}

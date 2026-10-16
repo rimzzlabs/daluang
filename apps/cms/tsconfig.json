@@ -4,7 +4,8 @@
 		"jsxImportSource": "react",
 		"paths": {
 			"@/*": ["./src/*"]
-		}
+		},
+		"types": ["@cloudflare/workers-types"]
 	},
 	"include": [".astro/types.d.ts", "**/*"],
 	"exclude": ["dist"]

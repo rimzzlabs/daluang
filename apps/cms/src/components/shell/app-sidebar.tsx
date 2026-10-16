@@ -1,0 +1,78 @@
+import { DaluangMark } from "@daluang/ui/components/daluang-mark";
+import { Sidebar, SidebarRail } from "@daluang/ui/components/sidebar";
+import {
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+} from "@daluang/ui/components/sidebar-menu";
+import {
+	SidebarContent,
+	SidebarGroup,
+	SidebarGroupContent,
+	SidebarGroupLabel,
+	SidebarHeader,
+} from "@daluang/ui/components/sidebar-sections";
+import { NotePencilIcon } from "@phosphor-icons/react";
+import type { ComponentType } from "react";
+
+interface NavItem {
+	label: string;
+	href: string;
+	icon: ComponentType;
+}
+
+// Each item has a page. Add an item with its page, not before.
+const WRITE_ITEMS: readonly NavItem[] = [
+	{ label: "Notes", href: "/", icon: NotePencilIcon },
+];
+
+export interface AppSidebarProps {
+	pathname: string;
+}
+
+export function AppSidebar(props: AppSidebarProps) {
+	return (
+		<Sidebar collapsible="icon">
+			<SidebarHeader>
+				<SidebarMenu>
+					<SidebarMenuItem>
+						<SidebarMenuButton
+							size="lg"
+							render={<a href="/" />}
+							tooltip="Daluang"
+						>
+							<span className="flex size-8 shrink-0 items-center justify-center">
+								<DaluangMark className="h-5 w-auto" />
+							</span>
+							<span className="font-semibold">Daluang</span>
+						</SidebarMenuButton>
+					</SidebarMenuItem>
+				</SidebarMenu>
+			</SidebarHeader>
+			<SidebarContent>
+				<nav aria-label="Main">
+					<SidebarGroup>
+						<SidebarGroupLabel>Write</SidebarGroupLabel>
+						<SidebarGroupContent>
+							<SidebarMenu>
+								{WRITE_ITEMS.map((item) => (
+									<SidebarMenuItem key={item.href}>
+										<SidebarMenuButton
+											render={<a href={item.href} />}
+											isActive={props.pathname === item.href}
+											tooltip={item.label}
+										>
+											<item.icon />
+											<span>{item.label}</span>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+								))}
+							</SidebarMenu>
+						</SidebarGroupContent>
+					</SidebarGroup>
+				</nav>
+			</SidebarContent>
+			<SidebarRail />
+		</Sidebar>
+	);
+}

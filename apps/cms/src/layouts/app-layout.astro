@@ -1,0 +1,34 @@
+---
+import { SIGN_IN_PATH } from "@daluang/auth/paths";
+import {
+	parseSidebarOpen,
+	parseSidebarWidth,
+	SIDEBAR_STATE_COOKIE,
+	SIDEBAR_WIDTH_COOKIE,
+} from "@daluang/ui/lib/sidebar-cookies";
+import { AppShell } from "@/components/shell/app-shell";
+import BaseLayout from "@/layouts/base-layout.astro";
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+// The sign-in guard sends a request with no session to the sign-in page, so a user exists
+// here. The check keeps the type narrow.
+const user = Astro.locals.user;
+if (user === null) return Astro.redirect(SIGN_IN_PATH);
+---
+
+<BaseLayout title={`${title} · Daluang`}>
+	<AppShell
+		client:load
+		title={title}
+		pathname={Astro.url.pathname}
+		user={{ name: user.name, githubLogin: user.githubLogin, image: user.image ?? null }}
+		defaultOpen={parseSidebarOpen(Astro.cookies.get(SIDEBAR_STATE_COOKIE)?.value)}
+		defaultWidth={parseSidebarWidth(Astro.cookies.get(SIDEBAR_WIDTH_COOKIE)?.value)}
+	>
+		<slot />
+	</AppShell>
+</BaseLayout>

@@ -9,5 +9,14 @@
 	},
 	"observability": {
 		"enabled": true
-	}
+	},
+	// The database of the CMS. With no `database_id`, `wrangler deploy` makes the database
+	// in your account. Apply `migrations/` with `pnpm db:migrate:local` or `db:migrate:remote`.
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "daluang",
+			"migrations_dir": "migrations"
+		}
+	]
 }
