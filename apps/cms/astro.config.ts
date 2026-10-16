@@ -3,6 +3,8 @@ import react from "@astrojs/react";
 import { daluangAuth } from "@daluang/auth/astro/integration";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, fontProviders } from "astro/config";
+import { CMS_CSP } from "./src/security/csp";
+import { securityHeaders } from "./src/security/integration";
 
 export default defineConfig({
 	output: "server",
@@ -12,9 +14,16 @@ export default defineConfig({
 	// Better Auth keeps the sessions in D1. With no Astro sessions, the adapter adds no KV
 	// namespace, and a deploy makes none in the account.
 	session: false,
-	// `daluangAuth` adds the `/api/auth` endpoints and the sign-in guard. The app has no
-	// auth route file.
-	integrations: [react({ compiler: true }), daluangAuth()],
+	// `securityHeaders` is first, so its middleware adds the headers to each response, also
+	// to a redirect of the guard. `daluangAuth` adds the `/api/auth` endpoints and the
+	// sign-in guard. The app has no auth route file.
+	integrations: [securityHeaders(), react({ compiler: true }), daluangAuth()],
+	// Astro sends the policy as a header of each page, with the hash of each script that it
+	// renders. `astro dev` sends no policy.
+	security: { csp: CMS_CSP },
+	// Comark renders the Markdown of a note. The CMS has no Markdown page of Astro, so it
+	// needs no highlighter. Shiki also writes inline styles, which the policy refuses.
+	markdown: { syntaxHighlight: false },
 	// Each font sets a CSS variable. `@daluang/ui/styles/theme.css` gives the variables
 	// to `font-sans`, `font-serif`, and `font-mono`.
 	fonts: [

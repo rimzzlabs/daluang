@@ -30,6 +30,11 @@ export default defineConfig({
 				// Wiring also. It gives the Better Auth client two actions with no branch. The
 				// tests of the components replace the module with a fake.
 				"packages/auth/src/client.ts",
+				// The security layer of the CMS app is wiring. The middleware needs
+				// `astro:middleware` to load, and the integration is one call of the setup hook.
+				// They give each response to `withSecurityHeaders`, which has tests.
+				"apps/cms/src/security/middleware.ts",
+				"apps/cms/src/security/integration.ts",
 			],
 			reporter: ["text-summary"],
 			thresholds: {
