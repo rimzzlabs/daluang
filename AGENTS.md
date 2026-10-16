@@ -47,7 +47,9 @@ the `catalog` in `pnpm-workspace.yaml`.
   how to host Daluang. Its pages are the Markdown files in `src/pages/`. The build is
   static HTML in `dist/public`, which deploys as Cloudflare static assets.
 - `packages/ui` (`@daluang/ui`): the UI primitives on Base UI and the Tailwind CSS 4
-  theme, with the font tokens. Each app loads the font files.
+  theme, with the font tokens. Each app loads the font files. `src/assets/` holds the
+  masters of the mark (the Sundanese letter da) and of the app icon. `DaluangMark` is the
+  mark as a component. Each app keeps its own copy of the icon files in `public/`.
 - `packages/tsconfig` (`@daluang/tsconfig`): the TypeScript base that each workspace
   extends.
 

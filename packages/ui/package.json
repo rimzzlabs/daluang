@@ -8,6 +8,7 @@
 		"**/*.css"
 	],
 	"exports": {
+		"./assets/*": "./src/assets/*",
 		"./components/*": "./src/components/*.tsx",
 		"./hooks/*": "./src/hooks/*.ts",
 		"./lib/*": "./src/lib/*.ts",

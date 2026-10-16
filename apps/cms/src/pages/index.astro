@@ -1,11 +1,15 @@
 ---
+import { DaluangMark } from "@daluang/ui/components/daluang-mark";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import BaseLayout from "@/layouts/base-layout.astro";
 ---
 
 <BaseLayout title="Daluang">
 	<header class="mx-auto flex max-w-2xl items-center justify-between px-6 py-4">
-		<span class="font-semibold">Daluang</span>
+		<a href="/" class="flex items-center gap-2 font-semibold">
+			<DaluangMark className="h-5 w-auto" />
+			Daluang
+		</a>
 		<ThemeToggle client:load />
 	</header>
 	<main class="mx-auto max-w-2xl px-6 py-12">
