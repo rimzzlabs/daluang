@@ -30,6 +30,18 @@ describe("decideAccess", () => {
 		});
 	});
 
+	it("sends a signed-in person to / when next hides a host behind a tab", () => {
+		expect(
+			decideAccess({
+				url: at("/sign-in?next=/%09/evil.example"),
+				signedIn: true,
+			}),
+		).toEqual({
+			action: "redirect",
+			location: "/",
+		});
+	});
+
 	it("opens each page to a signed-in person", () => {
 		expect(decideAccess({ url: at("/notes"), signedIn: true })).toEqual({
 			action: "continue",
