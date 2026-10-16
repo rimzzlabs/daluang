@@ -108,7 +108,8 @@ Do not run it. The workflow `deploy.yml` deploys, after a release. The name is n
 | `daluang.rimzzlabs.com/docs` | `apps/docs`, in the build of `apps/web`              | `daluang-web` |
 | `cms.rimzzlabs.com`          | `apps/cms`: the copy of the CMS that the owner hosts | `daluang-cms` |
 
-- `daluang-web` serves static files only. It has no server code.
+- `daluang-web` serves static files only. It has no server code. `apps/web/public/_headers`
+  gives each file its security headers: no frame, no sniffed type, and HSTS.
 - `apps/docs` has `basePath: "/docs"`. Each of its URLs starts with `/docs/`.
 - **The root of the docs site is `/docs/`, with the slash.** At `/docs`, the client
   router of Vocs (Waku) throws "pathname must start with basePath". Link to `/docs/`.

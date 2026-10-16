@@ -1,3 +1,13 @@
+# The security headers of each file. The site is static, with no data of a person.
+# A page of the site cannot show in a frame of another site.
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Cross-Origin-Opener-Policy: same-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
 # The file names of these assets have a content hash, so a browser can keep them.
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
