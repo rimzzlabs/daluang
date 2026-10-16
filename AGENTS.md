@@ -227,9 +227,13 @@ own words and its own rules: for example, the editor, the notes, or the media.
   row is made, and one at each new session. A refused sign-in returns to
   `/sign-in?error=github_user_not_allowed`.
 - `githubLogin` comes from the GitHub profile, and the allow list trusts it. Better Auth
-  drops a field with `input: false` from a profile, so the field takes input, and
-  `disabledPaths` closes `/update-user` and `/change-email`. Do not open an endpoint that
-  writes a user.
+  drops a field with `input: false` from a profile, so the field takes input.
+- **Only the endpoints of `OPEN_AUTH_PATHS` answer.** The plugin `openPathsOnly` of
+  `packages/auth/src/server.ts` gives 404 to each other path below `/api/auth`. It is an
+  allow list, so a new endpoint of Better Auth stays closed. Do not open an endpoint that
+  writes a user or gives the GitHub access token.
+- D1 keeps the GitHub tokens of an account encrypted with `BETTER_AUTH_SECRET`
+  (`encryptOAuthTokens`).
 - A session that exists stays valid after its user leaves the list, until it expires.
   To end it now, delete its row from the `session` table.
 - The guard (`packages/auth/src/astro/middleware.ts`) needs a session for each page and
