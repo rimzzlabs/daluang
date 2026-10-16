@@ -1,6 +1,7 @@
 import type { SettingsStore } from "@daluang/settings/settings-store";
 import { O } from "@mobily/ts-belt";
 import type { ReactElement } from "react";
+import type { NavLinkKind } from "@/components/shell/nav-link";
 import { type AppPagePath, findAppPage } from "@/lib/app-pages";
 import { ApiTokensPage } from "./api-tokens-page";
 import { MediaPage } from "./later-pages";
@@ -11,6 +12,8 @@ import { WebhooksPage } from "./webhooks-page";
 /** What each page gets: the server and the router give the same values. */
 export interface AppPageProps {
 	settings: SettingsStore;
+	/** `anchor` in the HTML of the server, `router` in the app island. */
+	linkKind: NavLinkKind;
 }
 
 /** The component of each page. The router and the HTML of the server use the same map. */
@@ -27,7 +30,7 @@ export const PAGE_COMPONENTS: Record<
 	"/settings/fields": FieldsPage,
 };
 
-export interface PageContentProps extends AppPageProps {
+export interface PageContentProps extends Pick<AppPageProps, "settings"> {
 	pathname: string;
 }
 
@@ -39,5 +42,5 @@ export function PageContent(props: PageContentProps) {
 	const page = findAppPage(props.pathname);
 	if (O.isNone(page)) return null;
 	const Page = PAGE_COMPONENTS[page.path];
-	return <Page settings={props.settings} />;
+	return <Page settings={props.settings} linkKind="anchor" />;
 }

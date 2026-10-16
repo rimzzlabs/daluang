@@ -10,7 +10,7 @@ export function routePage(path: AppPagePath) {
 	const Page = PAGE_COMPONENTS[path];
 	function RoutePage() {
 		const context = useRouteContext({ from: "__root__" });
-		return <Page settings={context.settings} />;
+		return <Page settings={context.settings} linkKind="router" />;
 	}
 	return RoutePage;
 }
