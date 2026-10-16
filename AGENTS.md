@@ -390,6 +390,8 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
 
 - `apps/cms/src/pages/[...path].astro` opens the island for each path that is not the
   sign-in page and not an endpoint. A path with no page gets the status 404.
+- `apps/cms/src/pages/api/[...path].ts` answers 404 as JSON for a path below `/api/` that
+  no endpoint has. A `fetch` then reads a failure, not the HTML of a page.
 - The island is `client:only`, because the router reads the browser history when it
   starts. `routes/app.tsx` is its root, and `routes/router.ts` has the route tree.
 - The root route renders `AppShell` around an `<Outlet />`.
