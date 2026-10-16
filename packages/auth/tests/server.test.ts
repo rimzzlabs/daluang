@@ -73,11 +73,37 @@ describe("createAuth", () => {
 		log.mockRestore();
 	});
 
-	it("closes each endpoint that writes a user", () => {
-		expect(makeAuth().options.disabledPaths).toEqual([
-			"/update-user",
-			"/change-email",
-		]);
+	it.each([
+		"/api/auth/update-user",
+		"/api/auth/change-email",
+		"/api/auth/get-access-token",
+		"/api/auth/refresh-token",
+		"/api/auth/link-social",
+		"/api/auth/sign-up/email",
+	])("answers 404 to %s", async (path) => {
+		const response = await makeAuth().handler(
+			new Request(`http://localhost:4321${path}`, {
+				method: "POST",
+				headers: {
+					"content-type": "application/json",
+					origin: "http://localhost:4321",
+				},
+				body: "{}",
+			}),
+		);
+		expect(response.status).toBe(404);
+	});
+
+	it("answers an open endpoint", async () => {
+		const response = await makeAuth().handler(
+			new Request("http://localhost:4321/api/auth/get-session"),
+		);
+		expect(response.status).toBe(200);
+		await expect(response.json()).resolves.toBeNull();
+	});
+
+	it("encrypts the GitHub tokens in D1", () => {
+		expect(makeAuth().options.account?.encryptOAuthTokens).toBe(true);
 	});
 
 	it("checks the allow list before it makes a user", async () => {

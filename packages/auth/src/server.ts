@@ -1,7 +1,8 @@
-import { betterAuth } from "better-auth";
+import { type BetterAuthPlugin, betterAuth } from "better-auth";
 import { APIError } from "better-auth/api";
 import { isAllowedGitHubUser, parseAllowList } from "./allow-list";
 import type { AuthEnv } from "./env";
+import { isOpenAuthPath } from "./paths";
 import { NOT_ALLOWED_ERROR_CODE } from "./sign-in-error";
 
 /** The GitHub username of a user row. `findUserById` types the row without `githubLogin`. */
@@ -28,6 +29,20 @@ export function assertAllowedUser(
 }
 
 /**
+ * Answers 404 to each request for an endpoint that is not in `OPEN_AUTH_PATHS`. It is an
+ * allow list, so an endpoint that a new version of Better Auth adds stays closed.
+ */
+export const openPathsOnly: BetterAuthPlugin = {
+	id: "daluang-open-paths",
+	onRequest: (request) => {
+		if (isOpenAuthPath(new URL(request.url).pathname)) return Promise.resolve();
+		return Promise.resolve({
+			response: new Response("Not Found", { status: 404 }),
+		});
+	},
+};
+
+/**
  * The Better Auth instance of the CMS: sign-in with GitHub, sessions in D1. Only the GitHub
  * users of `ALLOWED_GITHUB_USERS` can sign in. The list is checked when the user row is
  * made and at each new session, so a name that leaves the list cannot sign in again.
@@ -42,13 +57,18 @@ export function createAuth(env: AuthEnv) {
 		user: {
 			additionalFields: {
 				// Better Auth drops a field with `input: false` from the GitHub profile, so the
-				// field takes input. `disabledPaths` below closes each endpoint that writes a
+				// field takes input. `openPathsOnly` below closes each endpoint that writes a
 				// user, so only the GitHub profile sets `githubLogin`.
 				githubLogin: { type: "string", required: true },
 			},
 		},
-		// The allow list trusts `githubLogin`. A signed-in user must not change it.
-		disabledPaths: ["/update-user", "/change-email"],
+		// The allow list trusts `githubLogin`, and a signed-in user must not change it. The
+		// plugin also closes the endpoints that give the GitHub access token.
+		plugins: [openPathsOnly],
+		account: {
+			// D1 keeps the GitHub tokens of each account. The secret encrypts them.
+			encryptOAuthTokens: true,
+		},
 		socialProviders: {
 			github: {
 				clientId: env.GITHUB_CLIENT_ID,
