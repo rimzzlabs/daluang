@@ -32,9 +32,14 @@ export function createAuth(env: AuthEnv) {
 		baseURL: env.BETTER_AUTH_URL,
 		user: {
 			additionalFields: {
-				githubLogin: { type: "string", required: true, input: false },
+				// Better Auth drops a field with `input: false` from the GitHub profile, so the
+				// field takes input. `disabledPaths` below closes each endpoint that writes a
+				// user, so only the GitHub profile sets `githubLogin`.
+				githubLogin: { type: "string", required: true },
 			},
 		},
+		// The allow list trusts `githubLogin`. A signed-in user must not change it.
+		disabledPaths: ["/update-user", "/change-email"],
 		socialProviders: {
 			github: {
 				clientId: env.GITHUB_CLIENT_ID,

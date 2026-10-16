@@ -33,5 +33,6 @@
 		"**/.wrangler": true,
 		"**/dist": true,
 		"pnpm-lock.yaml": true
-	}
+	},
+	"js/ts.tsdk.path": "node_modules/typescript/lib"
 }

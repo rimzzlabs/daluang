@@ -1,13 +1,13 @@
 ---
 import { SignInButton } from "@daluang/auth/components/sign-in-button";
 import { safeNext } from "@daluang/auth/safe-next";
-import { signInErrorMessage } from "@daluang/auth/sign-in-error";
+import { signInError } from "@daluang/auth/sign-in-error";
 import { Alert, AlertDescription, AlertTitle } from "@daluang/ui/components/alert";
 import { DaluangMark } from "@daluang/ui/components/daluang-mark";
 import BaseLayout from "@/layouts/base-layout.astro";
 
 const next = safeNext(Astro.url.searchParams.get("next"));
-const error = signInErrorMessage(Astro.url.searchParams.get("error"));
+const error = signInError(Astro.url.searchParams.get("error"));
 ---
 
 <BaseLayout title="Sign in · Daluang">
@@ -23,7 +23,10 @@ const error = signInErrorMessage(Astro.url.searchParams.get("error"));
 				error && (
 					<Alert variant="destructive" className="mt-6">
 						<AlertTitle>Could not sign you in</AlertTitle>
-						<AlertDescription>{error}</AlertDescription>
+						<AlertDescription>
+							<p>{error.message}</p>
+							{error.code && <p class="font-mono text-xs">Error code: {error.code}</p>}
+						</AlertDescription>
 					</Alert>
 				)
 			}

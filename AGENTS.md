@@ -185,6 +185,10 @@ own words and its own rules: for example, the editor, the notes, or the media.
 - Two database hooks of `packages/auth/src/server.ts` check the list: one when the user
   row is made, and one at each new session. A refused sign-in returns to
   `/sign-in?error=github_user_not_allowed`.
+- `githubLogin` comes from the GitHub profile, and the allow list trusts it. Better Auth
+  drops a field with `input: false` from a profile, so the field takes input, and
+  `disabledPaths` closes `/update-user` and `/change-email`. Do not open an endpoint that
+  writes a user.
 - A session that exists stays valid after its user leaves the list, until it expires.
   To end it now, delete its row from the `session` table.
 - The guard (`packages/auth/src/astro/middleware.ts`) needs a session for each page and
