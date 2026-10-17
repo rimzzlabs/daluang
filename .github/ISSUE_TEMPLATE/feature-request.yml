@@ -1,0 +1,44 @@
+name: Feature request
+description: Suggest a change or a new feature for Daluang.
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Markdown is the one content format of Daluang. For now, a post is text only. "Product scope" in AGENTS.md has the full scope.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Sign-in
+        - Onboarding
+        - Posts
+        - Settings
+        - API tokens
+        - Webhooks
+        - Deploy
+        - Docs site
+        - Landing page
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: What I want to do
+      description: Tell the situation, not only the solution. The situation helps us find the best change.
+      placeholder: I write in English and in Indonesian, and I want to see which posts have no translation.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What can help
+    validations:
+      required: true
+  - type: textarea
+    id: workaround
+    attributes:
+      label: How I do it now

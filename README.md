@@ -25,7 +25,8 @@ A Markdown CMS that runs as a Cloudflare Worker. Open source under the MIT licen
 2. Run `pnpm install`.
 3. Run `pnpm dev` for the CMS, or `pnpm docs:dev` for the documentation site.
 
-`AGENTS.md` has the conventions of the repository.
+`CONTRIBUTING.md` tells how to make a change. `AGENTS.md` has the rules of the repository,
+and `docs/` has one file for each topic of the code.
 
 ## License
 
