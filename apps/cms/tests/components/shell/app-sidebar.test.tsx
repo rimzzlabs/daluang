@@ -21,7 +21,7 @@ function renderAt(pathname: string, store = settingsStore()) {
 describe("AppSidebar", () => {
 	it("marks the item of the current page", () => {
 		renderAt("/");
-		const notes = screen.getByRole("link", { name: "Notes" });
+		const notes = screen.getByRole("link", { name: "Posts" });
 		expect(notes.getAttribute("href")).toBe("/");
 		expect(notes.hasAttribute("data-active")).toBe(true);
 	});
@@ -29,7 +29,7 @@ describe("AppSidebar", () => {
 	it("marks no item on another page", () => {
 		renderAt("/settings");
 		expect(
-			screen.getByRole("link", { name: "Notes" }).hasAttribute("data-active"),
+			screen.getByRole("link", { name: "Posts" }).hasAttribute("data-active"),
 		).toBe(false);
 	});
 
@@ -41,7 +41,7 @@ describe("AppSidebar", () => {
 				.hasAttribute("data-active"),
 		).toBe(true);
 		expect(
-			screen.getByRole("link", { name: "Notes" }).hasAttribute("data-active"),
+			screen.getByRole("link", { name: "Posts" }).hasAttribute("data-active"),
 		).toBe(false);
 	});
 

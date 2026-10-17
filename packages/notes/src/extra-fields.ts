@@ -63,7 +63,7 @@ export const extraFieldsSchema = fieldNamesSchema.pipe(
 		if (A.length(keys) > EXTRA_FIELDS_MAX) {
 			context.addIssue({
 				code: "custom",
-				message: `A note can have ${EXTRA_FIELDS_MAX} extra fields or fewer.`,
+				message: `A post can have ${EXTRA_FIELDS_MAX} extra fields or fewer.`,
 			});
 		}
 	}),

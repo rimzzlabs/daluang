@@ -176,7 +176,7 @@ export function Onboarding(props: OnboardingProps) {
 					<StepFrame
 						key="site"
 						title={welcomeTitle(props.writerName)}
-						description="Tell Daluang about the site that shows your notes. You can change each answer later in Settings."
+						description="Tell Daluang about the site that shows your posts. You can change each answer later in Settings."
 						focus={step.moved}
 						onSubmit={submitSite}
 						actions={<span className="ml-auto">{continueButton}</span>}
@@ -195,7 +195,7 @@ export function Onboarding(props: OnboardingProps) {
 					<StepFrame
 						key="languages"
 						title="Which languages do you write in?"
-						description="Each note has one language. A note can have a translation in each other language on this list."
+						description="Each post has one language. A post can have a translation in each other language on this list."
 						focus={step.moved}
 						onSubmit={submitLanguages}
 						actions={

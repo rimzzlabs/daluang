@@ -6,7 +6,7 @@ export function MediaPage() {
 	return (
 		<LaterPage
 			title="Media"
-			description="The images and the videos of your notes. Cloudflare R2 keeps the files."
+			description="The images and the videos of your posts. Cloudflare R2 keeps the files."
 		/>
 	);
 }

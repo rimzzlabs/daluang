@@ -14,7 +14,7 @@ export function NotFoundPage() {
 				to="/"
 				className={buttonVariants({ variant: "outline", className: "mt-6" })}
 			>
-				Go to the notes
+				Go to the posts
 			</Link>
 		</section>
 	);

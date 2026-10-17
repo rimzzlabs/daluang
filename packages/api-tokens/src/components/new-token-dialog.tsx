@@ -197,7 +197,7 @@ export function NewTokenDialog(props: NewTokenDialogProps) {
 						<ResponsiveDialogHeader>
 							<ResponsiveDialogTitle>Make an API token</ResponsiveDialogTitle>
 							<ResponsiveDialogDescription>
-								A token lets one site read the published notes.
+								A token lets one site read the published posts.
 							</ResponsiveDialogDescription>
 						</ResponsiveDialogHeader>
 						<TokenForm

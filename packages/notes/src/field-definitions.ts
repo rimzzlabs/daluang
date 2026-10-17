@@ -20,7 +20,7 @@ export const fieldDefinitionSchema = z.object({
 		)
 		.refine(
 			(name) => !isCoreField(name),
-			"Each note has this core field. Give the field a different name.",
+			"Each post has this core field. Give the field a different name.",
 		),
 	/** The name of the field in the editor: `Related posts`. */
 	label: z

@@ -44,7 +44,7 @@ describe("RevokeTokenDialog", () => {
 	it("asks before a revoke, and says what a site loses", () => {
 		renderDialog();
 		expect(screen.getByRole("heading", { name: "Revoke Build?" })).toBeTruthy();
-		expect(screen.getByText(/can no longer read the notes/)).toBeTruthy();
+		expect(screen.getByText(/can no longer read the posts/)).toBeTruthy();
 	});
 
 	it("revokes the token, then closes", async () => {

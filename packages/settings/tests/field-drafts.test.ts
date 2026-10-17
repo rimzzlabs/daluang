@@ -74,7 +74,7 @@ describe("parseFieldDrafts", () => {
 				rows: {
 					[second.key]: {
 						label: "Give the field a label.",
-						name: "Each note has this core field. Give the field a different name.",
+						name: "Each post has this core field. Give the field a different name.",
 					},
 					[third.key]: {
 						name: "Another field has this name. Give each field its own name.",

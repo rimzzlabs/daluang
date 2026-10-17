@@ -16,7 +16,7 @@ export function SettingsSummary(props: SettingsSummaryProps) {
 			term: "Languages",
 			value: pipe(languages.languages, A.map(languageLabel), A.join(", ")),
 		},
-		{ term: "New notes", value: languageLabel(languages.defaultLanguage) },
+		{ term: "New posts", value: languageLabel(languages.defaultLanguage) },
 	];
 	return (
 		<dl className="divide-y divide-border rounded-2xl border border-border">

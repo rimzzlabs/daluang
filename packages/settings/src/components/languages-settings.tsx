@@ -38,7 +38,7 @@ export function LanguagesSettings(props: LanguagesSettingsProps) {
 	return (
 		<SettingsForm
 			title="Languages"
-			description="The languages that you write in. Each note has one language, and a note can have a translation in each other language."
+			description="The languages that you write in. Each post has one language, and a post can have a translation in each other language."
 			save={save}
 			onSubmit={submit}
 		>

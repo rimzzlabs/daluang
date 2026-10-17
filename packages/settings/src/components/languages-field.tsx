@@ -134,7 +134,7 @@ export function LanguagesField(props: LanguagesFieldProps) {
 			</Field>
 
 			<FieldSet>
-				<FieldLegend variant="label">New notes start in</FieldLegend>
+				<FieldLegend variant="label">New posts start in</FieldLegend>
 				{many ? (
 					<RadioGroup
 						value={props.value.defaultLanguage}

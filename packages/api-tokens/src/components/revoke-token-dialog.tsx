@@ -47,7 +47,7 @@ export function RevokeTokenDialog(props: RevokeTokenDialogProps) {
 				if (!open) setState({ status: "idle" });
 			}}
 			title={`Revoke ${name}?`}
-			description="A site that uses this token can no longer read the notes. You cannot undo a revoke: make a new token for the site."
+			description="A site that uses this token can no longer read the posts. You cannot undo a revoke: make a new token for the site."
 			confirmLabel="Revoke the token"
 			destructive
 			pending={state.status === "revoking"}

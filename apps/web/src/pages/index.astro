@@ -7,23 +7,23 @@ import BaseLayout from "@/layouts/base-layout.astro";
 // Each point is a decision that is already made. AGENTS.md has the open decisions.
 const points = [
 	{
-		heading: "Your notes stay Markdown.",
-		body: "Daluang stores each note as plain Markdown, not as HTML or rich text. Any Markdown tool can read it.",
+		heading: "Your posts stay Markdown.",
+		body: "Daluang stores each post as plain Markdown, not as HTML or rich text. Any Markdown tool can read it.",
 	},
 	{
 		heading: "It runs on your Cloudflare account.",
-		body: "Daluang is one Cloudflare Worker. Set your environment, fork the repository, and deploy. Your notes live in your account, not on a server that someone else runs.",
+		body: "Daluang is one Cloudflare Worker. Set your environment, fork the repository, and deploy. Your posts live in your account, not on a server that someone else runs.",
 	},
 	{
 		heading: "Your site stays static.",
-		body: "Readers get plain HTML from your site. When you publish a note, Daluang starts a rebuild of your site, so no server renders a page on each visit.",
+		body: "Readers get plain HTML from your site. When you publish a post, Daluang starts a rebuild of your site, so no server renders a page on each visit.",
 	},
 ] as const;
 ---
 
 <BaseLayout
 	title="Daluang: a Markdown CMS for developers who write on their own site"
-	description="Daluang is a Markdown CMS for developers who write on their own site. It publishes each note to the site you built, from your own Cloudflare account. Open source, MIT licensed."
+	description="Daluang is a Markdown CMS for developers who write on their own site. It publishes each post to the site you built, from your own Cloudflare account. Open source, MIT licensed."
 >
 	<header class="mx-auto flex w-full max-w-3xl items-center justify-between px-6 py-4">
 		<a href="/" class="flex items-center gap-2 font-semibold">
@@ -48,7 +48,7 @@ const points = [
 			</h1>
 			<p class="mt-6 max-w-xl text-lg text-pretty text-muted-foreground">
 				Daluang is a Markdown CMS for developers who write on their own site. You write in the
-				browser, and Daluang publishes each note to the site you built, from your own
+				browser, and Daluang publishes each post to the site you built, from your own
 				Cloudflare account.
 			</p>
 			<div class="mt-10 flex flex-wrap gap-3">

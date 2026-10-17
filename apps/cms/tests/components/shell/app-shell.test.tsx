@@ -10,7 +10,7 @@ describe("AppShell", () => {
 	it("frames the page with the sidebar and the navbar", () => {
 		render(
 			<AppShell
-				title="Notes"
+				title="Posts"
 				pathname="/"
 				user={user}
 				defaultOpen
@@ -18,10 +18,10 @@ describe("AppShell", () => {
 				linkKind="anchor"
 				settings={settingsStore()}
 			>
-				<p>No notes yet</p>
+				<p>No posts yet</p>
 			</AppShell>,
 		);
-		expect(screen.getByText("No notes yet")).toBeTruthy();
+		expect(screen.getByText("No posts yet")).toBeTruthy();
 		expect(screen.getByRole("navigation", { name: "Main" })).toBeTruthy();
 		expect(
 			screen.getByRole("button", { name: "Account menu of rimzzlabs" }),
@@ -35,7 +35,7 @@ describe("AppShell", () => {
 	it("renders the sidebar collapsed when it is stored collapsed", () => {
 		render(
 			<AppShell
-				title="Notes"
+				title="Posts"
 				pathname="/"
 				user={user}
 				defaultOpen={false}

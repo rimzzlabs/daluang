@@ -22,7 +22,7 @@ describe("fieldDefinitionSchema", () => {
 
 	it.each([
 		["a name with a hyphen", { name: "related-posts" }, "Start the name"],
-		["a core field", { name: "title" }, "Each note has this core field"],
+		["a core field", { name: "title" }, "Each post has this core field"],
 		["an empty label", { label: " " }, "Give the field a label."],
 	])("refuses %s", (_name, change, message) => {
 		const result = fieldDefinitionSchema.safeParse({ ...FEATURED, ...change });

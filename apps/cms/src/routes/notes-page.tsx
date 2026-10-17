@@ -27,7 +27,7 @@ const SETUP_STEPS: readonly SetupStep[] = [
 	{
 		href: "/settings/api-tokens",
 		title: "Make an API token",
-		description: "Your site reads the published notes with it.",
+		description: "Your site reads the published posts with it.",
 		icon: KeyIcon,
 	},
 	{
@@ -43,10 +43,10 @@ export function NotesPage(props: AppPageProps) {
 		<section className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16">
 			<div className="text-center">
 				<h1 className="font-serif text-2xl font-semibold tracking-tight">
-					No notes yet
+					No posts yet
 				</h1>
 				<p className="mt-2 text-pretty text-muted-foreground">
-					The editor comes in the next step. Your notes will show here.
+					The editor comes in the next step. Your posts will show here.
 				</p>
 			</div>
 			<h2 className="mt-10 text-sm font-medium">Set up your site</h2>

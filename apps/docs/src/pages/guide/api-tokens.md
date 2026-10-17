@@ -1,9 +1,9 @@
-# API tokens [Give a site a token to read the published notes]
+# API tokens [Give a site a token to read the published posts]
 
-A site reads the published notes of the CMS with an API token. Give each site its own
+A site reads the published posts of the CMS with an API token. Give each site its own
 token. Then you can revoke the token of one site, and the other sites keep their access.
 
-The API that reads the notes comes in a later release. You can make the tokens now.
+The API that reads the posts comes in a later release. You can make the tokens now.
 
 ## Make a token
 
@@ -26,4 +26,4 @@ shows the start of each token, the day that you made it, and its last use.
 2. Select **Revoke** on the token.
 3. Select **Revoke now**.
 
-A site that uses a revoked token can no longer read the notes. A CMS can have 20 tokens.
+A site that uses a revoked token can no longer read the posts. A CMS can have 20 tokens.

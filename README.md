@@ -15,7 +15,7 @@ A Markdown CMS that runs as a Cloudflare Worker. Open source under the MIT licen
 | `packages/auth`       | `@daluang/auth`       | Sign-in with GitHub, the allow list, and the sign-in guard            |
 | `packages/notes`      | `@daluang/notes`      | The model of a note: metadata, languages, slugs, and extra fields     |
 | `packages/settings`   | `@daluang/settings`   | The settings of a CMS and the questions of the first sign-in          |
-| `packages/api-tokens` | `@daluang/api-tokens` | The API tokens that let a site read the published notes               |
+| `packages/api-tokens` | `@daluang/api-tokens` | The API tokens that let a site read the published posts               |
 | `packages/webhooks`   | `@daluang/webhooks`   | The webhooks that tell a site to rebuild                              |
 | `packages/tsconfig`   | `@daluang/tsconfig`   | The TypeScript base of each workspace                                 |
 
