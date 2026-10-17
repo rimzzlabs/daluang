@@ -8,7 +8,7 @@ export const TOKEN = {
 	lastUsedAt: null,
 };
 
-/** The messages of the fake of `src/client.ts`. */
+/** The messages of the fake of `@daluang/api-tokens/client`. */
 export const MESSAGES = {
 	invalid: "Invalid.",
 	"too-many": "Too many.",

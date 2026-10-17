@@ -1,4 +1,4 @@
-import { ApiTokens } from "@daluang/api-tokens/components/api-tokens";
+import { ApiTokens } from "@/components/api-tokens/api-tokens";
 
 export function ApiTokensPage() {
 	return <ApiTokens />;

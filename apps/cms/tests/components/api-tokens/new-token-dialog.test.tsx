@@ -3,7 +3,7 @@ import { R } from "@mobily/ts-belt";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { NewTokenDialog } from "../../src/components/new-token-dialog";
+import { NewTokenDialog } from "@/components/api-tokens/new-token-dialog";
 import { MESSAGES, TOKEN } from "./client-mock";
 
 const client = vi.hoisted(() => ({
@@ -16,7 +16,7 @@ const client = vi.hoisted(() => ({
 		server: "Server.",
 	},
 }));
-vi.mock("../../src/client", () => client);
+vi.mock("@daluang/api-tokens/client", () => client);
 
 beforeEach(() => {
 	client.createApiToken.mockReset();

@@ -2,7 +2,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { TokenList } from "../../src/components/token-list";
+import { TokenList } from "@/components/api-tokens/token-list";
 import { TOKEN } from "./client-mock";
 
 describe("TokenList", () => {

@@ -1,7 +1,7 @@
+import type { ApiToken } from "@daluang/api-tokens/api-token";
+import { dayLabel } from "@daluang/api-tokens/date-label";
 import { Button } from "@daluang/ui/components/button";
 import { A } from "@mobily/ts-belt";
-import type { ApiToken } from "../api-token";
-import { dayLabel } from "../date-label";
 
 export interface TokenListProps {
 	tokens: readonly ApiToken[];
