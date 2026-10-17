@@ -1,6 +1,6 @@
+import { handleSettingsRequest } from "@daluang/settings/api";
 import type { APIRoute } from "astro";
-import { handleSettingsRequest } from "../api";
-import { readSettingsEnv } from "./env";
+import { readSettingsEnv } from "@/lib/settings/env";
 
 export const prerender = false;
 

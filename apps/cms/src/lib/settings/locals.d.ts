@@ -3,6 +3,6 @@
 // and for an endpoint.
 declare namespace App {
 	interface Locals {
-		settings: import("../settings").SettingsState | null;
+		settings: import("@daluang/settings/settings").SettingsState | null;
 	}
 }

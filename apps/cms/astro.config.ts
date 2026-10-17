@@ -1,11 +1,11 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import { daluangAuth } from "@daluang/auth/astro/integration";
-import { daluangSettings } from "@daluang/settings/astro/integration";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, fontProviders } from "astro/config";
 import { CMS_CSP } from "./src/lib/security/csp";
 import { securityHeaders } from "./src/lib/security/integration";
+import { settingsMiddleware } from "./src/lib/settings/integration";
 
 export default defineConfig({
 	output: "server",
@@ -17,14 +17,14 @@ export default defineConfig({
 	session: false,
 	// The order is the order of the middleware. `securityHeaders` is first, so it adds the
 	// headers to each response, also to a redirect of the guard. `daluangAuth` adds the
-	// `/api/auth` endpoints and the sign-in guard. `daluangSettings` adds `/api/settings`,
-	// and reads the settings for each page after the guard. The route files of
-	// `/api/tokens` and `/api/webhooks` are in `src/pages/api/`.
+	// `/api/auth` endpoints and the sign-in guard. `settingsMiddleware` reads the settings
+	// for each page after the guard. The route files of `/api/settings`, `/api/tokens`, and
+	// `/api/webhooks` are in `src/pages/api/`.
 	integrations: [
 		securityHeaders(),
 		react({ compiler: true }),
 		daluangAuth(),
-		daluangSettings(),
+		settingsMiddleware(),
 	],
 	// Astro sends the policy as a header of each page, with the hash of each script that it
 	// renders. `astro dev` sends no policy.
