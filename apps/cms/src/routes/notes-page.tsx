@@ -6,7 +6,7 @@ import {
 } from "@phosphor-icons/react";
 import type { ComponentType } from "react";
 import { NavLink } from "@/components/shell/nav-link";
-import type { AppPagePath } from "@/lib/app-pages";
+import type { AppPagePath } from "@/lib/shell/app-pages";
 import type { AppPageProps } from "./page-content";
 
 interface SetupStep {

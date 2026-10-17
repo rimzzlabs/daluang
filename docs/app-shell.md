@@ -34,7 +34,7 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
 - `NAV_GROUPS` in `apps/cms/src/components/shell/app-sidebar.tsx` holds the menus of the
   sidebar: Write (Posts, Media), Publish (API tokens, Webhooks), and Settings (Site,
   Languages, Fields).
-- Each item has a page in `APP_PAGES` (`apps/cms/src/lib/app-pages.ts`), a component in
+- Each item has a page in `APP_PAGES` (`apps/cms/src/lib/shell/app-pages.ts`), a component in
   `PAGE_COMPONENTS` (`routes/page-content.tsx`), and a route in `routes/router.ts`. Add
   the three together. Do not add an item with no page.
 - A page with no feature yet uses `LaterPage`, which says what the page will do.

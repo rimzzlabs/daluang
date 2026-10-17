@@ -6,8 +6,8 @@ import { daluangSettings } from "@daluang/settings/astro/integration";
 import { daluangWebhooks } from "@daluang/webhooks/astro/integration";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, fontProviders } from "astro/config";
-import { CMS_CSP } from "./src/security/csp";
-import { securityHeaders } from "./src/security/integration";
+import { CMS_CSP } from "./src/lib/security/csp";
+import { securityHeaders } from "./src/lib/security/integration";
 
 export default defineConfig({
 	output: "server",

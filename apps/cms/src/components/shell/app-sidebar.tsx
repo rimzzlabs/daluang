@@ -23,8 +23,8 @@ import {
 } from "@phosphor-icons/react";
 import type { ComponentType } from "react";
 import { useSettings } from "@/hooks/settings/use-settings";
-import type { AppPagePath } from "@/lib/app-pages";
 import type { SettingsStore } from "@/lib/settings/settings-store";
+import type { AppPagePath } from "@/lib/shell/app-pages";
 import { type NavLinkKind, navLinkElement } from "./nav-link";
 
 interface NavItem {

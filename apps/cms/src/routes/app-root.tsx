@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useLayoutEffect } from "react";
 import { AppShell } from "@/components/shell/app-shell";
-import { documentTitle, pageTitle } from "@/lib/app-pages";
+import { documentTitle, pageTitle } from "@/lib/shell/app-pages";
 
 /** The component of the root route: the frame of the app, with the page of the path in it. */
 export function AppRoot() {
