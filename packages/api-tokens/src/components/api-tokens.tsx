@@ -1,18 +1,34 @@
 import { Button } from "@daluang/ui/components/button";
+import {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyMedia,
+	EmptyTitle,
+} from "@daluang/ui/components/empty";
+import {
+	Page,
+	PageActions,
+	PageDescription,
+	PageHeader,
+	PageHeading,
+	PageTitle,
+} from "@daluang/ui/components/page";
 import { Skeleton } from "@daluang/ui/components/skeleton";
 import { A, R } from "@mobily/ts-belt";
+import { KeyIcon, PlusIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { match } from "ts-pattern";
 import type { ApiToken } from "../api-token";
 import {
 	type ApiTokensError,
-	type CreatedApiToken,
 	listApiTokens,
 	TOKENS_ERROR_MESSAGES,
 } from "../client";
-import { NewTokenForm } from "./new-token-form";
+import { NewTokenDialog } from "./new-token-dialog";
+import { RevokeTokenDialog } from "./revoke-token-dialog";
 import { TokenList } from "./token-list";
-import { TokenSecret } from "./token-secret";
 
 type ListState =
 	| { status: "loading" }
@@ -42,10 +58,20 @@ function changeTokens(
 	};
 }
 
+interface RevokeTarget {
+	open: boolean;
+	/** The dialog keeps the token while it closes, so its title does not change. */
+	token: ApiToken | null;
+}
+
 /** The page of the API tokens: make a token, see the tokens, and revoke one. */
 export function ApiTokens() {
 	const [list, setList] = useState<ListState>({ status: "loading" });
-	const [created, setCreated] = useState<CreatedApiToken | null>(null);
+	const [making, setMaking] = useState(false);
+	const [revoke, setRevoke] = useState<RevokeTarget>({
+		open: false,
+		token: null,
+	});
 
 	// The tokens are on the server, an external system. The page reads them when it opens.
 	useEffect(() => {
@@ -63,45 +89,32 @@ export function ApiTokens() {
 		setList(listState(await listApiTokens()));
 	}
 
-	function addToken(next: CreatedApiToken) {
-		setCreated(next);
-		setList(changeTokens((tokens) => [next.token, ...tokens]));
-	}
-
-	function removeToken(id: string) {
-		// The token of the panel is no longer valid, so the panel closes.
-		setCreated((current) => (current?.token.id === id ? null : current));
-		setList(
-			changeTokens((tokens) => A.reject(tokens, (token) => token.id === id)),
-		);
-	}
+	const makeButton = (
+		<Button type="button" onClick={() => setMaking(true)}>
+			<PlusIcon data-icon="inline-start" />
+			Make a token
+		</Button>
+	);
 
 	return (
-		<section className="mx-auto flex w-full max-w-xl flex-col gap-8 px-6 py-10">
-			<div className="flex flex-col gap-2">
-				<h1 className="font-serif text-2xl font-semibold tracking-tight">
-					API tokens
-				</h1>
-				<p className="text-sm text-pretty text-muted-foreground">
-					A token lets your site read the published notes through the API of
-					Daluang. Give each site its own token, so you can revoke one without
-					the others.
-				</p>
-			</div>
-			<NewTokenForm onCreated={addToken} />
-			{created === null ? null : (
-				<TokenSecret
-					name={created.token.name}
-					secret={created.secret}
-					onDone={() => setCreated(null)}
-				/>
-			)}
+		<Page>
+			<PageHeader>
+				<PageHeading>
+					<PageTitle>API tokens</PageTitle>
+					<PageDescription>
+						A token lets your site read the published notes through the API of
+						Daluang. Give each site its own token, so you can revoke one without
+						the others.
+					</PageDescription>
+				</PageHeading>
+				<PageActions>{makeButton}</PageActions>
+			</PageHeader>
 			{match(list)
 				.with({ status: "loading" }, () => (
-					<div role="status" className="flex flex-col gap-3">
+					<div role="status" className="flex flex-col gap-2">
 						<span className="sr-only">Loading the tokens</span>
-						<Skeleton className="h-12 w-full" />
-						<Skeleton className="h-12 w-full" />
+						<Skeleton className="h-14 w-full" />
+						<Skeleton className="h-14 w-full" />
 					</div>
 				))
 				.with({ status: "failed" }, (failed) => (
@@ -114,10 +127,47 @@ export function ApiTokens() {
 						</Button>
 					</div>
 				))
-				.with({ status: "ready" }, (ready) => (
-					<TokenList tokens={ready.tokens} onRevoked={removeToken} />
-				))
+				.with({ status: "ready" }, (ready) =>
+					A.isEmpty(ready.tokens) ? (
+						<Empty className="border border-border">
+							<EmptyHeader>
+								<EmptyMedia variant="icon">
+									<KeyIcon />
+								</EmptyMedia>
+								<EmptyTitle>No tokens yet</EmptyTitle>
+								<EmptyDescription>
+									Make one token for each site that reads your notes.
+								</EmptyDescription>
+							</EmptyHeader>
+							<EmptyContent>{makeButton}</EmptyContent>
+						</Empty>
+					) : (
+						<TokenList
+							tokens={ready.tokens}
+							onRevoke={(token) => setRevoke({ open: true, token })}
+						/>
+					),
+				)
 				.exhaustive()}
-		</section>
+			<NewTokenDialog
+				open={making}
+				onOpenChange={setMaking}
+				onCreated={(created) =>
+					setList(changeTokens((tokens) => [created.token, ...tokens]))
+				}
+			/>
+			<RevokeTokenDialog
+				open={revoke.open}
+				token={revoke.token}
+				onOpenChange={(open) => setRevoke({ ...revoke, open })}
+				onRevoked={(id) =>
+					setList(
+						changeTokens((tokens) =>
+							A.reject(tokens, (token) => token.id === id),
+						),
+					)
+				}
+			/>
+		</Page>
 	);
 }

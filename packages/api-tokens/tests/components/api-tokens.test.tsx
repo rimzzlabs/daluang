@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 import { R } from "@mobily/ts-belt";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ApiTokens } from "../../src/components/api-tokens";
+import { TOKEN } from "./client-mock";
 
 const client = vi.hoisted(() => ({
 	listApiTokens: vi.fn(),
@@ -19,14 +20,6 @@ const client = vi.hoisted(() => ({
 }));
 vi.mock("../../src/client", () => client);
 
-const TOKEN = {
-	id: "t1",
-	name: "Build",
-	start: "dlg_AbCd",
-	createdAt: "2026-10-17T12:00:00.000Z",
-	lastUsedAt: null,
-};
-
 beforeEach(() => {
 	client.listApiTokens.mockReset();
 	client.createApiToken.mockReset();
@@ -34,92 +27,80 @@ beforeEach(() => {
 });
 
 describe("ApiTokens", () => {
-	it("shows a loading state, then the tokens", async () => {
-		client.listApiTokens.mockResolvedValue(R.Ok([TOKEN]));
+	it("shows a loading state, then the empty state with its action", async () => {
+		client.listApiTokens.mockResolvedValue(R.Ok([]));
 		render(<ApiTokens />);
 		expect(screen.getByText("Loading the tokens")).toBeTruthy();
-		expect(await screen.findByText("Build")).toBeTruthy();
+		expect(await screen.findByText("No tokens yet")).toBeTruthy();
+		expect(
+			screen.getAllByRole("button", { name: "Make a token" }),
+		).toHaveLength(2);
 	});
 
 	it("shows why the list failed, and tries again", async () => {
 		client.listApiTokens.mockResolvedValueOnce(R.Error("offline"));
-		client.listApiTokens.mockResolvedValueOnce(R.Ok([]));
+		client.listApiTokens.mockResolvedValueOnce(R.Ok([TOKEN]));
 		render(<ApiTokens />);
 		expect((await screen.findByRole("alert")).textContent).toContain(
 			"Offline.",
 		);
 		await userEvent.click(screen.getByRole("button", { name: "Try again" }));
-		expect(await screen.findByText(/No tokens yet/)).toBeTruthy();
+		expect(await screen.findByText("Build")).toBeTruthy();
 	});
 
-	it("shows a new token one time, adds it to the list, and closes the panel", async () => {
+	it("makes a token in a dialog, and adds it to the list", async () => {
 		client.listApiTokens.mockResolvedValue(R.Ok([]));
 		client.createApiToken.mockResolvedValue(
 			R.Ok({ token: TOKEN, secret: "dlg_secret" }),
 		);
 		render(<ApiTokens />);
-		await screen.findByText(/No tokens yet/);
-		await userEvent.type(screen.getByLabelText("Token name"), "Build");
-		await userEvent.click(screen.getByRole("button", { name: "Make a token" }));
+		await screen.findByText("No tokens yet");
+		const [headerButton] = screen.getAllByRole("button", {
+			name: "Make a token",
+		});
+		if (headerButton === undefined) throw new Error("No button.");
+		await userEvent.click(headerButton);
+		const dialog = screen.getByRole("dialog");
+		await userEvent.type(within(dialog).getByLabelText("Token name"), "Build");
+		await userEvent.click(
+			within(dialog).getByRole("button", { name: "Make the token" }),
+		);
 		expect(await screen.findByText("dlg_secret")).toBeTruthy();
-		expect(screen.getByRole("button", { name: "Revoke Build" })).toBeTruthy();
 		await userEvent.click(screen.getByRole("button", { name: "Done" }));
-		expect(screen.queryByText("dlg_secret")).toBeNull();
+		expect(
+			(await screen.findByRole("list", { name: "API tokens" })).textContent,
+		).toContain("Build");
 	});
 
-	it("closes the panel when the writer revokes the new token", async () => {
-		client.listApiTokens.mockResolvedValue(R.Ok([]));
-		client.createApiToken.mockResolvedValue(
-			R.Ok({ token: TOKEN, secret: "dlg_secret" }),
-		);
-		client.revokeApiToken.mockResolvedValue(R.Ok(true));
-		render(<ApiTokens />);
-		await screen.findByText(/No tokens yet/);
-		await userEvent.type(screen.getByLabelText("Token name"), "Build");
-		await userEvent.click(screen.getByRole("button", { name: "Make a token" }));
-		await userEvent.click(
-			await screen.findByRole("button", { name: "Revoke Build" }),
-		);
-		await userEvent.click(
-			screen.getByRole("button", { name: "Revoke Build now" }),
-		);
-		expect(await screen.findByText(/No tokens yet/)).toBeTruthy();
-		expect(screen.queryByText("dlg_secret")).toBeNull();
-	});
-
-	it("removes both tokens of two revokes at the same time", async () => {
+	it("revokes a token after a confirmation, and keeps the others", async () => {
 		const other = { ...TOKEN, id: "t2", name: "Other" };
 		client.listApiTokens.mockResolvedValue(R.Ok([TOKEN, other]));
-		const first = Promise.withResolvers<unknown>();
-		const second = Promise.withResolvers<unknown>();
-		client.revokeApiToken
-			.mockReturnValueOnce(first.promise)
-			.mockReturnValueOnce(second.promise);
+		client.revokeApiToken.mockResolvedValue(R.Ok(true));
 		render(<ApiTokens />);
 		await userEvent.click(
 			await screen.findByRole("button", { name: "Revoke Build" }),
 		);
 		await userEvent.click(
-			screen.getByRole("button", { name: "Revoke Build now" }),
+			screen.getByRole("button", { name: "Revoke the token" }),
 		);
-		await userEvent.click(screen.getByRole("button", { name: "Revoke Other" }));
-		await userEvent.click(
-			screen.getByRole("button", { name: "Revoke Other now" }),
-		);
-		first.resolve(R.Ok(true));
-		second.resolve(R.Ok(true));
-		expect(await screen.findByText(/No tokens yet/)).toBeTruthy();
+		const list = await screen.findByRole("list", { name: "API tokens" });
+		expect(within(list).queryByText("Build")).toBeNull();
+		expect(within(list).getByText("Other")).toBeTruthy();
 	});
 
-	it("shows a new token also when the list did not load", async () => {
+	it("adds no token to a list that did not load", async () => {
 		client.listApiTokens.mockResolvedValue(R.Error("server"));
 		client.createApiToken.mockResolvedValue(
 			R.Ok({ token: TOKEN, secret: "dlg_secret" }),
 		);
 		render(<ApiTokens />);
 		await screen.findByText("Server.");
-		await userEvent.type(screen.getByLabelText("Token name"), "Build");
 		await userEvent.click(screen.getByRole("button", { name: "Make a token" }));
+		await userEvent.type(screen.getByLabelText("Token name"), "Build");
+		await userEvent.click(
+			screen.getByRole("button", { name: "Make the token" }),
+		);
 		expect(await screen.findByText("dlg_secret")).toBeTruthy();
+		expect(screen.queryByRole("list", { name: "API tokens" })).toBeNull();
 	});
 });

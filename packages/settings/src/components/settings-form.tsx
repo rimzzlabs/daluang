@@ -1,4 +1,11 @@
 import { Button } from "@daluang/ui/components/button";
+import {
+	Page,
+	PageDescription,
+	PageHeader,
+	PageHeading,
+	PageTitle,
+} from "@daluang/ui/components/page";
 import { Spinner } from "@daluang/ui/components/spinner";
 import { CheckIcon } from "@phosphor-icons/react";
 import type { FormEvent, ReactNode } from "react";
@@ -37,21 +44,19 @@ function saveMessage(save: SaveState): ReactNode {
 		.exhaustive();
 }
 
-/** The frame of a settings page: a title, the fields, and a save button with its result. */
+/** A settings page: its title, the fields of a form, and a save button with its result. */
 export function SettingsForm(props: SettingsFormProps) {
 	const saving = props.save.status === "saving";
 	return (
-		<section className="mx-auto flex w-full max-w-xl flex-col gap-8 px-6 py-10">
-			<div className="flex flex-col gap-2">
-				<h1 className="font-serif text-2xl font-semibold tracking-tight">
-					{props.title}
-				</h1>
-				<p className="text-sm text-pretty text-muted-foreground">
-					{props.description}
-				</p>
-			</div>
+		<Page>
+			<PageHeader>
+				<PageHeading>
+					<PageTitle>{props.title}</PageTitle>
+					<PageDescription>{props.description}</PageDescription>
+				</PageHeading>
+			</PageHeader>
 			<form
-				className="flex flex-col gap-8"
+				className="flex max-w-lg flex-col gap-6"
 				noValidate
 				onSubmit={props.onSubmit}
 			>
@@ -66,6 +71,6 @@ export function SettingsForm(props: SettingsFormProps) {
 					</p>
 				</div>
 			</form>
-		</section>
+		</Page>
 	);
 }
