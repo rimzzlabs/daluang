@@ -1,4 +1,3 @@
-import type { UserMenuProps } from "@daluang/auth/components/user-menu";
 import type { SettingsStore } from "@daluang/settings/settings-store";
 import {
 	createRootRouteWithContext,
@@ -6,6 +5,7 @@ import {
 	createRouter,
 	type RouterHistory,
 } from "@tanstack/react-router";
+import type { UserMenuProps } from "@/components/auth/user-menu";
 import { AppRoot } from "./app-root";
 import { NotFoundPage } from "./not-found-page";
 import { routePage } from "./route-page";

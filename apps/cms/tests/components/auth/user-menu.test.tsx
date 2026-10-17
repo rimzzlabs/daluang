@@ -2,13 +2,13 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { UserMenu } from "../../src/components/user-menu";
+import { UserMenu } from "@/components/auth/user-menu";
 
 const client = vi.hoisted(() => ({
 	startGitHubSignIn: vi.fn(),
 	signOut: vi.fn(),
 }));
-vi.mock("../../src/client", () => client);
+vi.mock("@/lib/auth/client", () => client);
 
 describe("UserMenu", () => {
 	it("shows the initials of the name when there is no avatar", () => {

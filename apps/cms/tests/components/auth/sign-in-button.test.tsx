@@ -2,13 +2,13 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { SignInButton } from "../../src/components/sign-in-button";
+import { SignInButton } from "@/components/auth/sign-in-button";
 
 const client = vi.hoisted(() => ({
 	startGitHubSignIn: vi.fn(),
 	signOut: vi.fn(),
 }));
-vi.mock("../../src/client", () => client);
+vi.mock("@/lib/auth/client", () => client);
 
 describe("SignInButton", () => {
 	beforeEach(() => {

@@ -29,7 +29,7 @@ export default defineConfig({
 				"packages/auth/src/astro/integration.ts",
 				// Wiring also. It gives the Better Auth client two actions with no branch. The
 				// tests of the components replace the module with a fake.
-				"packages/auth/src/client.ts",
+				"apps/cms/src/lib/auth/client.ts",
 				// The Astro layer of the settings package is wiring, as in the auth package. The
 				// env module, the route, and the middleware need the Workers runtime and
 				// `astro:middleware`. They give the request to `handleSettingsRequest`,

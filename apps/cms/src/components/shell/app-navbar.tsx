@@ -1,10 +1,7 @@
-import {
-	UserMenu,
-	type UserMenuProps,
-} from "@daluang/auth/components/user-menu";
 import { Separator } from "@daluang/ui/components/separator";
 import { SidebarTrigger } from "@daluang/ui/components/sidebar";
 import { ThemeToggle } from "@daluang/ui/components/theme-toggle";
+import { UserMenu, type UserMenuProps } from "@/components/auth/user-menu";
 
 export interface AppNavbarProps {
 	title: string;
