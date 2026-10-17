@@ -1,13 +1,13 @@
-import { R } from "@mobily/ts-belt";
-import { match, P } from "ts-pattern";
-import { z } from "zod";
 import {
 	type Delivery,
 	deliverySchema,
 	WEBHOOKS_API_PATH,
 	type Webhook,
 	webhookSchema,
-} from "./webhook";
+} from "@daluang/webhooks/webhook";
+import { R } from "@mobily/ts-belt";
+import { match, P } from "ts-pattern";
+import { z } from "zod";
 
 /** Why a request of the webhooks page failed. The UI shows one message for each code. */
 export type WebhooksError =

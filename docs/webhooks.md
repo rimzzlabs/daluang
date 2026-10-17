@@ -1,6 +1,8 @@
 # Webhooks
 
-This page tells how the CMS tells a site to rebuild. The code is in `packages/webhooks`.
+This page tells how the CMS tells a site to rebuild. The logic is in `packages/webhooks`.
+The page of the webhooks is in `apps/cms/src/components/webhooks/`, and its calls of the
+endpoint are in `apps/cms/src/lib/webhooks/client.ts`.
 
 - A webhook is a URL that gets a POST with `{ "event", "sentAt" }`, for example the
   deploy hook of a site on Cloudflare Pages. The only event now is `test`, from the button

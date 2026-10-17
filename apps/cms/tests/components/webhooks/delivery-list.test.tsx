@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { DeliveryList } from "../../src/components/delivery-list";
+import { DeliveryList } from "@/components/webhooks/delivery-list";
 
 const BASE = {
 	id: "d1",

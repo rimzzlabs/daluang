@@ -3,7 +3,7 @@ import { R } from "@mobily/ts-belt";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Webhooks } from "../../src/components/webhooks";
+import { Webhooks } from "@/components/webhooks/webhooks";
 import { DELIVERY, WEBHOOK } from "./fixtures";
 
 const client = vi.hoisted(() => ({
@@ -20,7 +20,7 @@ const client = vi.hoisted(() => ({
 		server: "Server.",
 	},
 }));
-vi.mock("../../src/client", () => client);
+vi.mock("@/lib/webhooks/client", () => client);
 
 beforeEach(() => {
 	for (const mock of [

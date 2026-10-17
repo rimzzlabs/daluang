@@ -1,12 +1,12 @@
 import { ConfirmDialog } from "@daluang/ui/components/confirm-dialog";
+import type { Delivery, Webhook } from "@daluang/webhooks/webhook";
 import { R } from "@mobily/ts-belt";
 import { useState } from "react";
 import {
 	removeWebhook,
 	testWebhookOfCms,
 	WEBHOOKS_ERROR_MESSAGES,
-} from "../client";
-import type { Delivery, Webhook } from "../webhook";
+} from "@/lib/webhooks/client";
 
 type ActionState =
 	| { status: "idle" }

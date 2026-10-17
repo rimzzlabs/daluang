@@ -15,6 +15,7 @@ import {
 	PageTitle,
 } from "@daluang/ui/components/page";
 import { Skeleton } from "@daluang/ui/components/skeleton";
+import type { Delivery, Webhook } from "@daluang/webhooks/webhook";
 import { A, R } from "@mobily/ts-belt";
 import { PlusIcon, WebhooksLogoIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
@@ -23,8 +24,7 @@ import {
 	listWebhooksOfCms,
 	WEBHOOKS_ERROR_MESSAGES,
 	type WebhooksError,
-} from "../client";
-import type { Delivery, Webhook } from "../webhook";
+} from "@/lib/webhooks/client";
 import { NewWebhookDialog } from "./new-webhook-dialog";
 import {
 	RemoveWebhookDialog,

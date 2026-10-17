@@ -1,7 +1,7 @@
 import { Badge } from "@daluang/ui/components/badge";
+import { timeLabel } from "@daluang/webhooks/date-label";
+import type { Delivery } from "@daluang/webhooks/webhook";
 import { A } from "@mobily/ts-belt";
-import { timeLabel } from "../date-label";
-import type { Delivery } from "../webhook";
 
 export interface DeliveryListProps {
 	deliveries: readonly Delivery[];

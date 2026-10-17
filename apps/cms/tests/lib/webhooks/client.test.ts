@@ -5,7 +5,7 @@ import {
 	listWebhooksOfCms,
 	removeWebhook,
 	testWebhookOfCms,
-} from "../src/client";
+} from "@/lib/webhooks/client";
 
 const WEBHOOK = {
 	id: "w1",
