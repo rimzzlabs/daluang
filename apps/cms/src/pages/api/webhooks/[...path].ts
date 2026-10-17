@@ -1,6 +1,6 @@
+import { handleWebhooksRequest } from "@daluang/webhooks/api";
 import type { APIRoute } from "astro";
-import { handleWebhooksRequest } from "../api";
-import { readWebhooksEnv } from "./env";
+import { readWebhooksEnv } from "@/lib/webhooks/env";
 
 export const prerender = false;
 

@@ -76,8 +76,8 @@ the `catalog` in `pnpm-workspace.yaml`.
   `/api/tokens`. The page and the route files of the tokens are in `apps/cms`. See
   `docs/api-tokens.md`.
 - `packages/webhooks` (`@daluang/webhooks`): the webhooks that tell a site to rebuild,
-  their deliveries, and the endpoint `/api/webhooks`. The page of the webhooks is in
-  `apps/cms`. See `docs/webhooks.md`.
+  their deliveries, and the handler of the endpoint `/api/webhooks`. The page and the
+  route files of the webhooks are in `apps/cms`. See `docs/webhooks.md`.
 - `packages/settings` (`@daluang/settings`): the settings of a CMS (the site and the
   languages), their store in D1, the endpoint `/api/settings`, the rules of the onboarding
   of the first sign-in, and the Astro integration (`src/astro/`). The settings pages and
@@ -292,9 +292,9 @@ The code below came before these rules. Move it in small pull requests, one pack
 one folder in each. Do not move it as part of another change. Until the code moves, the
 topic docs give the path where it is now.
 
-| Code now                                                                                        | Target                                                                                               |
-| ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `src/astro/` of `webhooks`, `settings`, and `auth`: the integration, the routes, the middleware | The routes to `apps/cms/src/pages/api/`. The middleware and `env.ts` to `apps/cms/src/lib/<domain>/` |
+| Code now                                                                           | Target                                                                                               |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `src/astro/` of `settings` and `auth`: the integration, the routes, the middleware | The routes to `apps/cms/src/pages/api/`. The middleware and `env.ts` to `apps/cms/src/lib/<domain>/` |
 
 Delete each row of this table when its code moves.
 
