@@ -1,6 +1,6 @@
 import { Button } from "@daluang/ui/components/button";
+import type { Webhook } from "@daluang/webhooks/webhook";
 import { PaperPlaneTiltIcon, TrashIcon } from "@phosphor-icons/react";
-import type { Webhook } from "../webhook";
 import { DeliveryList } from "./delivery-list";
 
 export interface WebhookCardProps {

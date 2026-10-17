@@ -6,7 +6,6 @@
 	"license": "MIT",
 	"exports": {
 		"./astro/*": "./src/astro/*.ts",
-		"./components/*": "./src/components/*.tsx",
 		"./*": "./src/*.ts"
 	},
 	"scripts": {

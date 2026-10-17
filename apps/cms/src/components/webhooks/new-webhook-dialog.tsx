@@ -17,18 +17,18 @@ import {
 	ResponsiveDialogTitle,
 } from "@daluang/ui/components/responsive-dialog";
 import { Spinner } from "@daluang/ui/components/spinner";
-import { A, O, pipe, R } from "@mobily/ts-belt";
-import { type FormEvent, useId, useState } from "react";
 import {
 	addWebhook,
 	WEBHOOKS_ERROR_MESSAGES,
 	type WebhooksError,
-} from "../client";
+} from "@daluang/webhooks/client";
 import {
 	newWebhookSchema,
 	WEBHOOK_NAME_MAX_LENGTH,
 	type Webhook,
-} from "../webhook";
+} from "@daluang/webhooks/webhook";
+import { A, O, pipe, R } from "@mobily/ts-belt";
+import { type FormEvent, useId, useState } from "react";
 
 export interface NewWebhookDialogProps {
 	open: boolean;

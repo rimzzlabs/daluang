@@ -15,16 +15,16 @@ import {
 	PageTitle,
 } from "@daluang/ui/components/page";
 import { Skeleton } from "@daluang/ui/components/skeleton";
-import { A, R } from "@mobily/ts-belt";
-import { PlusIcon, WebhooksLogoIcon } from "@phosphor-icons/react";
-import { useEffect, useState } from "react";
-import { match } from "ts-pattern";
 import {
 	listWebhooksOfCms,
 	WEBHOOKS_ERROR_MESSAGES,
 	type WebhooksError,
-} from "../client";
-import type { Delivery, Webhook } from "../webhook";
+} from "@daluang/webhooks/client";
+import type { Delivery, Webhook } from "@daluang/webhooks/webhook";
+import { A, R } from "@mobily/ts-belt";
+import { PlusIcon, WebhooksLogoIcon } from "@phosphor-icons/react";
+import { useEffect, useState } from "react";
+import { match } from "ts-pattern";
 import { NewWebhookDialog } from "./new-webhook-dialog";
 import {
 	RemoveWebhookDialog,

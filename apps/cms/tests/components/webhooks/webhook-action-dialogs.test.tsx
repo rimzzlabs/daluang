@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
 	RemoveWebhookDialog,
 	TestWebhookDialog,
-} from "../../src/components/webhook-action-dialogs";
+} from "@/components/webhooks/webhook-action-dialogs";
 import { DELIVERY, MESSAGES, WEBHOOK } from "./fixtures";
 
 const client = vi.hoisted(() => ({
@@ -21,7 +21,7 @@ const client = vi.hoisted(() => ({
 		server: "Server.",
 	},
 }));
-vi.mock("../../src/client", () => client);
+vi.mock("@daluang/webhooks/client", () => client);
 
 beforeEach(() => {
 	client.removeWebhook.mockReset();
