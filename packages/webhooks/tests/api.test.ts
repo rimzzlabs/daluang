@@ -8,6 +8,11 @@ const ORIGIN = "http://localhost:4321";
 const NOW = new Date("2026-10-17T00:00:00.000Z");
 const HOOK = { name: "Site", url: "https://example.com/deploy/a1b2c3d4" };
 
+/** The `fetch` of a test that sends no delivery. A call fails the test. */
+function noDelivery(): Promise<Response> {
+	return Promise.reject(new Error("This test sends no delivery."));
+}
+
 function request(path: string, init?: RequestInit) {
 	return new Request(`${ORIGIN}${path}`, init);
 }
@@ -46,11 +51,14 @@ describe("handleWebhooksRequest", () => {
 			request: post("/api/webhooks", JSON.stringify(HOOK)),
 			db,
 			now: () => NOW,
+			fetcher: noDelivery,
 		});
 		expect(added.status).toBe(201);
 		const listed = await handleWebhooksRequest({
 			request: request("/api/webhooks"),
 			db,
+			now: () => NOW,
+			fetcher: noDelivery,
 		});
 		await expect(listed.json()).resolves.toEqual({
 			webhooks: [expect.objectContaining({ urlHint: "example.com/…c3d4" })],
@@ -62,6 +70,8 @@ describe("handleWebhooksRequest", () => {
 		const added = await handleWebhooksRequest({
 			request: post("/api/webhooks", JSON.stringify(HOOK)),
 			db,
+			now: () => NOW,
+			fetcher: noDelivery,
 		});
 		expect(added.status).toBe(201);
 	});
@@ -74,6 +84,8 @@ describe("handleWebhooksRequest", () => {
 				JSON.stringify({ name: "", url: "http://127.0.0.1" }),
 			),
 			db,
+			now: () => NOW,
+			fetcher: noDelivery,
 		});
 		expect(response.status).toBe(422);
 		await expect(response.json()).resolves.toEqual({
@@ -100,7 +112,12 @@ describe("handleWebhooksRequest", () => {
 		],
 	])("refuses %s", async (_name, req, status) => {
 		const { db } = createFakeD1();
-		const response = await handleWebhooksRequest({ request: req, db });
+		const response = await handleWebhooksRequest({
+			request: req,
+			db,
+			now: () => NOW,
+			fetcher: noDelivery,
+		});
 		expect(response.status).toBe(status);
 	});
 
@@ -115,6 +132,8 @@ describe("handleWebhooksRequest", () => {
 		const response = await handleWebhooksRequest({
 			request: post("/api/webhooks", JSON.stringify(HOOK)),
 			db,
+			now: () => NOW,
+			fetcher: noDelivery,
 		});
 		expect(response.status).toBe(409);
 	});
@@ -141,25 +160,11 @@ describe("handleWebhooksRequest", () => {
 		const listed = await handleWebhooksRequest({
 			request: request("/api/webhooks"),
 			db,
+			now: () => NOW,
+			fetcher: noDelivery,
 		});
 		const body = await listed.json();
 		expect(JSON.stringify(body)).toContain('"statusCode":204');
-	});
-
-	it("sends a test with the fetch of the runtime when no fetch is given", async () => {
-		const fetch = vi.fn(() =>
-			Promise.resolve(new Response(null, { status: 200 })),
-		);
-		vi.stubGlobal("fetch", fetch);
-		const { db } = createFakeD1();
-		const { id } = await createWebhook({ db, webhook: HOOK, now: NOW });
-		const response = await handleWebhooksRequest({
-			request: request(`/api/webhooks/${id}/test`, { method: "POST" }),
-			db,
-		});
-		expect(response.status).toBe(200);
-		expect(fetch).toHaveBeenCalledOnce();
-		vi.unstubAllGlobals();
 	});
 
 	it("answers 404 to a test or a remove of a webhook that does not exist", async () => {
@@ -167,10 +172,14 @@ describe("handleWebhooksRequest", () => {
 		const test = await handleWebhooksRequest({
 			request: request("/api/webhooks/nope/test", { method: "POST" }),
 			db,
+			now: () => NOW,
+			fetcher: noDelivery,
 		});
 		const remove = await handleWebhooksRequest({
 			request: request("/api/webhooks/nope", { method: "DELETE" }),
 			db,
+			now: () => NOW,
+			fetcher: noDelivery,
 		});
 		expect([test.status, remove.status]).toEqual([404, 404]);
 	});
@@ -181,6 +190,8 @@ describe("handleWebhooksRequest", () => {
 		const response = await handleWebhooksRequest({
 			request: request(`/api/webhooks/${id}`, { method: "DELETE" }),
 			db,
+			now: () => NOW,
+			fetcher: noDelivery,
 		});
 		expect(response.status).toBe(204);
 	});
@@ -194,6 +205,8 @@ describe("handleWebhooksRequest", () => {
 		const response = await handleWebhooksRequest({
 			request: request(path, { method }),
 			db,
+			now: () => NOW,
+			fetcher: noDelivery,
 		});
 		expect(response.status).toBe(405);
 		expect(response.headers.get("Allow")).toBe(allow);

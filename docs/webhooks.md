@@ -19,5 +19,7 @@ They give each request to `handleWebhooksRequest`, with the `DB` binding of
 - A delivery is `delivered` for a status of 2xx, and `failed` for another status or for
   no answer. D1 keeps the 20 newest deliveries of each webhook
   (`apps/cms/migrations/0004_webhooks.sql`), and the list shows 5.
-- `sendWebhook` calls `fetch` with no `this`, in an async function. Workers refuses a call
-  of `fetch` as the method of another object ("Illegal invocation").
+- The package reads no global `fetch` and no clock. The route files give the handler `now`
+  and `fetcher`, and a test gives a fixed clock and a fake. `fetcher` calls `fetch` with no
+  `this`, and `sendWebhook` calls it in an async function. Workers refuses a call of `fetch`
+  as the method of another object ("Illegal invocation").

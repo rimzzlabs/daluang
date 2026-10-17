@@ -54,9 +54,9 @@ export interface WebhooksRequest {
 	request: Request;
 	db: D1Database;
 	/** The clock of a write and of a delivery. A test gives a fixed one. */
-	now?: () => Date;
-	/** The `fetch` of a delivery. A test gives a fake. */
-	fetcher?: typeof fetch;
+	now: () => Date;
+	/** The `fetch` of a delivery. The route file gives the `fetch` of Workers, and a test gives a fake. */
+	fetcher: typeof fetch;
 }
 
 /** Side effect: writes a new webhook to D1, so that a later delivery can find it. */
@@ -85,8 +85,11 @@ async function postWebhook(params: WebhooksRequest): Promise<Response> {
 		);
 	if ((await countWebhooks(db)) >= WEBHOOKS_MAX)
 		return errorResponse("too-many", { status: 409 });
-	const now = params.now ?? (() => new Date());
-	const webhook = await createWebhook({ db, webhook: parsed.data, now: now() });
+	const webhook = await createWebhook({
+		db,
+		webhook: parsed.data,
+		now: params.now(),
+	});
 	return Response.json({ webhook }, { status: 201 });
 }
 
@@ -103,8 +106,8 @@ async function testWebhook(
 	const delivery = await sendWebhook({
 		url,
 		event: "test",
-		now: params.now ?? (() => new Date()),
-		fetcher: params.fetcher ?? ((input, init) => fetch(input, init)),
+		now: params.now,
+		fetcher: params.fetcher,
 	});
 	await recordDelivery({ db, webhookId: id, delivery });
 	return Response.json({ delivery });

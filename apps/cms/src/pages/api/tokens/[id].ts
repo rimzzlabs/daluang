@@ -10,4 +10,5 @@ export const ALL: APIRoute = (context) =>
 		request: context.request,
 		db: readApiTokensEnv().DB,
 		id: context.params.id,
+		now: () => new Date(),
 	});
