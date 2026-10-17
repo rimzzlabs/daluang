@@ -43,6 +43,7 @@ export interface SettingsRequest {
 	now?: () => Date;
 }
 
+/** Side effect: writes the settings to D1, so that they stay after this request. */
 async function patchSettings(params: SettingsRequest): Promise<Response> {
 	const { request, db } = params;
 	if (
@@ -66,6 +67,9 @@ async function patchSettings(params: SettingsRequest): Promise<Response> {
 }
 
 /**
+ * Side effect: reads and writes the table `setting` of D1, because D1 keeps the settings
+ * of the CMS.
+ *
  * The endpoint of the settings. `GET` gives the stored settings. `PATCH` writes one setting
  * or more, then gives the stored settings. The sign-in guard checks the session and the
  * origin before this handler runs.

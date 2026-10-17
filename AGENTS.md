@@ -294,7 +294,6 @@ topic docs give the path where it is now.
 | Code now                                                                  | Target                                                                                               |
 | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `src/astro/` of each package: the integration, the routes, the middleware | The routes to `apps/cms/src/pages/api/`. The middleware and `env.ts` to `apps/cms/src/lib/<domain>/` |
-| The side-effect functions of `packages/*`, with no `Side effect:` comment | The same file, with the comment                                                                      |
 
 Delete each row of this table when its code moves.
 

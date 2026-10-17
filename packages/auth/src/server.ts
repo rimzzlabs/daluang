@@ -43,6 +43,9 @@ export const openPathsOnly: BetterAuthPlugin = {
 };
 
 /**
+ * Side effect: the instance reads and writes the users, the accounts, and the sessions
+ * in D1. A session must stay valid after its request.
+ *
  * The Better Auth instance of the CMS: sign-in with GitHub, sessions in D1. Only the GitHub
  * users of `ALLOWED_GITHUB_USERS` can sign in. The list is checked when the user row is
  * made and at each new session, so a name that leaves the list cannot sign in again.

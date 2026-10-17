@@ -59,6 +59,7 @@ export interface WebhooksRequest {
 	fetcher?: typeof fetch;
 }
 
+/** Side effect: writes a new webhook to D1, so that a later delivery can find it. */
 async function postWebhook(params: WebhooksRequest): Promise<Response> {
 	const { request, db } = params;
 	if (
@@ -89,6 +90,10 @@ async function postWebhook(params: WebhooksRequest): Promise<Response> {
 	return Response.json({ webhook }, { status: 201 });
 }
 
+/**
+ * Side effect: sends a POST to the URL of the webhook, and writes the delivery to D1. The
+ * writer then sees if the site got it.
+ */
 async function testWebhook(
 	params: WebhooksRequest & { id: string },
 ): Promise<Response> {
@@ -115,6 +120,9 @@ function notAllowed(allow: string): Promise<Response> {
 }
 
 /**
+ * Side effect: reads and writes the webhooks in D1, and sends a test delivery. D1 keeps
+ * the webhooks of the CMS.
+ *
  * The endpoint of the webhooks. `GET /api/webhooks` lists them, `POST /api/webhooks` adds
  * one, `DELETE /api/webhooks/<id>` removes one, and `POST /api/webhooks/<id>/test` sends a
  * test delivery. The sign-in guard checks the session and the origin before it runs.

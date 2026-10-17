@@ -28,6 +28,10 @@ export interface TokensRequest {
 	now?: () => Date;
 }
 
+/**
+ * Side effect: writes a new token to D1. A site needs a token that stays valid after this
+ * request.
+ */
 async function postToken(params: TokensRequest): Promise<Response> {
 	const { request, db } = params;
 	if (
@@ -65,6 +69,9 @@ function notAllowed(allow: string): Promise<Response> {
 }
 
 /**
+ * Side effect: reads and writes the table `api_token` of D1, because D1 keeps the tokens
+ * of the CMS.
+ *
  * The endpoint of the API tokens. `GET /api/tokens` lists the tokens, `POST /api/tokens`
  * makes one and gives the token one time, and `DELETE /api/tokens/<id>` revokes one. The
  * sign-in guard checks the session and the origin before this handler runs.

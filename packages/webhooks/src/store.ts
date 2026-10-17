@@ -31,7 +31,11 @@ function toDelivery(row: DeliveryRow): Delivery {
 	return D.deleteKey(row, "webhookId");
 }
 
-/** Each webhook, the newest first, with its newest deliveries. The URL is masked. */
+/**
+ * Side effect: reads the webhooks and their deliveries from D1, because D1 keeps them.
+ *
+ * Each webhook, the newest first, with its newest deliveries. The URL is masked.
+ */
 export async function listWebhooks(
 	db: D1Database,
 ): Promise<readonly Webhook[]> {
@@ -62,7 +66,11 @@ export async function listWebhooks(
 	}));
 }
 
-/** The number of webhooks. */
+/**
+ * Side effect: reads D1, because a CMS can have only `WEBHOOKS_MAX` webhooks.
+ *
+ * The number of webhooks.
+ */
 export async function countWebhooks(db: D1Database): Promise<number> {
 	const result = await db
 		.prepare('select count(*) as "count" from "webhook"')
@@ -80,7 +88,12 @@ export interface WebhookCreate {
 	now: Date;
 }
 
-/** Adds a webhook. */
+/**
+ * Side effect: writes a row with a random ID to D1. The webhook must stay after this
+ * request.
+ *
+ * Adds a webhook.
+ */
 export async function createWebhook(create: WebhookCreate): Promise<Webhook> {
 	const webhook = {
 		id: crypto.randomUUID(),
@@ -102,6 +115,9 @@ export interface WebhookRef {
 }
 
 /**
+ * Side effect: deletes a row and its deliveries from D1. A removed webhook gets no later
+ * delivery.
+ *
  * Removes a webhook. D1 enforces the foreign keys, so `on delete cascade` removes its
  * deliveries. False when no webhook has the ID.
  */
@@ -113,7 +129,12 @@ export async function deleteWebhook(ref: WebhookRef): Promise<boolean> {
 	return result.meta.changes > 0;
 }
 
-/** The URL of a webhook, or `None`. Only a delivery reads the URL. */
+/**
+ * Side effect: reads the URL from D1. Only D1 keeps the full URL, because the URL is a
+ * secret.
+ *
+ * The URL of a webhook, or `None`. Only a delivery reads the URL.
+ */
 export async function findWebhookUrl(
 	ref: WebhookRef,
 ): Promise<O.Option<string>> {
@@ -134,7 +155,12 @@ export interface DeliveryRecord {
 	delivery: Delivery;
 }
 
-/** Records a delivery, and deletes the deliveries after the newest ones. */
+/**
+ * Side effect: writes a delivery to D1, and deletes the old ones. The list shows the
+ * newest deliveries.
+ *
+ * Records a delivery, and deletes the deliveries after the newest ones.
+ */
 export async function recordDelivery(record: DeliveryRecord): Promise<void> {
 	const { db, webhookId, delivery } = record;
 	await db.batch([

@@ -25,7 +25,12 @@ export interface FieldErrors {
 	list?: string;
 }
 
-/** The drafts of the stored fields. */
+/**
+ * Side effect: makes a random key for each draft. React needs a stable key for each row
+ * of the list.
+ *
+ * The drafts of the stored fields.
+ */
 export function fieldDrafts(
 	fields: readonly FieldDefinition[],
 ): readonly FieldDraft[] {
@@ -36,7 +41,12 @@ export function fieldDrafts(
 	}));
 }
 
-/** A new row, empty or from a suggestion. */
+/**
+ * Side effect: makes a random key for the draft. React needs a stable key for each row
+ * of the list.
+ *
+ * A new row, empty or from a suggestion.
+ */
 export function newFieldDraft(suggestion?: FieldDefinition): FieldDraft {
 	return {
 		key: crypto.randomUUID(),

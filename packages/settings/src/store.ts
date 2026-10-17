@@ -21,6 +21,9 @@ interface SettingRead<T> {
 }
 
 /**
+ * Side effect: writes to the log when the schema refuses a stored value. The owner can
+ * then find the key.
+ *
  * The value of one setting, or `null` when it has no row. A value that its schema refuses
  * is `null` also, so the CMS asks the writer for it again. The log tells the owner why.
  */
@@ -37,7 +40,11 @@ function readSetting<T>(read: SettingRead<T>): T | null {
 	return null;
 }
 
-/** Reads each setting from the `setting` table of D1. */
+/**
+ * Side effect: reads the table `setting` of D1, because D1 keeps the settings.
+ *
+ * Reads each setting from the `setting` table of D1.
+ */
 export async function readSettings(db: D1Database): Promise<StoredSettings> {
 	const result = await db.prepare('select "key", "value" from "setting"').all();
 	const rows = A.filterMap(result.results, (row) =>
@@ -68,7 +75,12 @@ export interface SettingsWrite {
 	now: Date;
 }
 
-/** Writes each setting of the patch. D1 runs the batch as one transaction. */
+/**
+ * Side effect: writes the table `setting` of D1 in one batch, so that the settings stay
+ * after this request.
+ *
+ * Writes each setting of the patch. D1 runs the batch as one transaction.
+ */
 export async function writeSettings(write: SettingsWrite): Promise<void> {
 	const updatedAt = write.now.toISOString();
 	const statements = pipe(
