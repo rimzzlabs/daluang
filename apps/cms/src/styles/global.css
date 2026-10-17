@@ -4,7 +4,6 @@
  * Tailwind CSS scans the app, and the theme adds the UI package. These lines add the
  * components of each domain package that the app renders.
  */
-@source "../../../../packages/api-tokens/src";
 @source "../../../../packages/auth/src";
 @source "../../../../packages/settings/src";
 @source "../../../../packages/webhooks/src";

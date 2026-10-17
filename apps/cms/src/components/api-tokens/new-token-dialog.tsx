@@ -1,3 +1,7 @@
+import {
+	TOKEN_NAME_MAX_LENGTH,
+	tokenNameSchema,
+} from "@daluang/api-tokens/api-token";
 import { Button } from "@daluang/ui/components/button";
 import {
 	Field,
@@ -20,13 +24,12 @@ import { R } from "@mobily/ts-belt";
 import { CheckIcon, CopyIcon } from "@phosphor-icons/react";
 import { type FormEvent, useId, useState } from "react";
 import { match } from "ts-pattern";
-import { TOKEN_NAME_MAX_LENGTH, tokenNameSchema } from "../api-token";
 import {
 	type ApiTokensError,
 	type CreatedApiToken,
 	createApiToken,
 	TOKENS_ERROR_MESSAGES,
-} from "../client";
+} from "@/lib/api-tokens/client";
 
 export interface NewTokenDialogProps {
 	open: boolean;
