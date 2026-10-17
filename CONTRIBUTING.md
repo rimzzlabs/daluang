@@ -49,8 +49,10 @@ Do not run it. `docs/infrastructure.md` tells how a release deploys.
 
 ## Branches
 
-Make a branch from `main` for each change. Name the branch `type/short-description`.
-The type is the commit type of the main change:
+Make a branch from `main` for each change. Name the branch `type/short-description`:
+
+- The type is the type of each commit on the branch, and of the PR title.
+- The description names the one change, in kebab-case.
 
 ```
 feat/post-editor
@@ -58,6 +60,13 @@ fix/webhook-timeout
 docs/contributor-guide
 chore/bump-astro
 ```
+
+- **Do not collect changes on a long-lived branch,** for example `chore/next` or `dev`.
+  Such a branch mixes commit types, and its name does not tell what it changes.
+- Do not use a name with no subject: `next`, `wip`, `dev`, `temp`, `misc`, or `update`.
+- If a branch gets a commit of another type, move that commit to a new branch.
+- Before you push, compare the name of the branch with its commits. If the type is
+  different, rename the branch with `git branch -m <old> <new>`.
 
 ## Commits
 

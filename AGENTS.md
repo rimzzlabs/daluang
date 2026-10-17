@@ -121,7 +121,8 @@ before the first commit of a session.
 
 ### Steps
 
-1. Make a branch from `main` for the change: `type/short-description`.
+1. Make a branch from `main` for the change: `type/short-description`. The type is the
+   type of its commits and of the PR title.
 2. Make one change of behavior in each commit, with its test and its docs.
 3. Run `pnpm check`, `pnpm typecheck`, and `pnpm test` on your computer. Each one must
    pass.
@@ -129,14 +130,19 @@ before the first commit of a session.
 5. If the change touches `apps/web` or `apps/docs`, run `pnpm web:build`.
 6. If the change is visible in the interface, look at it in `pnpm dev`. Ask the person
    before you open a browser.
-7. Ask the person: "Shall I open a PR?"
-8. If the answer is yes, push the branch. Then open the pull request with `gh pr create`,
+7. Compare the name of the branch with its commits. If the type is different, rename
+   the branch with `git branch -m`.
+8. Ask the person: "Shall I open a PR?"
+9. If the answer is yes, push the branch. Then open the pull request with `gh pr create`,
    and fill in the template.
-9. If the answer is no, stop. Tell the person that the branch is ready to push.
+10. If the answer is no, stop. Tell the person that the branch is ready to push.
 
 ### Rules
 
 - Do not push and do not open a pull request before the person answers yes.
+- **Name each branch for its one change.** Do not collect changes on a long-lived
+  branch, for example `chore/next`. Do not use a name with no subject: `next`, `wip`,
+  `dev`, `temp`, or `misc`.
 - Keep one subject in each pull request. If a pull request changes more than 400 lines
   of code, split it. Moved files and generated files do not count.
 - If a task has two subjects, make two branches and two pull requests.
