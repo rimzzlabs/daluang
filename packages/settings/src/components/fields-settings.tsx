@@ -164,7 +164,7 @@ export function FieldsSettings(props: FieldsSettingsProps) {
 			</div>
 
 			{A.isEmpty(fields) ? (
-				<Empty className="border border-border">
+				<Empty className="flex-none border border-border p-8">
 					<EmptyHeader>
 						<EmptyMedia variant="icon">
 							<ListDashesIcon />

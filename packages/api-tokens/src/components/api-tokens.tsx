@@ -128,7 +128,7 @@ export function ApiTokens() {
 				))
 				.with({ status: "ready" }, (ready) =>
 					A.isEmpty(ready.tokens) ? (
-						<Empty className="border border-border">
+						<Empty className="flex-none border border-border p-8">
 							<EmptyHeader>
 								<EmptyMedia variant="icon">
 									<KeyIcon />

@@ -2,19 +2,15 @@ import { cn } from "cn";
 import type { ComponentProps } from "react";
 
 /**
- * The frame of a page in the app shell. The content starts at the left edge of the shell
- * and stops at 72rem, so a list stays readable on a wide screen. An empty state centers
- * itself inside it.
+ * The frame of a page in the app shell: the full width of the shell, with a compact
+ * padding. The primary action of the header sits at the right edge.
  */
 export function Page(props: ComponentProps<"section">) {
 	const { className, ...rest } = props;
 	return (
 		<section
 			data-slot="page"
-			className={cn(
-				"flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8",
-				className,
-			)}
+			className={cn("flex w-full flex-col gap-5 px-4 py-5 sm:px-6", className)}
 			{...rest}
 		/>
 	);
