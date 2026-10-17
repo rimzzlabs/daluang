@@ -1,7 +1,3 @@
-import {
-	type SettingsStore,
-	useSettings,
-} from "@daluang/settings/settings-store";
 import { DaluangMark } from "@daluang/ui/components/daluang-mark";
 import { Sidebar, SidebarRail } from "@daluang/ui/components/sidebar";
 import {
@@ -27,6 +23,7 @@ import {
 } from "@phosphor-icons/react";
 import type { ComponentType } from "react";
 import type { AppPagePath } from "@/lib/app-pages";
+import { type SettingsStore, useSettings } from "@/lib/settings/settings-store";
 import { type NavLinkKind, navLinkElement } from "./nav-link";
 
 interface NavItem {

@@ -1,11 +1,11 @@
 ---
 import { SIGN_IN_PATH } from "@daluang/auth/paths";
 import { ONBOARDING_PATH } from "@daluang/settings/onboarding";
-import { createSettingsStore } from "@daluang/settings/settings-store";
 import { SIDEBAR_WIDTH_REM } from "@daluang/ui/lib/sidebar-preferences";
 import { AppShell } from "@/components/shell/app-shell";
 import BaseLayout from "@/layouts/base-layout.astro";
 import { documentTitle, findAppPage, pageTitle } from "@/lib/app-pages";
+import { createSettingsStore } from "@/lib/settings/settings-store";
 import { App } from "@/routes/app";
 import { PageContent } from "@/routes/page-content";
 

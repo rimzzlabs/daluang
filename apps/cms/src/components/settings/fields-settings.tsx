@@ -8,10 +8,6 @@ import {
 } from "@daluang/settings/field-drafts";
 import { FIELD_SUGGESTIONS } from "@daluang/settings/field-suggestions";
 import { settingsState } from "@daluang/settings/settings";
-import {
-	type SettingsStore,
-	useSettings,
-} from "@daluang/settings/settings-store";
 import { Badge } from "@daluang/ui/components/badge";
 import { Button } from "@daluang/ui/components/button";
 import { ConfirmDialog } from "@daluang/ui/components/confirm-dialog";
@@ -39,6 +35,7 @@ import {
 	type SaveSettingsError,
 	saveSettings,
 } from "@/lib/settings/client";
+import { type SettingsStore, useSettings } from "@/lib/settings/settings-store";
 import { FieldDialog, type FieldEdit } from "./field-dialog";
 import { FieldList } from "./field-list";
 

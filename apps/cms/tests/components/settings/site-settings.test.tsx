@@ -1,11 +1,11 @@
 // @vitest-environment jsdom
 
-import { createSettingsStore } from "@daluang/settings/settings-store";
 import { R } from "@mobily/ts-belt";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SiteSettings } from "@/components/settings/site-settings";
+import { createSettingsStore } from "@/lib/settings/settings-store";
 
 const client = vi.hoisted(() => ({
 	saveSettings: vi.fn(),

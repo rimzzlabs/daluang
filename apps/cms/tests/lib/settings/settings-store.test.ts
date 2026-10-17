@@ -1,7 +1,10 @@
 // @vitest-environment jsdom
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { createSettingsStore, useSettings } from "../src/settings-store";
+import {
+	createSettingsStore,
+	useSettings,
+} from "@/lib/settings/settings-store";
 
 const SETTINGS = {
 	site: { name: "rimzzlabs", url: null },

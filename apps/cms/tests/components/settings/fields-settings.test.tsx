@@ -1,11 +1,11 @@
 // @vitest-environment jsdom
 import type { FieldDefinition } from "@daluang/notes/field-definitions";
-import { createSettingsStore } from "@daluang/settings/settings-store";
 import { R } from "@mobily/ts-belt";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { FieldsSettings } from "@/components/settings/fields-settings";
+import { createSettingsStore } from "@/lib/settings/settings-store";
 
 const client = vi.hoisted(() => ({
 	saveSettings: vi.fn(),

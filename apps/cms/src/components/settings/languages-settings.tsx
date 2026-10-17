@@ -1,10 +1,10 @@
 import { languagesSettingSchema } from "@daluang/notes/languages-setting";
 import { settingsState } from "@daluang/settings/settings";
-import type { SettingsStore } from "@daluang/settings/settings-store";
-import { useSettings } from "@daluang/settings/settings-store";
 import { R } from "@mobily/ts-belt";
 import { type FormEvent, useState } from "react";
 import { saveSettings } from "@/lib/settings/client";
+import type { SettingsStore } from "@/lib/settings/settings-store";
+import { useSettings } from "@/lib/settings/settings-store";
 import { LanguagesField } from "./languages-field";
 import { type SaveState, SettingsForm } from "./settings-form";
 

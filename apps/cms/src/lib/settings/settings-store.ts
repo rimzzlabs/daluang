@@ -1,6 +1,6 @@
+import type { CmsSettings } from "@daluang/settings/settings";
 import { A } from "@mobily/ts-belt";
 import { useSyncExternalStore } from "react";
-import type { CmsSettings } from "./settings";
 
 /**
  * The settings in the browser. The app island makes one store from the settings of the
