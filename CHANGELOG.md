@@ -1,5 +1,47 @@
 # Changelog
 
+## [0.2.0](https://github.com/rimzzlabs/daluang/compare/v0.1.0...v0.2.0) (2026-10-17)
+
+
+### Features
+
+* **api-tokens:** make, list, and revoke the API tokens of a site ([c173ab9](https://github.com/rimzzlabs/daluang/commit/c173ab93fbdec524d676a71ef91069876946228f))
+* **cms:** add the settings pages of the site and the languages ([c94da5f](https://github.com/rimzzlabs/daluang/commit/c94da5fa0b147c3199b1c50aeee32211ea289886))
+* **cms:** call a note a post in the interface and the docs ([faa9aba](https://github.com/rimzzlabs/daluang/commit/faa9aba79ae91ef981f0e07e53b13868a5b80939))
+* **cms:** put each action of a page in a responsive dialog ([ed69059](https://github.com/rimzzlabs/daluang/commit/ed6905985041617c4215cdda54579d5a015e0e74))
+* **cms:** send a content security policy and the security headers ([dad5d5d](https://github.com/rimzzlabs/daluang/commit/dad5d5d3fe671a7241f6f0ec4eada27207640d5e))
+* **cms:** show the next settings of a site on the empty notes page ([9b252bc](https://github.com/rimzzlabs/daluang/commit/9b252bc1dd34966fbb8b542d0b74a43260898611))
+* **settings:** ask for the site and the languages at the first sign-in ([762e27d](https://github.com/rimzzlabs/daluang/commit/762e27d622c7d9c560ad0eed2c1980150446f58a))
+* **settings:** define the extra fields of the site ([1c1e556](https://github.com/rimzzlabs/daluang/commit/1c1e556fd1c7c6a2bd4e14817eee4b307cb45be7))
+* **ui:** add a responsive dialog, a confirm dialog, and a page frame ([3b45c66](https://github.com/rimzzlabs/daluang/commit/3b45c66a3ca5241bcb0663a2b48b27afa3596d43))
+* **webhooks:** add the webhooks that tell a site to rebuild ([0285989](https://github.com/rimzzlabs/daluang/commit/0285989f794d396b3fb6263c2e5714ded584f6aa))
+
+
+### Bug Fixes
+
+* **auth:** answer only the endpoints of Better Auth that the CMS uses ([bd893a8](https://github.com/rimzzlabs/daluang/commit/bd893a8a2c102afe256435f27f5d27049fa6080d))
+* **auth:** refuse a name of Object.prototype in the sign-in error code ([919f9d4](https://github.com/rimzzlabs/daluang/commit/919f9d4acd04ec48951b7a86706e705424590f71))
+* **auth:** refuse a next value that a browser opens on another host ([2f1a043](https://github.com/rimzzlabs/daluang/commit/2f1a043ddaa81c0e37e61625cece3cc916771c43))
+* **auth:** show each sign-in error on the sign-in page ([78763a6](https://github.com/rimzzlabs/daluang/commit/78763a647f8ad17eb4105523e508e6365e5d378e))
+* **auth:** turn on the rate limit of the sign-in on Cloudflare ([9a10809](https://github.com/rimzzlabs/daluang/commit/9a10809db752b380f6a8ea413d53c098b32231b8))
+* **cms:** answer 404 as JSON for an unknown API path ([e9a15cd](https://github.com/rimzzlabs/daluang/commit/e9a15cd6bcd8ece04e67d3efcf3c5f6ee8ea7694))
+* **cms:** make each page of the app shell full width and compact ([61e6862](https://github.com/rimzzlabs/daluang/commit/61e6862135f1e00b885f8559cf6cf85ffd2a080b))
+* **cms:** put the primary action of a page on the right, with 44px targets ([500b591](https://github.com/rimzzlabs/daluang/commit/500b59137baf208be7924844a67637a955073a80))
+* **settings:** keep the focus in a field after a move back in the onboarding ([df2dabe](https://github.com/rimzzlabs/daluang/commit/df2dabe8e4567f2c247f5bf1ab395faab063170a))
+* **settings:** list the most used languages as the choices ([55493fa](https://github.com/rimzzlabs/daluang/commit/55493fa68d558461579d96261c1f2d5248ea81a2))
+* **settings:** put a space between the label of the address and (optional) ([d0f9e51](https://github.com/rimzzlabs/daluang/commit/d0f9e515090630c22c1280f288d306c65b9ab496))
+* **settings:** put Required and Remove on their own line in a field row ([3b0eac3](https://github.com/rimzzlabs/daluang/commit/3b0eac317527b95fa28c2e236fd605dc1e69ac08))
+* **webhooks:** apply each change of a list to the current list ([6f01ed3](https://github.com/rimzzlabs/daluang/commit/6f01ed34fc8c7ca3102543fe549dfbed8fbc9d65))
+* **webhooks:** refuse a local host name with its last dot ([63a7025](https://github.com/rimzzlabs/daluang/commit/63a7025ddc34e433e8583ddda9216e386cc72647))
+* **web:** send the security headers with each file of the site ([92ed8f6](https://github.com/rimzzlabs/daluang/commit/92ed8f6f37483c2455297d20ad312f3ff7b81783))
+
+
+### Documentation
+
+* add the contributor guide and the rules of the repository ([#6](https://github.com/rimzzlabs/daluang/issues/6)) ([cd2232f](https://github.com/rimzzlabs/daluang/commit/cd2232fb085b09e78d8a009937f7478546f7d0a4))
+* list the parts of the CMS that exist now ([a463bcc](https://github.com/rimzzlabs/daluang/commit/a463bccbb8159ed79d9441c8216ef3c220b70579))
+* name each side effect of the domain packages ([#12](https://github.com/rimzzlabs/daluang/issues/12)) ([f155a49](https://github.com/rimzzlabs/daluang/commit/f155a49caac0f09a46dd280bb69884ff62cedec4))
+
 ## 0.1.0 (2026-10-16)
 
 
