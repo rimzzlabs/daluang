@@ -87,27 +87,7 @@ To use a workspace package, write `"@daluang/<name>": "workspace:*"` in the
 `package.json` by hand. Then run `pnpm install`. `pnpm add` puts a package in the
 `catalog`, which is for versions.
 
-Run each script from the root:
-
-| Command                 | Does                                                                                         |
-| ----------------------- | -------------------------------------------------------------------------------------------- |
-| `pnpm dev`              | `astro dev` in `apps/cms`                                                                    |
-| `pnpm build`            | `astro build` in `apps/cms`                                                                  |
-| `pnpm web:dev`          | `vocs dev` and `astro dev` together, with hot reload for both. Open `http://localhost:4322`. |
-| `pnpm web:build`        | The docs site, then the landing page with the docs site in `dist/docs`                       |
-| `pnpm web:preview`      | `wrangler dev` on the build of `apps/web`: the same files and rules as production            |
-| `pnpm docs:dev`         | `vocs dev` in `apps/docs` only, at `http://localhost:4323/docs/`                             |
-| `pnpm docs:build`       | `vocs build` in `apps/docs`. A dead link fails it.                                           |
-| `pnpm typecheck`        | The type check of each workspace                                                             |
-| `pnpm check`            | Biome (lint and format) and Prettier, with no write                                          |
-| `pnpm fix`              | Biome and Prettier, with write                                                               |
-| `pnpm commit`           | The commit prompt of commitlint                                                              |
-| `pnpm test`             | The unit tests, with coverage. A number below its threshold fails it.                        |
-| `pnpm db:migrate:local` | Apply `apps/cms/migrations` to the local D1 database                                         |
-
-`apps/cms` and `apps/web` each have a `cf:deploy` script, which runs `wrangler deploy`.
-Do not run it. The workflow `deploy.yml` deploys, after a release. The name is not
-`deploy`, because `pnpm deploy` is a command of pnpm.
+Run each script from the root. `CONTRIBUTING.md` lists each script.
 
 ## Topic docs
 
@@ -131,6 +111,47 @@ commit as the change.
 
 Read `docs/code-conventions.md` and `docs/testing.md` before the first code edit of a
 session.
+
+## Workflow
+
+Each change goes to `main` through a pull request of its own. Keep each commit and each
+pull request small: a small change is fast to review and safe to revert.
+`CONTRIBUTING.md` has the branch names, the commit format, and each script. Read it
+before the first commit of a session.
+
+### Steps
+
+1. Make a branch from `main` for the change: `type/short-description`.
+2. Make one change of behavior in each commit, with its test and its docs.
+3. Run `pnpm check`, `pnpm typecheck`, and `pnpm test` on your computer. Each one must
+   pass.
+4. If the change touches `apps/cms` or a package, run `pnpm build`.
+5. If the change touches `apps/web` or `apps/docs`, run `pnpm web:build`.
+6. If the change is visible in the interface, look at it in `pnpm dev`. Ask the person
+   before you open a browser.
+7. Ask the person: "Shall I open a PR?"
+8. If the answer is yes, push the branch. Then open the pull request with `gh pr create`,
+   and fill in the template.
+9. If the answer is no, stop. Tell the person that the branch is ready to push.
+
+### Rules
+
+- Do not push and do not open a pull request before the person answers yes.
+- Keep one subject in each pull request. If a pull request changes more than 400 lines
+  of code, split it. Moved files and generated files do not count.
+- If a task has two subjects, make two branches and two pull requests.
+- The title of a pull request is a Conventional Commit, in lower case. The repository
+  merges with squash only, so the title becomes the commit on `main`.
+- Do not add a trailer, a session link, or a "generated with" line to a commit or a pull
+  request.
+- Do not skip a hook with `LEFTHOOK=0` or `--no-verify`. If a hook fails, correct the
+  cause, then make the commit again.
+- Do not run `cf:deploy`. `deploy.yml` deploys, after a release.
+- A release is a tag that release-please cuts. Do not edit `CHANGELOG.md` or a `version`
+  field by hand.
+- When the person tells you that a pull request is merged, switch to `main` and pull.
+  Then run `git fetch --prune`, delete each local branch whose remote is gone, and make
+  a new branch for the next task.
 
 ## Tech stack
 
@@ -271,18 +292,6 @@ topic docs give the path where it is now.
 
 When the last package with components moves, delete the `@source` lines of the packages
 in `apps/cms/src/styles/global.css`. Delete each row of this table when its code moves.
-
-## Git
-
-- **Write each commit message as a Conventional Commit:** `type(scope): subject`. The
-  scope is the workspace name without the prefix, for example `cms`, `ui`, or `docs`.
-- `pnpm commit` opens the prompt of commitlint.
-- Write the subject in the imperative and in lower case, with no period at the end.
-- Do not add a trailer, a session link, or a "generated with" line to a commit or a pull
-  request.
-- Do not push and do not open a pull request unless the person tells you to.
-- A release is a tag that release-please cuts. Do not edit `CHANGELOG.md` or a `version`
-  field by hand.
 
 ## Documentation
 
