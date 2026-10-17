@@ -5,9 +5,10 @@ import { afterEach, vi } from "vitest";
 if (typeof document !== "undefined") {
 	const { cleanup } = await import("@testing-library/react");
 
-	// jsdom has no matchMedia. The sidebar asks for the width of a phone.
+	// jsdom has no matchMedia. The sidebar asks for the width of a phone, and a dialog for
+	// the width of a desktop. The tests run as a desktop: a `min-width` query matches.
 	vi.stubGlobal("matchMedia", (query: string) => ({
-		matches: false,
+		matches: query.includes("min-width"),
 		media: query,
 		addEventListener: () => {},
 		removeEventListener: () => {},
