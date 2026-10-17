@@ -20,7 +20,7 @@ const client = vi.hoisted(() => ({
 		server: "Server.",
 	},
 }));
-vi.mock("@daluang/webhooks/client", () => client);
+vi.mock("@/lib/webhooks/client", () => client);
 
 beforeEach(() => {
 	for (const mock of [

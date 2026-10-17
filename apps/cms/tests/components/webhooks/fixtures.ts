@@ -15,7 +15,7 @@ export const DELIVERY = {
 	createdAt: "2026-10-17T00:00:00.000Z",
 };
 
-/** The messages of the fake of `@daluang/webhooks/client`. */
+/** The messages of the fake of `@/lib/webhooks/client`. */
 export const MESSAGES = {
 	invalid: "Invalid.",
 	"too-many": "Too many.",
