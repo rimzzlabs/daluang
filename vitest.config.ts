@@ -44,11 +44,11 @@ export default defineConfig({
 				"apps/cms/src/lib/api-tokens/env.ts",
 				"apps/cms/src/pages/api/tokens.ts",
 				"apps/cms/src/pages/api/tokens/\\[id\\].ts",
-				// The Astro layer of the webhooks package is wiring also. The route gives the
-				// request to `handleWebhooksRequest`, which has tests.
-				"packages/webhooks/src/astro/env.ts",
-				"packages/webhooks/src/astro/route.ts",
-				"packages/webhooks/src/astro/integration.ts",
+				// The env module and the route files of the webhooks are wiring also. They give
+				// the request to `handleWebhooksRequest`, which has tests.
+				"apps/cms/src/lib/webhooks/env.ts",
+				"apps/cms/src/pages/api/webhooks.ts",
+				"apps/cms/src/pages/api/webhooks/\\[...path\\].ts",
 				// The security layer of the CMS app is wiring. The middleware needs
 				// `astro:middleware` to load, and the integration is one call of the setup hook.
 				// They give each response to `withSecurityHeaders`, which has tests.
