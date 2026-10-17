@@ -78,8 +78,9 @@ the `catalog` in `pnpm-workspace.yaml`.
   their deliveries, and the endpoint `/api/webhooks`. The page of the webhooks is in
   `apps/cms`. See `docs/webhooks.md`.
 - `packages/settings` (`@daluang/settings`): the settings of a CMS (the site and the
-  languages), their store in D1, the endpoint `/api/settings`, the onboarding of the first
-  sign-in, and the Astro integration (`src/astro/`). See `docs/settings.md`.
+  languages), their store in D1, the endpoint `/api/settings`, the rules of the onboarding
+  of the first sign-in, and the Astro integration (`src/astro/`). The settings pages and
+  the onboarding are in `apps/cms`. See `docs/settings.md`.
 - `packages/tsconfig` (`@daluang/tsconfig`): the TypeScript base that each workspace
   extends.
 
@@ -292,7 +293,6 @@ topic docs give the path where it is now.
 
 | Code now                                                                  | Target                                                                                               |
 | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `src/components/` of `settings`                                           | `apps/cms/src/components/<domain>/`                                                                  |
 | `packages/settings/src/settings-store.ts`: a store with state, and a hook | The store to `apps/cms/src/lib/settings/`, and `useSettings` to `apps/cms/src/hooks/settings/`       |
 | `src/astro/` of each package: the integration, the routes, the middleware | The routes to `apps/cms/src/pages/api/`. The middleware and `env.ts` to `apps/cms/src/lib/<domain>/` |
 | `src/client.ts` of `settings`: the calls of `fetch`                       | `apps/cms/src/lib/<domain>/client.ts`. A schema that the server also uses stays in the package.      |
@@ -300,8 +300,7 @@ topic docs give the path where it is now.
 | `apps/cms/src/security/`                                                  | `apps/cms/src/lib/security/`                                                                         |
 | `apps/cms/src/lib/app-pages.ts`                                           | `apps/cms/src/lib/shell/app-pages.ts`                                                                |
 
-When the last package with components moves, delete the `@source` lines of the packages
-in `apps/cms/src/styles/global.css`. Delete each row of this table when its code moves.
+Delete each row of this table when its code moves.
 
 ## Documentation
 

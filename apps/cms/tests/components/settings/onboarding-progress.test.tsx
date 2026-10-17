@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { OnboardingProgress } from "../../src/components/onboarding-progress";
+import { OnboardingProgress } from "@/components/settings/onboarding-progress";
 
 describe("OnboardingProgress", () => {
 	it("gives the number of the step, and marks the current step", () => {

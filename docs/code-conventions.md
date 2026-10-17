@@ -137,8 +137,8 @@ see `docs/app-shell.md`.
 - Use a token of the theme: `bg-background`, `text-muted-foreground`, `border-border`. Do
   not write a color value in a class.
 - **Tailwind CSS scans only the files that it knows.** `theme.css` adds `packages/ui`.
-  `apps/cms/src/styles/global.css` adds each domain package that still has components,
-  with an `@source` line. A new domain package has no components, so it needs no line.
+  A domain package has no components, so `apps/cms/src/styles/global.css` needs no
+  `@source` line for it.
 - Do not write an arbitrary value in a class: `w-[400px]`, `text-[15px]`, `bg-[#fff]`. Use
   a step of the scale, or add a token to `theme.css`.
 - A variant in square brackets is correct only when Tailwind CSS has no named variant for

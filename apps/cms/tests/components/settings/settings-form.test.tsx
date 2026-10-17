@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
 	type SaveState,
 	SettingsForm,
-} from "../../src/components/settings-form";
+} from "@/components/settings/settings-form";
 
 function renderForm(save: SaveState) {
 	render(

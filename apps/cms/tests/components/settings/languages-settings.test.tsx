@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
+
+import { createSettingsStore } from "@daluang/settings/settings-store";
 import { R } from "@mobily/ts-belt";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { LanguagesSettings } from "../../src/components/languages-settings";
-import { createSettingsStore } from "../../src/settings-store";
+import { LanguagesSettings } from "@/components/settings/languages-settings";
 
 const client = vi.hoisted(() => ({
 	saveSettings: vi.fn(),
@@ -15,7 +16,7 @@ const client = vi.hoisted(() => ({
 		server: "Server.",
 	},
 }));
-vi.mock("../../src/client", () => client);
+vi.mock("@daluang/settings/client", () => client);
 
 const SETTINGS = {
 	site: { name: "rimzzlabs", url: null },

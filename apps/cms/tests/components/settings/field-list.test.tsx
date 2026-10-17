@@ -2,7 +2,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { FieldList } from "../../src/components/field-list";
+import { FieldList } from "@/components/settings/field-list";
 
 const FIELDS = [
 	{ name: "featured", label: "Featured", type: "boolean", required: true },

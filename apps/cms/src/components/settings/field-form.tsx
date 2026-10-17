@@ -3,6 +3,12 @@ import {
 	FIELD_TYPES,
 	type FieldType,
 } from "@daluang/notes/field-definitions";
+import {
+	type FieldDraft,
+	type FieldRowErrors,
+	relabelField,
+	renameField,
+} from "@daluang/settings/field-drafts";
 import { Checkbox } from "@daluang/ui/components/checkbox";
 import {
 	Field,
@@ -19,12 +25,6 @@ import {
 } from "@daluang/ui/components/toggle-group";
 import { A } from "@mobily/ts-belt";
 import { useId } from "react";
-import {
-	type FieldDraft,
-	type FieldRowErrors,
-	relabelField,
-	renameField,
-} from "../field-drafts";
 
 /** The name of each type of value, as the writer reads it. */
 export const TYPE_LABELS: Record<FieldType, string> = {

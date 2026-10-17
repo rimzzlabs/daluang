@@ -1,5 +1,18 @@
 import { languagesSettingSchema } from "@daluang/notes/languages-setting";
 import {
+	openPage,
+	SAVE_ERROR_MESSAGES,
+	type SaveSettingsError,
+	saveSettings,
+} from "@daluang/settings/client";
+import type { LanguagesChoice } from "@daluang/settings/languages-choice";
+import type { CmsSettings } from "@daluang/settings/settings";
+import {
+	parseSiteDraft,
+	type SiteDraft,
+	type SiteErrors,
+} from "@daluang/settings/site-draft";
+import {
 	Alert,
 	AlertDescription,
 	AlertTitle,
@@ -11,15 +24,6 @@ import { ArrowLeftIcon, ArrowRightIcon } from "@phosphor-icons/react";
 import type { FormEvent, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { match } from "ts-pattern";
-import {
-	openPage,
-	SAVE_ERROR_MESSAGES,
-	type SaveSettingsError,
-	saveSettings,
-} from "../client";
-import type { LanguagesChoice } from "../languages-choice";
-import type { CmsSettings } from "../settings";
-import { parseSiteDraft, type SiteDraft, type SiteErrors } from "../site-draft";
 import { LanguagesField } from "./languages-field";
 import { OnboardingProgress } from "./onboarding-progress";
 import { SettingsSummary } from "./settings-summary";

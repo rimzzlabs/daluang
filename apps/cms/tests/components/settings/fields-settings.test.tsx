@@ -1,11 +1,11 @@
 // @vitest-environment jsdom
 import type { FieldDefinition } from "@daluang/notes/field-definitions";
+import { createSettingsStore } from "@daluang/settings/settings-store";
 import { R } from "@mobily/ts-belt";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { FieldsSettings } from "../../src/components/fields-settings";
-import { createSettingsStore } from "../../src/settings-store";
+import { FieldsSettings } from "@/components/settings/fields-settings";
 
 const client = vi.hoisted(() => ({
 	saveSettings: vi.fn(),
@@ -16,7 +16,7 @@ const client = vi.hoisted(() => ({
 		server: "Server.",
 	},
 }));
-vi.mock("../../src/client", () => client);
+vi.mock("@daluang/settings/client", () => client);
 
 const FEATURED: FieldDefinition = {
 	name: "featured",

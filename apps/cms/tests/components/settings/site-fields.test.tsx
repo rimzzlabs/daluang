@@ -2,7 +2,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { focusSiteError, SiteFields } from "../../src/components/site-fields";
+import { focusSiteError, SiteFields } from "@/components/settings/site-fields";
 
 describe("SiteFields", () => {
 	it("gives each change of a field", async () => {

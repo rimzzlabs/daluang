@@ -1,3 +1,5 @@
+import { SITE_NAME_MAX_LENGTH } from "@daluang/settings/site";
+import type { SiteDraft, SiteErrors } from "@daluang/settings/site-draft";
 import {
 	Field,
 	FieldDescription,
@@ -7,8 +9,6 @@ import {
 } from "@daluang/ui/components/field";
 import { Input } from "@daluang/ui/components/input";
 import { useId } from "react";
-import { SITE_NAME_MAX_LENGTH } from "../site";
-import type { SiteDraft, SiteErrors } from "../site-draft";
 
 export interface SiteFieldsProps {
 	value: SiteDraft;

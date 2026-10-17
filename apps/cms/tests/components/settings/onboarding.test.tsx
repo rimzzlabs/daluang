@@ -3,7 +3,7 @@ import { R } from "@mobily/ts-belt";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { firstName, Onboarding } from "../../src/components/onboarding";
+import { firstName, Onboarding } from "@/components/settings/onboarding";
 
 const client = vi.hoisted(() => ({
 	saveSettings: vi.fn(),
@@ -15,7 +15,7 @@ const client = vi.hoisted(() => ({
 		server: "Server.",
 	},
 }));
-vi.mock("../../src/client", () => client);
+vi.mock("@daluang/settings/client", () => client);
 
 const LANGUAGES = { languages: ["en"], defaultLanguage: "en" };
 

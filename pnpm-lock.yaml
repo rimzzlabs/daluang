@@ -346,6 +346,9 @@ importers:
       '@daluang/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@daluang/notes':
+        specifier: workspace:*
+        version: link:../../packages/notes
       '@daluang/settings':
         specifier: workspace:*
         version: link:../../packages/settings
@@ -373,6 +376,9 @@ importers:
       better-auth:
         specifier: 'catalog:'
         version: 1.7.10(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vitest@5.0.5)(vue@3.5.44(typescript@6.0.3))
+      cn:
+        specifier: 'catalog:'
+        version: 0.4.0
       react:
         specifier: 'catalog:'
         version: 19.3.1

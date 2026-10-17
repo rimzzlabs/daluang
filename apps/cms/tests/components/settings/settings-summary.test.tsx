@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { SettingsSummary } from "../../src/components/settings-summary";
+import { SettingsSummary } from "@/components/settings/settings-summary";
 
 describe("SettingsSummary", () => {
 	it("lists each answer by its own name", () => {

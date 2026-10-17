@@ -1,6 +1,6 @@
-import { FieldsSettings } from "@daluang/settings/components/fields-settings";
-import { LanguagesSettings } from "@daluang/settings/components/languages-settings";
-import { SiteSettings } from "@daluang/settings/components/site-settings";
+import { FieldsSettings } from "@/components/settings/fields-settings";
+import { LanguagesSettings } from "@/components/settings/languages-settings";
+import { SiteSettings } from "@/components/settings/site-settings";
 import type { AppPageProps } from "./page-content";
 
 export function SitePage(props: AppPageProps) {
