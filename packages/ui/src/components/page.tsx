@@ -2,8 +2,9 @@ import { cn } from "cn";
 import type { ComponentProps } from "react";
 
 /**
- * The frame of a page in the app shell: left-aligned, with a width that a form can read.
- * An empty state centers itself inside it.
+ * The frame of a page in the app shell. The content starts at the left edge of the shell
+ * and stops at 72rem, so a list stays readable on a wide screen. An empty state centers
+ * itself inside it.
  */
 export function Page(props: ComponentProps<"section">) {
 	const { className, ...rest } = props;
@@ -11,7 +12,7 @@ export function Page(props: ComponentProps<"section">) {
 		<section
 			data-slot="page"
 			className={cn(
-				"flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8",
+				"flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8",
 				className,
 			)}
 			{...rest}
@@ -19,7 +20,10 @@ export function Page(props: ComponentProps<"section">) {
 	);
 }
 
-/** The title and the description of a page, with its main actions on the right. */
+/**
+ * The title and the description of a page on the left, and its primary action on the
+ * right. On a phone the action goes below the title.
+ */
 export function PageHeader(props: ComponentProps<"header">) {
 	const { className, ...rest } = props;
 	return (
@@ -73,12 +77,16 @@ export function PageDescription(props: ComponentProps<"p">) {
 	);
 }
 
+/** The actions of a page. On a phone each one is full width and 44px high, for a thumb. */
 export function PageActions(props: ComponentProps<"div">) {
 	const { className, ...rest } = props;
 	return (
 		<div
 			data-slot="page-actions"
-			className={cn("flex shrink-0 flex-wrap items-center gap-2", className)}
+			className={cn(
+				"flex shrink-0 flex-wrap items-center gap-2 max-sm:*:h-11 max-sm:*:flex-1",
+				className,
+			)}
 			{...rest}
 		/>
 	);

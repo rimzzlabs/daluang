@@ -27,14 +27,14 @@ beforeEach(() => {
 });
 
 describe("ApiTokens", () => {
-	it("shows a loading state, then the empty state with its action", async () => {
+	it("shows a loading state, then the empty state, with one primary action", async () => {
 		client.listApiTokens.mockResolvedValue(R.Ok([]));
 		render(<ApiTokens />);
 		expect(screen.getByText("Loading the tokens")).toBeTruthy();
 		expect(await screen.findByText("No tokens yet")).toBeTruthy();
 		expect(
 			screen.getAllByRole("button", { name: "Make a token" }),
-		).toHaveLength(2);
+		).toHaveLength(1);
 	});
 
 	it("shows why the list failed, and tries again", async () => {
@@ -55,11 +55,7 @@ describe("ApiTokens", () => {
 		);
 		render(<ApiTokens />);
 		await screen.findByText("No tokens yet");
-		const [headerButton] = screen.getAllByRole("button", {
-			name: "Make a token",
-		});
-		if (headerButton === undefined) throw new Error("No button.");
-		await userEvent.click(headerButton);
+		await userEvent.click(screen.getByRole("button", { name: "Make a token" }));
 		const dialog = screen.getByRole("dialog");
 		await userEvent.type(within(dialog).getByLabelText("Token name"), "Build");
 		await userEvent.click(

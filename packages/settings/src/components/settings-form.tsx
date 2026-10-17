@@ -56,19 +56,23 @@ export function SettingsForm(props: SettingsFormProps) {
 				</PageHeading>
 			</PageHeader>
 			<form
-				className="flex max-w-lg flex-col gap-6"
+				className="flex max-w-xl flex-col gap-6"
 				noValidate
 				onSubmit={props.onSubmit}
 			>
 				{props.children}
-				<div className="flex flex-wrap items-center gap-4">
-					<Button type="submit" disabled={saving}>
+				<div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-3 border-t border-border pt-4">
+					<p role="status" className="mr-auto text-sm">
+						{saveMessage(props.save)}
+					</p>
+					<Button
+						type="submit"
+						disabled={saving}
+						className="max-sm:h-11 max-sm:w-full"
+					>
 						{saving ? <Spinner data-icon="inline-start" /> : null}
 						Save
 					</Button>
-					<p role="status" className="text-sm">
-						{saveMessage(props.save)}
-					</p>
 				</div>
 			</form>
 		</Page>

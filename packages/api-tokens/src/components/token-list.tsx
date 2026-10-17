@@ -35,7 +35,7 @@ export function TokenList(props: TokenListProps) {
 						type="button"
 						size="sm"
 						variant="outline"
-						className="self-start sm:self-auto"
+						className="self-start max-sm:h-11 sm:self-auto"
 						aria-label={`Revoke ${token.name}`}
 						onClick={() => props.onRevoke(token)}
 					>

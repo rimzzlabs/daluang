@@ -35,7 +35,7 @@ export function FieldList(props: FieldListProps) {
 							) : null}
 						</div>
 					</div>
-					<div className="flex items-center gap-1">
+					<div className="flex items-center gap-1 max-sm:*:h-11">
 						<Button
 							type="button"
 							size="sm"

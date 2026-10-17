@@ -116,7 +116,10 @@ export function ResponsiveDialogFooter(props: ComponentProps<"div">) {
 	const desktop = useContext(DesktopContext);
 	if (desktop) return <DialogFooter {...props} />;
 	const { className, ...rest } = props;
-	return <DrawerFooter className={cn("px-0 pb-0", className)} {...rest} />;
+	// A drawer is for a phone or a tablet: each button is 44px high, for a thumb.
+	return (
+		<DrawerFooter className={cn("px-0 pb-0 *:h-11", className)} {...rest} />
+	);
 }
 
 /** A button that closes the dialog or the drawer. */

@@ -1,7 +1,6 @@
 import { Button } from "@daluang/ui/components/button";
 import {
 	Empty,
-	EmptyContent,
 	EmptyDescription,
 	EmptyHeader,
 	EmptyMedia,
@@ -168,7 +167,6 @@ export function Webhooks() {
 									notes.
 								</EmptyDescription>
 							</EmptyHeader>
-							<EmptyContent>{addButton}</EmptyContent>
 						</Empty>
 					) : (
 						<ul

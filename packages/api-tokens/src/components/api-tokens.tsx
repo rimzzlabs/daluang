@@ -1,7 +1,6 @@
 import { Button } from "@daluang/ui/components/button";
 import {
 	Empty,
-	EmptyContent,
 	EmptyDescription,
 	EmptyHeader,
 	EmptyMedia,
@@ -139,7 +138,6 @@ export function ApiTokens() {
 									Make one token for each site that reads your notes.
 								</EmptyDescription>
 							</EmptyHeader>
-							<EmptyContent>{makeButton}</EmptyContent>
 						</Empty>
 					) : (
 						<TokenList

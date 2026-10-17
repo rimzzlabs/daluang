@@ -23,7 +23,7 @@ export function WebhookCard(props: WebhookCardProps) {
 						{webhook.urlHint}
 					</p>
 				</div>
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-2 max-sm:*:h-11">
 					<Button
 						type="button"
 						size="sm"
