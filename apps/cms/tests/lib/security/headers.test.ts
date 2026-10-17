@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { securityHeaders, withSecurityHeaders } from "@/security/headers";
+import { securityHeaders, withSecurityHeaders } from "@/lib/security/headers";
 
 const HTTPS = new URL("https://cms.example.com/notes");
 const HTTP = new URL("http://localhost:4321/notes");

@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactElement, ReactNode } from "react";
-import type { AppPagePath } from "@/lib/app-pages";
+import type { AppPagePath } from "@/lib/shell/app-pages";
 
 /**
  * How a menu item navigates. Inside the app island, the client router opens the page. In

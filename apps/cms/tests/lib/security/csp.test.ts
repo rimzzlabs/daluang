@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { PREFERENCES_SCRIPT } from "@daluang/ui/lib/preferences-script";
 import { describe, expect, it } from "vitest";
-import { CMS_CSP, scriptHash } from "@/security/csp";
+import { CMS_CSP, scriptHash } from "@/lib/security/csp";
 
 describe("scriptHash", () => {
 	it("gives the base64 SHA-256 of the script, as a CSP source", () => {

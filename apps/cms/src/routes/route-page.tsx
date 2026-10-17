@@ -1,5 +1,5 @@
 import { useRouteContext } from "@tanstack/react-router";
-import type { AppPagePath } from "@/lib/app-pages";
+import type { AppPagePath } from "@/lib/shell/app-pages";
 import { PAGE_COMPONENTS } from "./page-content";
 
 /**

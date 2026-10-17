@@ -1,11 +1,11 @@
 # Security headers
 
 This page tells which headers the CMS sends with each response, and how the Content
-Security Policy works. The code is in `apps/cms/src/security/`.
+Security Policy works. The code is in `apps/cms/src/lib/security/`.
 
 ## Headers
 
-- `apps/cms/src/security/` holds the security layer of the CMS. Its integration is first
+- `apps/cms/src/lib/security/` holds the security layer of the CMS. Its integration is first
   in `integrations`, so its middleware runs before the sign-in guard.
 - **Each response gets the headers of `securityHeaders`:** no frame, no sniffed type, no
   search index, `Referrer-Policy: same-origin`, and HSTS on HTTPS. A response with no

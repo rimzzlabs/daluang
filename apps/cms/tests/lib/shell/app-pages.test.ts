@@ -6,7 +6,7 @@ import {
 	NOT_FOUND_TITLE,
 	normalizePath,
 	pageTitle,
-} from "@/lib/app-pages";
+} from "@/lib/shell/app-pages";
 
 describe("normalizePath", () => {
 	it("removes each trailing slash and keeps /", () => {
