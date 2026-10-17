@@ -9,4 +9,5 @@ export const ALL: APIRoute = (context) =>
 	handleSettingsRequest({
 		request: context.request,
 		db: readSettingsEnv().DB,
+		now: () => new Date(),
 	});

@@ -9,4 +9,8 @@ export const ALL: APIRoute = (context) =>
 	handleWebhooksRequest({
 		request: context.request,
 		db: readWebhooksEnv().DB,
+		now: () => new Date(),
+		// Workers refuses a call of `fetch` as the method of another object, so the call has
+		// no `this`.
+		fetcher: (input, init) => fetch(input, init),
 	});

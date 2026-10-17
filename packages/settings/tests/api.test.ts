@@ -6,6 +6,7 @@ import { createFakeD1 } from "./fake-d1";
 const URL_OF_API = `http://localhost:4321${SETTINGS_API_PATH}`;
 const SITE = { name: "rimzzlabs", url: "https://rimzzlabs.com" };
 const LANGUAGES = { languages: ["en", "id"], defaultLanguage: "en" };
+const NOW = new Date("2026-10-17T00:00:00.000Z");
 
 function patch(body: string, contentType = "application/json") {
 	return new Request(URL_OF_API, {
@@ -21,6 +22,7 @@ describe("handleSettingsRequest", () => {
 		const response = await handleSettingsRequest({
 			request: new Request(URL_OF_API),
 			db,
+			now: () => NOW,
 		});
 		expect(response.status).toBe(200);
 		await expect(response.json()).resolves.toEqual({
@@ -33,7 +35,7 @@ describe("handleSettingsRequest", () => {
 		const response = await handleSettingsRequest({
 			request: patch(JSON.stringify({ site: SITE, languages: LANGUAGES })),
 			db,
-			now: () => new Date("2026-10-17T00:00:00.000Z"),
+			now: () => NOW,
 		});
 		expect(response.status).toBe(200);
 		await expect(response.json()).resolves.toEqual({
@@ -46,6 +48,7 @@ describe("handleSettingsRequest", () => {
 		const response = await handleSettingsRequest({
 			request: patch(JSON.stringify({ site: SITE })),
 			db,
+			now: () => NOW,
 		});
 		expect(response.status).toBe(200);
 	});
@@ -55,6 +58,7 @@ describe("handleSettingsRequest", () => {
 		const response = await handleSettingsRequest({
 			request: patch(JSON.stringify({ site: { name: "", url: "not a site" } })),
 			db,
+			now: () => NOW,
 		});
 		expect(response.status).toBe(422);
 		await expect(response.json()).resolves.toEqual({
@@ -74,6 +78,7 @@ describe("handleSettingsRequest", () => {
 		const response = await handleSettingsRequest({
 			request: patch("{site"),
 			db,
+			now: () => NOW,
 		});
 		expect(response.status).toBe(400);
 		await expect(response.json()).resolves.toEqual({ error: "not-json" });
@@ -84,6 +89,7 @@ describe("handleSettingsRequest", () => {
 		const response = await handleSettingsRequest({
 			request: patch("site=x", "application/x-www-form-urlencoded"),
 			db,
+			now: () => NOW,
 		});
 		expect(response.status).toBe(415);
 	});
@@ -93,6 +99,7 @@ describe("handleSettingsRequest", () => {
 		const response = await handleSettingsRequest({
 			request: patch(JSON.stringify({ site: { name: "a".repeat(17_000) } })),
 			db,
+			now: () => NOW,
 		});
 		expect(response.status).toBe(413);
 		await expect(response.json()).resolves.toEqual({ error: "too-large" });
@@ -103,6 +110,7 @@ describe("handleSettingsRequest", () => {
 		const response = await handleSettingsRequest({
 			request: new Request(URL_OF_API, { method: "DELETE" }),
 			db,
+			now: () => NOW,
 		});
 		expect(response.status).toBe(405);
 		expect(response.headers.get("Allow")).toBe("GET, PATCH");

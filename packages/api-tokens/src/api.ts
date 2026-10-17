@@ -24,8 +24,8 @@ export interface TokensRequest {
 	db: D1Database;
 	/** The ID of `/api/tokens/<id>`, or `undefined` for `/api/tokens`. */
 	id: string | undefined;
-	/** The time of a new token. A test gives a fixed time. */
-	now?: () => Date;
+	/** The clock. The route file gives `() => new Date()`, and a test gives a fixed time. */
+	now: () => Date;
 }
 
 /**
@@ -54,8 +54,11 @@ async function postToken(params: TokensRequest): Promise<Response> {
 	}
 	if (A.length(await listTokens(db)) >= TOKENS_MAX)
 		return errorResponse("too-many", { status: 409 });
-	const now = params.now ?? (() => new Date());
-	const created = await createToken({ db, name: parsed.data.name, now: now() });
+	const created = await createToken({
+		db,
+		name: parsed.data.name,
+		now: params.now(),
+	});
 	return Response.json(created, { status: 201 });
 }
 

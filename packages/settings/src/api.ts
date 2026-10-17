@@ -39,8 +39,8 @@ function toIssues(error: z.ZodError): readonly SettingsIssue[] {
 export interface SettingsRequest {
 	request: Request;
 	db: D1Database;
-	/** The time of a write. A test gives a fixed time. */
-	now?: () => Date;
+	/** The clock. The route file gives `() => new Date()`, and a test gives a fixed time. */
+	now: () => Date;
 }
 
 /** Side effect: writes the settings to D1, so that they stay after this request. */
@@ -61,8 +61,7 @@ async function patchSettings(params: SettingsRequest): Promise<Response> {
 			status: 422,
 			issues: toIssues(patch.error),
 		});
-	const now = params.now ?? (() => new Date());
-	await writeSettings({ db, patch: patch.data, now: now() });
+	await writeSettings({ db, patch: patch.data, now: params.now() });
 	return Response.json({ settings: await readSettings(db) });
 }
 

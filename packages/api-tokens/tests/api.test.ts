@@ -23,6 +23,7 @@ describe("handleTokensRequest", () => {
 			request: new Request(URL_OF_API),
 			db,
 			id: undefined,
+			now: () => NOW,
 		});
 		await expect(response.json()).resolves.toEqual({ tokens: [token] });
 	});
@@ -48,6 +49,7 @@ describe("handleTokensRequest", () => {
 			request: post(JSON.stringify({ name: "Build" })),
 			db,
 			id: undefined,
+			now: () => NOW,
 		});
 		expect(response.status).toBe(201);
 	});
@@ -58,6 +60,7 @@ describe("handleTokensRequest", () => {
 			request: post(JSON.stringify({ name: "" })),
 			db,
 			id: undefined,
+			now: () => NOW,
 		});
 		expect(response.status).toBe(422);
 		await expect(response.json()).resolves.toEqual({
@@ -76,7 +79,12 @@ describe("handleTokensRequest", () => {
 		],
 	])("refuses %s", async (_name, request, status) => {
 		const { db } = createFakeD1();
-		const response = await handleTokensRequest({ request, db, id: undefined });
+		const response = await handleTokensRequest({
+			request,
+			db,
+			id: undefined,
+			now: () => NOW,
+		});
 		expect(response.status).toBe(status);
 	});
 
@@ -88,6 +96,7 @@ describe("handleTokensRequest", () => {
 			request: post(JSON.stringify({ name: "One more" })),
 			db,
 			id: undefined,
+			now: () => NOW,
 		});
 		expect(response.status).toBe(409);
 		await expect(response.json()).resolves.toEqual({ error: "too-many" });
@@ -101,6 +110,7 @@ describe("handleTokensRequest", () => {
 				request: new Request(`${URL_OF_API}/${token.id}`, { method: "DELETE" }),
 				db,
 				id: token.id,
+				now: () => NOW,
 			});
 		expect((await revoke()).status).toBe(204);
 		expect((await revoke()).status).toBe(404);
@@ -115,6 +125,7 @@ describe("handleTokensRequest", () => {
 			request: new Request(URL_OF_API, { method }),
 			db,
 			id,
+			now: () => NOW,
 		});
 		expect(response.status).toBe(405);
 		expect(response.headers.get("Allow")).toBe(allow);
