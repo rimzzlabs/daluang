@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { getAuth } from "./auth";
+import { getAuth } from "@/lib/auth/auth";
 
 export const prerender = false;
 

@@ -1,7 +1,7 @@
 import type { AstroIntegration } from "astro";
 
 /**
- * Adds the middleware that reads the settings for each page. Put it after `daluangAuth` in
+ * Adds the middleware that reads the settings for each page. Put it after `authGuard` in
  * `integrations`, so the sign-in guard runs first.
  */
 export function settingsMiddleware(): AstroIntegration {

@@ -1,7 +1,7 @@
 import { defineMiddleware } from "astro:middleware";
+import { decideAccess } from "@daluang/auth/guard";
+import { isAuthApiPath } from "@daluang/auth/paths";
 import { match } from "ts-pattern";
-import { decideAccess } from "../guard";
-import { isAuthApiPath } from "../paths";
 import { getAuth } from "./auth";
 
 /** The sign-in guard: it reads the session and applies the rule of `decideAccess`. */
