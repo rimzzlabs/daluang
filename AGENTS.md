@@ -530,10 +530,11 @@ Apply each rule to a file that you write or change.
 - **Each action of a page opens a `ResponsiveDialog`**: a form, or a `ConfirmDialog`
   before a change. It is a dialog from 64rem (`lg`, `useIsDesktop`), and a drawer from the
   bottom on a phone or a tablet. Do not put a form or a confirmation inline in a list.
-- **A page of the app shell is a `Page`** of `@daluang/ui/components/page`: left-aligned,
-  at most 48rem wide, with a `PageHeader` that has the title, the description, and the
-  main action on the right. An empty state is centered: `Empty` in a page, or a full empty
-  page such as the notes page.
+- **A page of the app shell is a `Page`** of `@daluang/ui/components/page`: the full
+  width of the shell, with compact padding. Its `PageHeader` has the title and the
+  description on the left and the primary action at the right edge. A form keeps a
+  readable width below the header. An empty list is a compact `Empty` box. A full empty
+  page, such as the notes page, centers its content.
 - `render` replaces the `asChild` prop of Radix UI. Do not install or import Radix UI.
 
 ### Styles
