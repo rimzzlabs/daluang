@@ -1,4 +1,4 @@
-import { type Auth, createAuth } from "../server";
+import { type Auth, createAuth } from "@daluang/auth/server";
 import { readAuthEnv } from "./env";
 
 // One instance for each isolate of the Worker. The bindings do not change between requests.

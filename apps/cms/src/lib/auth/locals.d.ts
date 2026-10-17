@@ -2,7 +2,7 @@
 // references this file.
 declare namespace App {
 	interface Locals {
-		user: import("../server").AuthLocals["user"];
-		session: import("../server").AuthLocals["session"];
+		user: import("@daluang/auth/server").AuthLocals["user"];
+		session: import("@daluang/auth/server").AuthLocals["session"];
 	}
 }

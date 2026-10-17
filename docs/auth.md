@@ -3,7 +3,8 @@
 This page tells how a person signs in to the CMS, and how the CMS guards each page and
 each endpoint. The logic is in `packages/auth`. The sign-in button and the user menu are
 in `apps/cms/src/components/auth/`. The browser client of Better Auth is
-`apps/cms/src/lib/auth/client.ts`.
+`apps/cms/src/lib/auth/client.ts`. The server side of the app is in `apps/cms/src/lib/auth/`:
+the instance, the guard middleware, and the read of the environment.
 
 ## Sign-in
 
@@ -23,6 +24,8 @@ in `apps/cms/src/components/auth/`. The browser client of Better Auth is
 
 ## Endpoints of Better Auth
 
+- `apps/cms/src/pages/api/auth/[...all].ts` gives each request below `/api/auth` to the
+  handler of the Better Auth instance (`apps/cms/src/lib/auth/auth.ts`).
 - **Only the endpoints of `OPEN_AUTH_PATHS` answer.** The plugin `openPathsOnly` of
   `packages/auth/src/server.ts` gives 404 to each other path below `/api/auth`. It is an
   allow list, so a new endpoint of Better Auth stays closed. Do not open an endpoint that
@@ -37,7 +40,7 @@ in `apps/cms/src/components/auth/`. The browser client of Better Auth is
 
 ## The guard
 
-- The guard (`packages/auth/src/astro/middleware.ts`) needs a session for each page and
+- The guard (`apps/cms/src/lib/auth/middleware.ts`) needs a session for each page and
   each endpoint, with two exceptions: `/sign-in`, and `/api/auth/*`. A page with no
   session redirects to `/sign-in?next=<path>`. An endpoint with no session answers 401.
 - **A write from another origin answers 403, also with a session.** A write is `POST`,
@@ -56,5 +59,5 @@ in `apps/cms/src/components/auth/`. The browser client of Better Auth is
   migration.
 - `apps/cms/.dev.vars.example` lists each variable. In production, set each one with
   `wrangler secret put`.
-- `packages/auth/src/astro/env.ts` reads the auth variables and the `DB` binding with the
+- `apps/cms/src/lib/auth/env.ts` reads the auth variables and the `DB` binding with the
   schema of `@daluang/auth/env`.

@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import { type AuthEnv, authEnvSchema } from "../env";
+import { type AuthEnv, authEnvSchema } from "@daluang/auth/env";
 
 /**
  * The one module that reads the auth variables and the D1 binding. A wrong or missing value

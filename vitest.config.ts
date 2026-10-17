@@ -16,17 +16,17 @@ export default defineConfig({
 				// The route types of the docs site. The Waku of Vocs writes the file at each
 				// `vocs dev`, and Git ignores it.
 				"apps/docs/src/pages.gen.ts",
-				// The Astro layer of the auth package is wiring. The env module, the instance,
-				// the route, and the middleware need the Workers runtime and `astro:middleware`
-				// to load. They give the request to functions with tests: `createAuth`,
-				// and `decideAccess`, and the schema of `env.ts`.
-				"packages/auth/src/astro/env.ts",
-				"packages/auth/src/astro/auth.ts",
-				"packages/auth/src/astro/route.ts",
-				"packages/auth/src/astro/middleware.ts",
-				// Wiring also: two calls of the setup hook of Astro, with no branch. A test of it
+				// The Astro layer of auth is wiring. The env module, the instance, the route, and
+				// the middleware need the Workers runtime and `astro:middleware` to load. They
+				// give the request to functions with tests: `createAuth`, `decideAccess`, and
+				// the schema of `@daluang/auth/env`.
+				"apps/cms/src/lib/auth/env.ts",
+				"apps/cms/src/lib/auth/auth.ts",
+				"apps/cms/src/pages/api/auth/\\[...all\\].ts",
+				"apps/cms/src/lib/auth/middleware.ts",
+				// Wiring also: one call of the setup hook of Astro, with no branch. A test of it
 				// needs each parameter of that hook.
-				"packages/auth/src/astro/integration.ts",
+				"apps/cms/src/lib/auth/integration.ts",
 				// Wiring also. It gives the Better Auth client two actions with no branch. The
 				// tests of the components replace the module with a fake.
 				"apps/cms/src/lib/auth/client.ts",

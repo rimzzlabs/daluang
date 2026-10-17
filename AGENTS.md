@@ -65,9 +65,9 @@ the `catalog` in `pnpm-workspace.yaml`.
   mark as a component. Each app keeps its own copy of the icon files in `public/`.
   `ThemeToggle` and `lib/theme.ts` switch the light and the dark theme.
 - `packages/auth` (`@daluang/auth`): sign-in with GitHub through Better Auth, the allow
-  list, the sign-in guard, the session types, the auth env schema, and the Astro
-  integration that adds `/api/auth/*` and the guard (`src/astro/`). The sign-in button and
-  the user menu are in `apps/cms`. See `docs/auth.md`.
+  list, the rule of the sign-in guard, the session types, and the auth env schema. The
+  sign-in button, the user menu, the route of `/api/auth/*`, and the guard middleware are
+  in `apps/cms`. See `docs/auth.md`.
 - `packages/notes` (`@daluang/notes`): the model of a note. The language tag, the
   languages setting, the slug, the core metadata, the extra fields and their definitions,
   and the rule of a translation.
@@ -285,18 +285,6 @@ domain packages.
    A file in the same folder keeps `./`. In a package, import by relative path.
 8. `apps/web` obeys the same layout. `apps/docs` obeys the layout of Vocs: its pages are
    the Markdown files in `src/pages/`.
-
-### Code that does not obey these rules yet
-
-The code below came before these rules. Move it in small pull requests, one package or
-one folder in each. Do not move it as part of another change. Until the code moves, the
-topic docs give the path where it is now.
-
-| Code now                                                                         | Target                                                                       |
-| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `src/astro/` of `auth`: the integration, the route, the middleware, the instance | The route to `apps/cms/src/pages/api/`. The rest to `apps/cms/src/lib/auth/` |
-
-Delete each row of this table when its code moves.
 
 ## Documentation
 
