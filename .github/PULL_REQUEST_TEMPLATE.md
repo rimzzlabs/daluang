@@ -19,6 +19,7 @@ Closes #
 ## Checklist
 
 - [ ] The title is a Conventional Commit, in lower case. The squash merge makes it the commit on `main`.
+- [ ] Each commit has the type of the title. The pull request does not mix commit types.
 - [ ] The pull request has one subject, and it changes less than 400 lines of code.
 - [ ] `pnpm check`, `pnpm typecheck`, and `pnpm test` pass on my computer. I did not skip a hook.
 - [ ] If the change touches `apps/cms` or a package, `pnpm build` passes. If it touches `apps/web` or `apps/docs`, `pnpm web:build` passes.

@@ -142,6 +142,10 @@ before the first commit of a session.
 - If a task has two subjects, make two branches and two pull requests.
 - The title of a pull request is a Conventional Commit, in lower case. The repository
   merges with squash only, so the title becomes the commit on `main`.
+- **Do not mix commit types in one pull request.** Each commit has the type of the title.
+  The squash merge keeps only the title, so release-please does not see the type of
+  another commit. If the work needs a commit of another type, open a second pull
+  request.
 - Do not add a trailer, a session link, or a "generated with" line to a commit or a pull
   request.
 - Do not skip a hook with `LEFTHOOK=0` or `--no-verify`. If a hook fails, correct the

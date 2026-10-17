@@ -111,6 +111,9 @@ Run each command that applies to the change. Each one must pass.
 - The title is a Conventional Commit, in lower case. The repository merges with squash
   only, so the title becomes the commit on `main`. release-please reads that commit to
   make the release. CI runs commitlint on the title.
+- **Do not mix commit types in one pull request.** Each commit has the type of the title.
+  The squash merge keeps only the title, so a `fix` commit in a `feat` pull request does
+  not show in the changelog. Open a second pull request for the `fix`.
 - Fill in the template, with its checklist.
 - Link the issue of the change. Before a large change, open an issue, so that the
   approach is agreed before the work.
