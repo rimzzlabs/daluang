@@ -1,3 +1,4 @@
+import { signOut } from "@daluang/auth/client";
 import {
 	Avatar,
 	AvatarFallback,
@@ -15,7 +16,6 @@ import {
 } from "@daluang/ui/components/dropdown-menu";
 import { A, pipe, S } from "@mobily/ts-belt";
 import { SignOutIcon } from "@phosphor-icons/react";
-import { signOut } from "../client";
 
 export interface UserMenuProps {
 	name: string;

@@ -1,9 +1,9 @@
 ---
-import { SignInButton } from "@daluang/auth/components/sign-in-button";
 import { safeNext } from "@daluang/auth/safe-next";
 import { signInError } from "@daluang/auth/sign-in-error";
 import { Alert, AlertDescription, AlertTitle } from "@daluang/ui/components/alert";
 import { DaluangMark } from "@daluang/ui/components/daluang-mark";
+import { SignInButton } from "@/components/auth/sign-in-button";
 import BaseLayout from "@/layouts/base-layout.astro";
 
 const next = safeNext(Astro.url.searchParams.get("next"));

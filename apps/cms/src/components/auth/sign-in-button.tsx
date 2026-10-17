@@ -1,8 +1,8 @@
+import { startGitHubSignIn } from "@daluang/auth/client";
 import { Button } from "@daluang/ui/components/button";
 import { pipe, R } from "@mobily/ts-belt";
 import { GithubLogoIcon } from "@phosphor-icons/react";
 import { useState } from "react";
-import { startGitHubSignIn } from "../client";
 
 export interface SignInButtonProps {
 	/** The path to open after the sign-in. Give it a value from `safeNext`. */

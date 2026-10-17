@@ -1,7 +1,8 @@
 # Auth
 
 This page tells how a person signs in to the CMS, and how the CMS guards each page and
-each endpoint. The code is in `packages/auth`.
+each endpoint. The logic is in `packages/auth`. The sign-in button and the user menu are
+in `apps/cms/src/components/auth/`.
 
 ## Sign-in
 

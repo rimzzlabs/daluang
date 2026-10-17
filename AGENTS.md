@@ -65,9 +65,9 @@ the `catalog` in `pnpm-workspace.yaml`.
   mark as a component. Each app keeps its own copy of the icon files in `public/`.
   `ThemeToggle` and `lib/theme.ts` switch the light and the dark theme.
 - `packages/auth` (`@daluang/auth`): sign-in with GitHub through Better Auth, the allow
-  list, the sign-in guard, the session types, the auth env schema, the sign-in button, the
-  user menu, and the Astro integration that adds `/api/auth/*` and the guard
-  (`src/astro/`). See `docs/auth.md`.
+  list, the sign-in guard, the session types, the auth env schema, and the Astro
+  integration that adds `/api/auth/*` and the guard (`src/astro/`). The sign-in button and
+  the user menu are in `apps/cms`. See `docs/auth.md`.
 - `packages/notes` (`@daluang/notes`): the model of a note. The language tag, the
   languages setting, the slug, the core metadata, the extra fields and their definitions,
   and the rule of a translation.
@@ -292,7 +292,7 @@ topic docs give the path where it is now.
 
 | Code now                                                                                       | Target                                                                                               |
 | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `src/components/` of `auth`, `settings`, and `webhooks`                                        | `apps/cms/src/components/<domain>/`                                                                  |
+| `src/components/` of `settings` and `webhooks`                                                 | `apps/cms/src/components/<domain>/`                                                                  |
 | `packages/settings/src/settings-store.ts`: a store with state, and a hook                      | The store to `apps/cms/src/lib/settings/`, and `useSettings` to `apps/cms/src/hooks/settings/`       |
 | `src/astro/` of each package: the integration, the routes, the middleware                      | The routes to `apps/cms/src/pages/api/`. The middleware and `env.ts` to `apps/cms/src/lib/<domain>/` |
 | `src/client.ts` of `auth`, `settings`, and `webhooks`: the calls of `fetch` and of Better Auth | `apps/cms/src/lib/<domain>/client.ts`. A schema that the server also uses stays in the package.      |

@@ -9,7 +9,6 @@
 			"types": "./src/astro/locals.d.ts"
 		},
 		"./astro/*": "./src/astro/*.ts",
-		"./components/*": "./src/components/*.tsx",
 		"./*": "./src/*.ts"
 	},
 	"scripts": {
