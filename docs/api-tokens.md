@@ -2,7 +2,10 @@
 
 This page tells how a site gets a token to read the published notes. The logic is in
 `packages/api-tokens`. The page of the tokens is in `apps/cms/src/components/api-tokens/`,
-and its calls of the endpoint are in `apps/cms/src/lib/api-tokens/client.ts`.
+and its calls of the endpoint are in `apps/cms/src/lib/api-tokens/client.ts`. The route
+files are `apps/cms/src/pages/api/tokens.ts` and `apps/cms/src/pages/api/tokens/[id].ts`.
+They give each request to `handleTokensRequest`, with the `DB` binding of
+`apps/cms/src/lib/api-tokens/env.ts`.
 
 - A site reads the published notes with a token: `Authorization: Bearer dlg_…`. The
   content API that reads the notes comes in a later step. `verifyApiToken` of

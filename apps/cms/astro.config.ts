@@ -1,6 +1,5 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
-import { daluangApiTokens } from "@daluang/api-tokens/astro/integration";
 import { daluangAuth } from "@daluang/auth/astro/integration";
 import { daluangSettings } from "@daluang/settings/astro/integration";
 import { daluangWebhooks } from "@daluang/webhooks/astro/integration";
@@ -20,15 +19,13 @@ export default defineConfig({
 	// The order is the order of the middleware. `securityHeaders` is first, so it adds the
 	// headers to each response, also to a redirect of the guard. `daluangAuth` adds the
 	// `/api/auth` endpoints and the sign-in guard. `daluangSettings` adds `/api/settings`,
-	// and reads the settings for each page after the guard. `daluangApiTokens` adds
-	// `/api/tokens`, and `daluangWebhooks` adds `/api/webhooks`. The app has no route file
-	// for an endpoint.
+	// and reads the settings for each page after the guard. `daluangWebhooks` adds
+	// `/api/webhooks`. The route files of `/api/tokens` are in `src/pages/api/`.
 	integrations: [
 		securityHeaders(),
 		react({ compiler: true }),
 		daluangAuth(),
 		daluangSettings(),
-		daluangApiTokens(),
 		daluangWebhooks(),
 	],
 	// Astro sends the policy as a header of each page, with the hash of each script that it

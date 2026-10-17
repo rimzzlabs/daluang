@@ -1,10 +1,10 @@
+import { handleTokensRequest } from "@daluang/api-tokens/api";
 import type { APIRoute } from "astro";
-import { handleTokensRequest } from "../api";
-import { readApiTokensEnv } from "./env";
+import { readApiTokensEnv } from "@/lib/api-tokens/env";
 
 export const prerender = false;
 
-/** `GET` and `POST /api/tokens`, and `DELETE /api/tokens/<id>`. See `handleTokensRequest`. */
+/** `GET` and `POST /api/tokens`. See `handleTokensRequest`. */
 export const ALL: APIRoute = (context) =>
 	handleTokensRequest({
 		request: context.request,
