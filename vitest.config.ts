@@ -38,11 +38,12 @@ export default defineConfig({
 				"packages/settings/src/astro/route.ts",
 				"packages/settings/src/astro/middleware.ts",
 				"packages/settings/src/astro/integration.ts",
-				// The Astro layer of the API tokens package is wiring also. The route gives the
-				// request to `handleTokensRequest`, which has tests.
-				"packages/api-tokens/src/astro/env.ts",
-				"packages/api-tokens/src/astro/route.ts",
-				"packages/api-tokens/src/astro/integration.ts",
+				// The env module and the route files of the API tokens are wiring also. They need
+				// the Workers runtime, and they give the request to `handleTokensRequest`, which
+				// has tests. A glob reads `[id]` as a set of letters, so the brackets are escaped.
+				"apps/cms/src/lib/api-tokens/env.ts",
+				"apps/cms/src/pages/api/tokens.ts",
+				"apps/cms/src/pages/api/tokens/\\[id\\].ts",
 				// The Astro layer of the webhooks package is wiring also. The route gives the
 				// request to `handleWebhooksRequest`, which has tests.
 				"packages/webhooks/src/astro/env.ts",

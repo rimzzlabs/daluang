@@ -72,8 +72,9 @@ the `catalog` in `pnpm-workspace.yaml`.
   languages setting, the slug, the core metadata, the extra fields and their definitions,
   and the rule of a translation.
 - `packages/api-tokens` (`@daluang/api-tokens`): the API tokens that let a site read the
-  published notes. Make, list, revoke, and check a token, and the endpoint `/api/tokens`.
-  The page of the tokens is in `apps/cms`. See `docs/api-tokens.md`.
+  published notes. Make, list, revoke, and check a token, and the handler of the endpoint
+  `/api/tokens`. The page and the route files of the tokens are in `apps/cms`. See
+  `docs/api-tokens.md`.
 - `packages/webhooks` (`@daluang/webhooks`): the webhooks that tell a site to rebuild,
   their deliveries, and the endpoint `/api/webhooks`. The page of the webhooks is in
   `apps/cms`. See `docs/webhooks.md`.
@@ -291,9 +292,9 @@ The code below came before these rules. Move it in small pull requests, one pack
 one folder in each. Do not move it as part of another change. Until the code moves, the
 topic docs give the path where it is now.
 
-| Code now                                                                  | Target                                                                                               |
-| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `src/astro/` of each package: the integration, the routes, the middleware | The routes to `apps/cms/src/pages/api/`. The middleware and `env.ts` to `apps/cms/src/lib/<domain>/` |
+| Code now                                                                                        | Target                                                                                               |
+| ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `src/astro/` of `webhooks`, `settings`, and `auth`: the integration, the routes, the middleware | The routes to `apps/cms/src/pages/api/`. The middleware and `env.ts` to `apps/cms/src/lib/<domain>/` |
 
 Delete each row of this table when its code moves.
 
