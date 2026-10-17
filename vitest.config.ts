@@ -30,14 +30,14 @@ export default defineConfig({
 				// Wiring also. It gives the Better Auth client two actions with no branch. The
 				// tests of the components replace the module with a fake.
 				"apps/cms/src/lib/auth/client.ts",
-				// The Astro layer of the settings package is wiring, as in the auth package. The
-				// env module, the route, and the middleware need the Workers runtime and
+				// The Astro layer of the settings is wiring, as in the auth package. The env
+				// module, the route, and the middleware need the Workers runtime and
 				// `astro:middleware`. They give the request to `handleSettingsRequest`,
 				// `readSettings`, and `decideOnboarding`, which have tests.
-				"packages/settings/src/astro/env.ts",
-				"packages/settings/src/astro/route.ts",
-				"packages/settings/src/astro/middleware.ts",
-				"packages/settings/src/astro/integration.ts",
+				"apps/cms/src/lib/settings/env.ts",
+				"apps/cms/src/pages/api/settings.ts",
+				"apps/cms/src/lib/settings/middleware.ts",
+				"apps/cms/src/lib/settings/integration.ts",
 				// The env module and the route files of the API tokens are wiring also. They need
 				// the Workers runtime, and they give the request to `handleTokensRequest`, which
 				// has tests. A glob reads `[id]` as a set of letters, so the brackets are escaped.

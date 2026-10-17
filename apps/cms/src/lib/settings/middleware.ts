@@ -1,8 +1,8 @@
 import { defineMiddleware } from "astro:middleware";
+import { decideOnboarding, needsSettings } from "@daluang/settings/onboarding";
+import { settingsState } from "@daluang/settings/settings";
+import { readSettings } from "@daluang/settings/store";
 import { match } from "ts-pattern";
-import { decideOnboarding, needsSettings } from "../onboarding";
-import { settingsState } from "../settings";
-import { readSettings } from "../store";
 import { readSettingsEnv } from "./env";
 
 /**

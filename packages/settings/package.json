@@ -5,17 +5,10 @@
 	"type": "module",
 	"license": "MIT",
 	"exports": {
-		"./astro/locals": {
-			"types": "./src/astro/locals.d.ts"
-		},
-		"./astro/*": "./src/astro/*.ts",
 		"./*": "./src/*.ts"
 	},
 	"scripts": {
 		"typecheck": "tsc"
-	},
-	"peerDependencies": {
-		"astro": "catalog:"
 	},
 	"dependencies": {
 		"@daluang/auth": "workspace:*",
@@ -28,7 +21,6 @@
 		"@cloudflare/workers-types": "catalog:",
 		"@daluang/tsconfig": "workspace:*",
 		"@types/node": "catalog:",
-		"astro": "catalog:",
 		"typescript": "catalog:",
 		"vitest": "catalog:"
 	}

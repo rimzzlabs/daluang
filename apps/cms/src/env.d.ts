@@ -1,2 +1,2 @@
 /// <reference types="@daluang/auth/astro/locals" />
-/// <reference types="@daluang/settings/astro/locals" />
+/// <reference path="./lib/settings/locals.d.ts" />

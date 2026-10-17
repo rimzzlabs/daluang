@@ -14,14 +14,15 @@ The logic is in `packages/settings`. The settings pages and the onboarding are i
 - The settings are complete when the site and the languages have a valid value.
   `settingsState` gives `complete` or `needed`. The fields are optional: no value is no
   extra field.
-- `GET /api/settings` gives the stored settings. `PATCH /api/settings` writes one setting
+- `GET /api/settings` gives the stored settings. The route file is
+  `apps/cms/src/pages/api/settings.ts`, and `handleSettingsRequest` of the package answers. `PATCH /api/settings` writes one setting
   or more, each with its full value, in one D1 batch. A refused value answers 422 with the
   message of each field.
 
 ## Onboarding
 
 - **The middleware of the settings reads them for each page**, after the sign-in guard,
-  and puts them in `Astro.locals.settings`. The value is `null` for `/sign-in` and for an
+  and puts them in `Astro.locals.settings`. It is `apps/cms/src/lib/settings/middleware.ts`. The value is `null` for `/sign-in` and for an
   endpoint.
 - **With no complete settings, each page opens `/welcome`.** With complete settings,
   `/welcome` opens `/`. `decideOnboarding` of `packages/settings/src/onboarding.ts` has
