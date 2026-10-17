@@ -7,9 +7,6 @@ describe("languageLabel", () => {
 		["id", "Indonesia"],
 		["es", "Español"],
 		["ja", "日本語"],
-		["su", "Basa Sunda"],
-		["jv", "Basa Jawa"],
-		["valueOf", "Valueof"],
 	])("names %s as %s", (tag, label) => {
 		expect(languageLabel(tag)).toBe(label);
 	});

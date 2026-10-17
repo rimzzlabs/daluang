@@ -7,8 +7,8 @@ describe("suggestLanguages", () => {
 	});
 
 	it("orders the languages by weight", () => {
-		expect(suggestLanguages("id;q=0.5,ja;q=0.9,su")).toEqual([
-			"su",
+		expect(suggestLanguages("id;q=0.5,ja;q=0.9,ko")).toEqual([
+			"ko",
 			"ja",
 			"id",
 		]);
