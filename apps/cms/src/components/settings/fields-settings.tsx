@@ -1,6 +1,13 @@
 import { EXTRA_FIELDS_MAX } from "@daluang/notes/extra-fields";
 import type { FieldDefinition } from "@daluang/notes/field-definitions";
 import { CORE_FIELDS } from "@daluang/notes/metadata";
+import {
+	fieldDrafts,
+	newFieldDraft,
+	openSuggestions,
+} from "@daluang/settings/field-drafts";
+import { FIELD_SUGGESTIONS } from "@daluang/settings/field-suggestions";
+import { settingsState } from "@daluang/settings/settings";
 import { Badge } from "@daluang/ui/components/badge";
 import { Button } from "@daluang/ui/components/button";
 import { ConfirmDialog } from "@daluang/ui/components/confirm-dialog";
@@ -23,15 +30,13 @@ import {
 import { A, R } from "@mobily/ts-belt";
 import { ListDashesIcon, PlusIcon } from "@phosphor-icons/react";
 import { useState } from "react";
+import { useSettings } from "@/hooks/settings/use-settings";
 import {
 	SAVE_ERROR_MESSAGES,
 	type SaveSettingsError,
 	saveSettings,
-} from "../client";
-import { fieldDrafts, newFieldDraft, openSuggestions } from "../field-drafts";
-import { FIELD_SUGGESTIONS } from "../field-suggestions";
-import { settingsState } from "../settings";
-import { type SettingsStore, useSettings } from "../settings-store";
+} from "@/lib/settings/client";
+import type { SettingsStore } from "@/lib/settings/settings-store";
 import { FieldDialog, type FieldEdit } from "./field-dialog";
 import { FieldList } from "./field-list";
 

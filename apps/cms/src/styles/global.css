@@ -1,7 +1,6 @@
 @import "@daluang/ui/styles/theme.css";
 
 /*
- * Tailwind CSS scans the app, and the theme adds the UI package. These lines add the
- * components of each domain package that the app renders.
+ * Tailwind CSS scans the app, and the theme adds the UI package. A domain package has no
+ * components, so it needs no `@source` line.
  */
-@source "../../../../packages/settings/src";

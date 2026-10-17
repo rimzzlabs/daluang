@@ -10,7 +10,10 @@ import { Spinner } from "@daluang/ui/components/spinner";
 import { CheckIcon } from "@phosphor-icons/react";
 import type { FormEvent, ReactNode } from "react";
 import { match } from "ts-pattern";
-import { SAVE_ERROR_MESSAGES, type SaveSettingsError } from "../client";
+import {
+	SAVE_ERROR_MESSAGES,
+	type SaveSettingsError,
+} from "@/lib/settings/client";
 
 /** The state of a save of a settings page. */
 export type SaveState =

@@ -1,8 +1,8 @@
-import type { SettingsStore } from "@daluang/settings/settings-store";
 import { O } from "@mobily/ts-belt";
 import type { ReactElement } from "react";
 import type { NavLinkKind } from "@/components/shell/nav-link";
 import { type AppPagePath, findAppPage } from "@/lib/app-pages";
+import type { SettingsStore } from "@/lib/settings/settings-store";
 import { ApiTokensPage } from "./api-tokens-page";
 import { MediaPage } from "./later-pages";
 import { NotesPage } from "./notes-page";

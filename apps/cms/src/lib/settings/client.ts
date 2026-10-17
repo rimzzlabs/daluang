@@ -1,12 +1,12 @@
-import { R } from "@mobily/ts-belt";
-import { match, P } from "ts-pattern";
-import { z } from "zod";
 import {
 	SETTINGS_API_PATH,
 	type SettingsPatch,
 	type StoredSettings,
 	storedSettingsSchema,
-} from "./settings";
+} from "@daluang/settings/settings";
+import { R } from "@mobily/ts-belt";
+import { match, P } from "ts-pattern";
+import { z } from "zod";
 
 const savedSchema = z.object({ settings: storedSettingsSchema });
 

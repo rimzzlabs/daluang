@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
+
+import { newFieldDraft } from "@daluang/settings/field-drafts";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { FieldForm } from "../../src/components/field-form";
-import { newFieldDraft } from "../../src/field-drafts";
+import { FieldForm } from "@/components/settings/field-form";
 
 describe("FieldForm", () => {
 	it("marks a field with an error and shows the message", () => {

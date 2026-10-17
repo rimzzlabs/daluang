@@ -1,8 +1,8 @@
-import type { SettingsStore } from "@daluang/settings/settings-store";
 import { SidebarInset, SidebarProvider } from "@daluang/ui/components/sidebar";
 import { TooltipProvider } from "@daluang/ui/components/tooltip";
 import type { ReactNode } from "react";
 import type { UserMenuProps } from "@/components/auth/user-menu";
+import type { SettingsStore } from "@/lib/settings/settings-store";
 import { AppNavbar } from "./app-navbar";
 import { AppSidebar } from "./app-sidebar";
 import type { NavLinkKind } from "./nav-link";

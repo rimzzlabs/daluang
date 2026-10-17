@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
+
+import type { LanguagesChoice } from "@daluang/settings/languages-choice";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { LanguagesField } from "../../src/components/languages-field";
-import type { LanguagesChoice } from "../../src/languages-choice";
+import { LanguagesField } from "@/components/settings/languages-field";
 
 interface HarnessProps {
 	initial: LanguagesChoice;

@@ -1,7 +1,9 @@
 # Settings and onboarding
 
 This page tells how the CMS keeps its settings, and how the first sign-in asks for them.
-The code is in `packages/settings`.
+The logic is in `packages/settings`. The settings pages and the onboarding are in
+`apps/cms/src/components/settings/`, and their calls of the endpoint are in
+`apps/cms/src/lib/settings/client.ts`.
 
 ## Store
 
@@ -31,7 +33,7 @@ The code is in `packages/settings`.
 ## Settings pages
 
 - The settings pages `/settings/site` and `/settings/languages` change the answers of the
-  onboarding. `SiteSettings` and `LanguagesSettings` of the settings package are their
+  onboarding. `SiteSettings` and `LanguagesSettings` of `apps/cms/src/components/settings/` are their
   components.
 - **`/settings/fields` defines the extra fields of the site**: a label, a frontmatter
   name, a type (`FIELD_TYPES`), and if a note needs a value. `fieldDefinitionsSchema` of

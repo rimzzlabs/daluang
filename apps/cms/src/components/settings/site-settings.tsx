@@ -1,11 +1,15 @@
+import { settingsState } from "@daluang/settings/settings";
+import type { SiteSetting } from "@daluang/settings/site";
+import {
+	parseSiteDraft,
+	type SiteErrors,
+	siteDraft,
+} from "@daluang/settings/site-draft";
 import { R } from "@mobily/ts-belt";
 import { type FormEvent, useState } from "react";
-import { saveSettings } from "../client";
-import { settingsState } from "../settings";
-import type { SettingsStore } from "../settings-store";
-import { useSettings } from "../settings-store";
-import type { SiteSetting } from "../site";
-import { parseSiteDraft, type SiteErrors, siteDraft } from "../site-draft";
+import { useSettings } from "@/hooks/settings/use-settings";
+import { saveSettings } from "@/lib/settings/client";
+import type { SettingsStore } from "@/lib/settings/settings-store";
 import { type SaveState, SettingsForm } from "./settings-form";
 import { focusSiteError, SiteFields } from "./site-fields";
 

@@ -1,6 +1,6 @@
+import { languageLabel } from "@daluang/settings/language-label";
+import type { CmsSettings } from "@daluang/settings/settings";
 import { A, pipe } from "@mobily/ts-belt";
-import { languageLabel } from "../language-label";
-import type { CmsSettings } from "../settings";
 
 export interface SettingsSummaryProps {
 	settings: Pick<CmsSettings, "site" | "languages">;

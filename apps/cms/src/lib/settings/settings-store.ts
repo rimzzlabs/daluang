@@ -1,6 +1,5 @@
+import type { CmsSettings } from "@daluang/settings/settings";
 import { A } from "@mobily/ts-belt";
-import { useSyncExternalStore } from "react";
-import type { CmsSettings } from "./settings";
 
 /**
  * The settings in the browser. The app island makes one store from the settings of the
@@ -31,9 +30,4 @@ export function createSettingsStore(initial: CmsSettings): SettingsStore {
 			};
 		},
 	};
-}
-
-/** The settings of a store. The component renders again after each write. */
-export function useSettings(store: SettingsStore): CmsSettings {
-	return useSyncExternalStore(store.subscribe, store.read, store.read);
 }

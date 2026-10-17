@@ -1,8 +1,8 @@
 import type { CmsSettings } from "@daluang/settings/settings";
-import { createSettingsStore } from "@daluang/settings/settings-store";
 import { readSidebarPreferences } from "@daluang/ui/lib/sidebar-preferences";
 import { RouterProvider } from "@tanstack/react-router";
 import { useState } from "react";
+import { createSettingsStore } from "@/lib/settings/settings-store";
 import { type AppRouterContext, createAppRouter } from "./router";
 
 export interface AppProps extends Pick<AppRouterContext, "user"> {

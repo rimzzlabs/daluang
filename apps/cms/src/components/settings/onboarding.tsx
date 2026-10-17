@@ -1,4 +1,11 @@
 import { languagesSettingSchema } from "@daluang/notes/languages-setting";
+import type { LanguagesChoice } from "@daluang/settings/languages-choice";
+import type { CmsSettings } from "@daluang/settings/settings";
+import {
+	parseSiteDraft,
+	type SiteDraft,
+	type SiteErrors,
+} from "@daluang/settings/site-draft";
 import {
 	Alert,
 	AlertDescription,
@@ -16,10 +23,7 @@ import {
 	SAVE_ERROR_MESSAGES,
 	type SaveSettingsError,
 	saveSettings,
-} from "../client";
-import type { LanguagesChoice } from "../languages-choice";
-import type { CmsSettings } from "../settings";
-import { parseSiteDraft, type SiteDraft, type SiteErrors } from "../site-draft";
+} from "@/lib/settings/client";
 import { LanguagesField } from "./languages-field";
 import { OnboardingProgress } from "./onboarding-progress";
 import { SettingsSummary } from "./settings-summary";

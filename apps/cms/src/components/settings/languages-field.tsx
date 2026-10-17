@@ -1,3 +1,11 @@
+import { languageLabel } from "@daluang/settings/language-label";
+import {
+	addLanguage,
+	chooseLanguages,
+	type LanguagesChoice,
+	languageOptions,
+} from "@daluang/settings/languages-choice";
+import { COMMON_LANGUAGES } from "@daluang/settings/suggested-languages";
 import { Button } from "@daluang/ui/components/button";
 import {
 	Field,
@@ -16,14 +24,6 @@ import {
 import { A, R } from "@mobily/ts-belt";
 import { CheckIcon, PlusIcon } from "@phosphor-icons/react";
 import { type SyntheticEvent, useId, useState } from "react";
-import { languageLabel } from "../language-label";
-import {
-	addLanguage,
-	chooseLanguages,
-	type LanguagesChoice,
-	languageOptions,
-} from "../languages-choice";
-import { COMMON_LANGUAGES } from "../suggested-languages";
 
 export interface LanguagesFieldProps {
 	value: LanguagesChoice;

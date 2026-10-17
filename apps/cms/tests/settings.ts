@@ -1,7 +1,7 @@
 import {
 	createSettingsStore,
 	type SettingsStore,
-} from "@daluang/settings/settings-store";
+} from "@/lib/settings/settings-store";
 
 /** The settings of a CMS after the onboarding, for the tests of the app. */
 export const SETTINGS = {
