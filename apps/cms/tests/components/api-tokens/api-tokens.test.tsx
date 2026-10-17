@@ -18,7 +18,7 @@ const client = vi.hoisted(() => ({
 		server: "Server.",
 	},
 }));
-vi.mock("@daluang/api-tokens/client", () => client);
+vi.mock("@/lib/api-tokens/client", () => client);
 
 beforeEach(() => {
 	client.listApiTokens.mockReset();

@@ -1,9 +1,4 @@
 import type { ApiToken } from "@daluang/api-tokens/api-token";
-import {
-	type ApiTokensError,
-	listApiTokens,
-	TOKENS_ERROR_MESSAGES,
-} from "@daluang/api-tokens/client";
 import { Button } from "@daluang/ui/components/button";
 import {
 	Empty,
@@ -25,6 +20,11 @@ import { A, R } from "@mobily/ts-belt";
 import { KeyIcon, PlusIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { match } from "ts-pattern";
+import {
+	type ApiTokensError,
+	listApiTokens,
+	TOKENS_ERROR_MESSAGES,
+} from "@/lib/api-tokens/client";
 import { NewTokenDialog } from "./new-token-dialog";
 import { RevokeTokenDialog } from "./revoke-token-dialog";
 import { TokenList } from "./token-list";

@@ -1,6 +1,10 @@
 import { R } from "@mobily/ts-belt";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createApiToken, listApiTokens, revokeApiToken } from "../src/client";
+import {
+	createApiToken,
+	listApiTokens,
+	revokeApiToken,
+} from "@/lib/api-tokens/client";
 
 const TOKEN = {
 	id: "t1",

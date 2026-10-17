@@ -1,11 +1,8 @@
 import type { ApiToken } from "@daluang/api-tokens/api-token";
-import {
-	revokeApiToken,
-	TOKENS_ERROR_MESSAGES,
-} from "@daluang/api-tokens/client";
 import { ConfirmDialog } from "@daluang/ui/components/confirm-dialog";
 import { R } from "@mobily/ts-belt";
 import { useState } from "react";
+import { revokeApiToken, TOKENS_ERROR_MESSAGES } from "@/lib/api-tokens/client";
 
 export interface RevokeTokenDialogProps {
 	/** The token to revoke. The dialog keeps it while it closes. */

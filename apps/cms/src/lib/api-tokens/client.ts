@@ -1,7 +1,11 @@
+import {
+	type ApiToken,
+	apiTokenSchema,
+	TOKENS_API_PATH,
+} from "@daluang/api-tokens/api-token";
 import { R } from "@mobily/ts-belt";
 import { match, P } from "ts-pattern";
 import { z } from "zod";
-import { type ApiToken, apiTokenSchema, TOKENS_API_PATH } from "./api-token";
 
 /** Why a request of the tokens page failed. The UI shows one message for each code. */
 export type ApiTokensError =
