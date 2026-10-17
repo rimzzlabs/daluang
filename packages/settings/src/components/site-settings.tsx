@@ -54,7 +54,7 @@ export function SiteSettings(props: SiteSettingsProps) {
 	return (
 		<SettingsForm
 			title="Site"
-			description="The site that shows your notes."
+			description="The site that shows your posts."
 			save={save}
 			onSubmit={submit}
 		>

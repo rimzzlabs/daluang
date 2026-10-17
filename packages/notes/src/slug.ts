@@ -14,7 +14,7 @@ export const slugSchema = z
 	)
 	.regex(
 		SLUG_PATTERN,
-		"Use lowercase letters, digits, and single hyphens: my-first-note.",
+		"Use lowercase letters, digits, and single hyphens: my-first-post.",
 	);
 
 /**

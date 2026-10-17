@@ -7,7 +7,7 @@ import { settingsStore } from "../settings";
 describe("NotesPage", () => {
 	it("links to each setting that a site needs after the onboarding", () => {
 		render(<NotesPage settings={settingsStore()} linkKind="anchor" />);
-		expect(screen.getByRole("heading", { name: "No notes yet" })).toBeTruthy();
+		expect(screen.getByRole("heading", { name: "No posts yet" })).toBeTruthy();
 		expect(
 			screen.getAllByRole("link").map((link) => link.getAttribute("href")),
 		).toEqual([

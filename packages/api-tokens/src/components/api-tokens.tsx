@@ -101,7 +101,7 @@ export function ApiTokens() {
 				<PageHeading>
 					<PageTitle>API tokens</PageTitle>
 					<PageDescription>
-						A token lets your site read the published notes through the API of
+						A token lets your site read the published posts through the API of
 						Daluang. Give each site its own token, so you can revoke one without
 						the others.
 					</PageDescription>
@@ -135,7 +135,7 @@ export function ApiTokens() {
 								</EmptyMedia>
 								<EmptyTitle>No tokens yet</EmptyTitle>
 								<EmptyDescription>
-									Make one token for each site that reads your notes.
+									Make one token for each site that reads your posts.
 								</EmptyDescription>
 							</EmptyHeader>
 						</Empty>

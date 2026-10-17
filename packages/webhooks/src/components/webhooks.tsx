@@ -132,7 +132,7 @@ export function Webhooks() {
 					<PageDescription>
 						A webhook tells your site to rebuild. Daluang sends a POST to its
 						URL, for example the deploy hook of your site. A later release sends
-						one when you publish a note.
+						one when you publish a post.
 					</PageDescription>
 				</PageHeading>
 				<PageActions>{addButton}</PageActions>
@@ -164,7 +164,7 @@ export function Webhooks() {
 								<EmptyTitle>No webhooks yet</EmptyTitle>
 								<EmptyDescription>
 									Add the deploy hook of your site, so it rebuilds with your
-									notes.
+									posts.
 								</EmptyDescription>
 							</EmptyHeader>
 						</Empty>

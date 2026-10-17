@@ -114,7 +114,7 @@ export function FieldForm(props: FieldFormProps) {
 					onCheckedChange={(required) => props.onChange({ ...draft, required })}
 				/>
 				<FieldLabel htmlFor={`${id}-required`}>
-					Required: each note must have a value
+					Required: each post must have a value
 				</FieldLabel>
 			</Field>
 		</FieldGroup>

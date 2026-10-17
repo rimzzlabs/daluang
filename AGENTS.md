@@ -19,6 +19,9 @@ The first site that reads the notes is rimzzlabs.com. Its source is in
 
 ## Product scope
 
+- **The interface calls a note a post.** Each label, message, and page of the docs says
+  "post". The code, the package `@daluang/notes`, and this file keep the domain word
+  "note" until a rename of the domain.
 - **Markdown is the one content format.** The CMS does not keep HTML, MDX, or rich text.
   Comark ([comark.dev](https://comark.dev)) parses and renders the Markdown.
 - **A note is text only, for now.** Images and videos in a note come in a later step.
@@ -356,7 +359,7 @@ own words and its own rules: for example, the editor, the notes, or the media.
 ## Menus
 
 - `NAV_GROUPS` in `apps/cms/src/components/shell/app-sidebar.tsx` holds the menus of the
-  sidebar: Write (Notes, Media), Publish (API tokens, Webhooks), and Settings (Site,
+  sidebar: Write (Posts, Media), Publish (API tokens, Webhooks), and Settings (Site,
   Languages, Fields).
 - Each item has a page in `APP_PAGES` (`apps/cms/src/lib/app-pages.ts`), a component in
   `PAGE_COMPONENTS` (`routes/page-content.tsx`), and a route in `routes/router.ts`. Add

@@ -38,6 +38,6 @@ describe("pageTitle", () => {
 
 describe("documentTitle", () => {
 	it("adds the name of the product", () => {
-		expect(documentTitle("Notes")).toBe("Notes · Daluang");
+		expect(documentTitle("Posts")).toBe("Posts · Daluang");
 	});
 });

@@ -143,7 +143,7 @@ export function FieldsSettings(props: FieldsSettingsProps) {
 				<PageHeading>
 					<PageTitle>Fields</PageTitle>
 					<PageDescription>
-						The fields that your site reads from each note, after the core
+						The fields that your site reads from each post, after the core
 						fields. The editor shows an input for each one.
 					</PageDescription>
 				</PageHeading>
@@ -151,7 +151,7 @@ export function FieldsSettings(props: FieldsSettingsProps) {
 			</PageHeader>
 
 			<div className="flex flex-col gap-2">
-				<p className="text-sm font-medium">Each note has these core fields</p>
+				<p className="text-sm font-medium">Each post has these core fields</p>
 				<ul className="flex flex-wrap gap-1.5" aria-label="Core fields">
 					{A.map(CORE_FIELDS, (field) => (
 						<li key={field}>
@@ -212,7 +212,7 @@ export function FieldsSettings(props: FieldsSettingsProps) {
 					setRemove({ status: "idle" });
 				}}
 				title={`Remove ${removing.field?.label ?? "the field"}?`}
-				description="The editor no longer shows the field. Your site reads the notes with no such field."
+				description="The editor no longer shows the field. Your site reads the posts with no such field."
 				confirmLabel="Remove the field"
 				destructive
 				pending={remove.status === "removing"}

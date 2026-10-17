@@ -9,7 +9,7 @@ export type NoteStatus = (typeof NOTE_STATUSES)[number];
 /** The core metadata of a note. Each site gets these fields. */
 export const noteMetadataSchema = z
 	.object({
-		title: z.string().trim().min(1, "Give the note a title.").max(200),
+		title: z.string().trim().min(1, "Give the post a title.").max(200),
 		slug: slugSchema,
 		language: languageTagSchema,
 		description: z.string().trim().max(300).default(""),
@@ -21,7 +21,7 @@ export const noteMetadataSchema = z
 	.refine(
 		(metadata) => metadata.status === "draft" || metadata.publishedAt !== null,
 		{
-			message: "A published note needs a publishedAt date.",
+			message: "A published post needs a publishedAt date.",
 			path: ["publishedAt"],
 		},
 	);

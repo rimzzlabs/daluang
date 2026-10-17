@@ -63,12 +63,12 @@ export function UserMenu(props: UserMenuProps) {
 							@{props.githubLogin}
 						</span>
 					</DropdownMenuLabel>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem onClick={signOut}>
+						<SignOutIcon />
+						Sign out
+					</DropdownMenuItem>
 				</DropdownMenuGroup>
-				<DropdownMenuSeparator />
-				<DropdownMenuItem onClick={signOut}>
-					<SignOutIcon />
-					Sign out
-				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

@@ -2,7 +2,7 @@ import { A, O, pipe } from "@mobily/ts-belt";
 
 /** The pages of the app island. The router, the menus, and the Astro page read this list. */
 export const APP_PAGES = [
-	{ path: "/", title: "Notes" },
+	{ path: "/", title: "Posts" },
 	{ path: "/media", title: "Media" },
 	{ path: "/settings/api-tokens", title: "API tokens" },
 	{ path: "/settings/webhooks", title: "Webhooks" },

@@ -9,12 +9,12 @@ describe("AppNavbar", () => {
 		render(
 			<SidebarProvider>
 				<AppNavbar
-					title="Notes"
+					title="Posts"
 					user={{ name: "Rizki Citra", githubLogin: "rimzzlabs", image: null }}
 				/>
 			</SidebarProvider>,
 		);
-		expect(screen.getByText("Notes")).toBeTruthy();
+		expect(screen.getByText("Posts")).toBeTruthy();
 		expect(
 			screen.getByRole("button", { name: "Toggle the sidebar" }),
 		).toBeTruthy();

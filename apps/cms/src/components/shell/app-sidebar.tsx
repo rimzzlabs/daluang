@@ -45,7 +45,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 	{
 		label: "Write",
 		items: [
-			{ label: "Notes", href: "/", icon: NotePencilIcon },
+			{ label: "Posts", href: "/", icon: NotePencilIcon },
 			{ label: "Media", href: "/media", icon: ImagesIcon },
 		],
 	},

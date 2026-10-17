@@ -146,7 +146,7 @@ export function FieldDialog(props: FieldDialogProps) {
 						{adding ? "Add a field" : `Change ${props.edit.draft.label}`}
 					</ResponsiveDialogTitle>
 					<ResponsiveDialogDescription>
-						The editor shows an input for the field on each note. Your site
+						The editor shows an input for the field on each post. Your site
 						reads it by its name in the frontmatter.
 					</ResponsiveDialogDescription>
 				</ResponsiveDialogHeader>

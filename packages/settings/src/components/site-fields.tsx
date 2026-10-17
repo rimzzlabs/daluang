@@ -67,7 +67,7 @@ export function SiteFields(props: SiteFieldsProps) {
 				/>
 				{errors.url === undefined ? (
 					<FieldDescription id={`${id}-url-help`}>
-						The address where readers find your notes.
+						The address where readers find your posts.
 					</FieldDescription>
 				) : (
 					<FieldError id={`${id}-url-help`}>{errors.url}</FieldError>
