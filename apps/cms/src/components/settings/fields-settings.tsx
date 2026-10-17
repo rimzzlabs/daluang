@@ -30,12 +30,13 @@ import {
 import { A, R } from "@mobily/ts-belt";
 import { ListDashesIcon, PlusIcon } from "@phosphor-icons/react";
 import { useState } from "react";
+import { useSettings } from "@/hooks/settings/use-settings";
 import {
 	SAVE_ERROR_MESSAGES,
 	type SaveSettingsError,
 	saveSettings,
 } from "@/lib/settings/client";
-import { type SettingsStore, useSettings } from "@/lib/settings/settings-store";
+import type { SettingsStore } from "@/lib/settings/settings-store";
 import { FieldDialog, type FieldEdit } from "./field-dialog";
 import { FieldList } from "./field-list";
 

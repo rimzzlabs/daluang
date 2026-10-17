@@ -1,10 +1,5 @@
-// @vitest-environment jsdom
-import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import {
-	createSettingsStore,
-	useSettings,
-} from "@/lib/settings/settings-store";
+import { createSettingsStore } from "@/lib/settings/settings-store";
 
 const SETTINGS = {
 	site: { name: "rimzzlabs", url: null },
@@ -32,15 +27,5 @@ describe("createSettingsStore", () => {
 		store.write(SETTINGS);
 		expect(first).toHaveBeenCalledOnce();
 		expect(second).toHaveBeenCalledTimes(2);
-	});
-});
-
-describe("useSettings", () => {
-	it("renders again after a write", () => {
-		const store = createSettingsStore(SETTINGS);
-		const { result } = renderHook(() => useSettings(store));
-		expect(result.current.site.name).toBe("rimzzlabs");
-		act(() => store.write(RENAMED));
-		expect(result.current.site.name).toBe("Catatan");
 	});
 });

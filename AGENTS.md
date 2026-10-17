@@ -291,13 +291,12 @@ The code below came before these rules. Move it in small pull requests, one pack
 one folder in each. Do not move it as part of another change. Until the code moves, the
 topic docs give the path where it is now.
 
-| Code now                                                                         | Target                                                                                               |
-| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `useSettings` in `apps/cms/src/lib/settings/settings-store.ts`: a hook in `lib/` | `apps/cms/src/hooks/settings/use-settings.ts`                                                        |
-| `src/astro/` of each package: the integration, the routes, the middleware        | The routes to `apps/cms/src/pages/api/`. The middleware and `env.ts` to `apps/cms/src/lib/<domain>/` |
-| The side-effect functions of `packages/*`, with no `Side effect:` comment        | The same file, with the comment                                                                      |
-| `apps/cms/src/security/`                                                         | `apps/cms/src/lib/security/`                                                                         |
-| `apps/cms/src/lib/app-pages.ts`                                                  | `apps/cms/src/lib/shell/app-pages.ts`                                                                |
+| Code now                                                                  | Target                                                                                               |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `src/astro/` of each package: the integration, the routes, the middleware | The routes to `apps/cms/src/pages/api/`. The middleware and `env.ts` to `apps/cms/src/lib/<domain>/` |
+| The side-effect functions of `packages/*`, with no `Side effect:` comment | The same file, with the comment                                                                      |
+| `apps/cms/src/security/`                                                  | `apps/cms/src/lib/security/`                                                                         |
+| `apps/cms/src/lib/app-pages.ts`                                           | `apps/cms/src/lib/shell/app-pages.ts`                                                                |
 
 Delete each row of this table when its code moves.
 
