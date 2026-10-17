@@ -1,0 +1,74 @@
+name: Bug report
+description: A part of Daluang does not work as the docs tell.
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for the report. Give each step, so that we can see the bug on our computer.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Where in Daluang does the bug occur?
+      options:
+        - Sign-in
+        - Onboarding
+        - Posts
+        - Settings
+        - API tokens
+        - Webhooks
+        - Deploy
+        - Docs site
+        - Landing page
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: What I did
+      description: One step on each line, so that we can do the same steps.
+      placeholder: |
+        1. Opened Settings, then Languages
+        2. Removed English
+        3. Clicked Save
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What I expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What occurred
+      description: Copy each error message exactly. A screenshot helps.
+    validations:
+      required: true
+  - type: dropdown
+    id: host
+    attributes:
+      label: Where Daluang runs
+      options:
+        - My own Cloudflare account
+        - Local development (pnpm dev)
+        - cms.rimzzlabs.com
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The release tag or the commit of your copy.
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and system
+      placeholder: Firefox 150 on macOS 26
