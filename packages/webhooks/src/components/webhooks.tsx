@@ -1,6 +1,23 @@
 import { Button } from "@daluang/ui/components/button";
+import {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyMedia,
+	EmptyTitle,
+} from "@daluang/ui/components/empty";
+import {
+	Page,
+	PageActions,
+	PageDescription,
+	PageHeader,
+	PageHeading,
+	PageTitle,
+} from "@daluang/ui/components/page";
 import { Skeleton } from "@daluang/ui/components/skeleton";
 import { A, R } from "@mobily/ts-belt";
+import { PlusIcon, WebhooksLogoIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { match } from "ts-pattern";
 import {
@@ -9,7 +26,11 @@ import {
 	type WebhooksError,
 } from "../client";
 import type { Delivery, Webhook } from "../webhook";
-import { NewWebhookForm } from "./new-webhook-form";
+import { NewWebhookDialog } from "./new-webhook-dialog";
+import {
+	RemoveWebhookDialog,
+	TestWebhookDialog,
+} from "./webhook-action-dialogs";
 import { WebhookCard } from "./webhook-card";
 
 type ListState =
@@ -43,9 +64,24 @@ function withDelivery(add: DeliveryAdd): Webhook {
 	};
 }
 
+type ActionKind = "test" | "remove";
+
+interface ActionTarget {
+	kind: ActionKind;
+	open: boolean;
+	/** The dialog keeps the webhook while it closes, so its title does not change. */
+	webhook: Webhook | null;
+}
+
 /** The page of the webhooks: add one, send a test, see the deliveries, and remove one. */
 export function Webhooks() {
 	const [list, setList] = useState<ListState>({ status: "loading" });
+	const [adding, setAdding] = useState(false);
+	const [action, setAction] = useState<ActionTarget>({
+		kind: "test",
+		open: false,
+		webhook: null,
+	});
 
 	// The webhooks are on the server, an external system. The page reads them when it opens.
 	useEffect(() => {
@@ -74,24 +110,37 @@ export function Webhooks() {
 		});
 	}
 
+	function openAction(kind: ActionKind, webhook: Webhook) {
+		setAction({ kind, open: true, webhook });
+	}
+
+	function changeOpen(kind: ActionKind) {
+		return (open: boolean) => setAction({ ...action, kind, open });
+	}
+
+	const addButton = (
+		<Button type="button" onClick={() => setAdding(true)}>
+			<PlusIcon data-icon="inline-start" />
+			Add a webhook
+		</Button>
+	);
+
 	return (
-		<section className="mx-auto flex w-full max-w-xl flex-col gap-8 px-6 py-10">
-			<div className="flex flex-col gap-2">
-				<h1 className="font-serif text-2xl font-semibold tracking-tight">
-					Webhooks
-				</h1>
-				<p className="text-sm text-pretty text-muted-foreground">
-					A webhook tells your site to rebuild. Daluang sends a POST to its URL,
-					for example the deploy hook of your site. A later release sends one
-					when you publish a note. Send a test now to check the URL.
-				</p>
-			</div>
-			<NewWebhookForm
-				onAdded={(webhook) => update((webhooks) => [webhook, ...webhooks])}
-			/>
+		<Page>
+			<PageHeader>
+				<PageHeading>
+					<PageTitle>Webhooks</PageTitle>
+					<PageDescription>
+						A webhook tells your site to rebuild. Daluang sends a POST to its
+						URL, for example the deploy hook of your site. A later release sends
+						one when you publish a note.
+					</PageDescription>
+				</PageHeading>
+				<PageActions>{addButton}</PageActions>
+			</PageHeader>
 			{match(list)
 				.with({ status: "loading" }, () => (
-					<div role="status" className="flex flex-col gap-3">
+					<div role="status" className="flex flex-col gap-2">
 						<span className="sr-only">Loading the webhooks</span>
 						<Skeleton className="h-24 w-full" />
 					</div>
@@ -108,37 +157,63 @@ export function Webhooks() {
 				))
 				.with({ status: "ready" }, (ready) =>
 					A.isEmpty(ready.webhooks) ? (
-						<p className="rounded-2xl border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
-							No webhooks yet. Add the deploy hook of your site.
-						</p>
+						<Empty className="border border-border">
+							<EmptyHeader>
+								<EmptyMedia variant="icon">
+									<WebhooksLogoIcon />
+								</EmptyMedia>
+								<EmptyTitle>No webhooks yet</EmptyTitle>
+								<EmptyDescription>
+									Add the deploy hook of your site, so it rebuilds with your
+									notes.
+								</EmptyDescription>
+							</EmptyHeader>
+							<EmptyContent>{addButton}</EmptyContent>
+						</Empty>
 					) : (
-						<ul className="flex flex-col gap-3" aria-label="Webhooks">
+						<ul
+							aria-label="Webhooks"
+							className="divide-y divide-border rounded-2xl border border-border"
+						>
 							{A.map(ready.webhooks, (webhook) => (
 								<WebhookCard
 									key={webhook.id}
 									webhook={webhook}
-									onDelivered={(delivery) =>
-										update((webhooks) =>
-											A.map(webhooks, (item) =>
-												withDelivery({
-													webhook: item,
-													id: webhook.id,
-													delivery,
-												}),
-											),
-										)
-									}
-									onRemoved={(id) =>
-										update((webhooks) =>
-											A.reject(webhooks, (item) => item.id === id),
-										)
-									}
+									onTest={(target) => openAction("test", target)}
+									onRemove={(target) => openAction("remove", target)}
 								/>
 							))}
 						</ul>
 					),
 				)
 				.exhaustive()}
-		</section>
+			<NewWebhookDialog
+				open={adding}
+				onOpenChange={setAdding}
+				onAdded={(webhook) => update((webhooks) => [webhook, ...webhooks])}
+			/>
+			<TestWebhookDialog
+				webhook={action.webhook}
+				open={action.open && action.kind === "test"}
+				onOpenChange={changeOpen("test")}
+				onDelivered={(id, delivery) =>
+					update((webhooks) =>
+						A.map(webhooks, (webhook) =>
+							withDelivery({ webhook, id, delivery }),
+						),
+					)
+				}
+			/>
+			<RemoveWebhookDialog
+				webhook={action.webhook}
+				open={action.open && action.kind === "remove"}
+				onOpenChange={changeOpen("remove")}
+				onRemoved={(id) =>
+					update((webhooks) =>
+						A.reject(webhooks, (webhook) => webhook.id === id),
+					)
+				}
+			/>
+		</Page>
 	);
 }

@@ -21,7 +21,7 @@ export function SiteFields(props: SiteFieldsProps) {
 	const id = useId();
 	const { value, errors } = props;
 	return (
-		<FieldGroup>
+		<FieldGroup className="gap-5">
 			<Field data-invalid={errors.name !== undefined}>
 				<FieldLabel htmlFor={`${id}-name`}>Site name</FieldLabel>
 				<Input
