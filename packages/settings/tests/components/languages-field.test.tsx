@@ -42,10 +42,14 @@ describe("LanguagesField", () => {
 		expect(chip(/Español/).getAttribute("aria-pressed")).toBe("false");
 	});
 
-	it("names Sundanese and Javanese in their own language", () => {
-		renderField({ languages: ["su"], defaultLanguage: "su" });
-		expect(chip(/Basa Sunda/)).toBeTruthy();
-		expect(chip(/Basa Jawa/)).toBeTruthy();
+	it("shows the most used languages by their own name", () => {
+		renderField({ languages: ["en"], defaultLanguage: "en" });
+		expect(chip(/中文/)).toBeTruthy();
+		expect(chip(/हिन्दी/)).toBeTruthy();
+		expect(chip(/العربية/)).toBeTruthy();
+		expect(
+			screen.queryByRole("button", { name: /Sundanese|Javanese/ }),
+		).toBeNull();
 	});
 
 	it("gives the default to the next language when the default leaves", async () => {

@@ -3,22 +3,22 @@ import type { LanguagesSetting } from "@daluang/notes/languages-setting";
 import { A, O, pipe, S } from "@mobily/ts-belt";
 
 /**
- * The languages that the onboarding shows first. The name Daluang comes from old Sundanese
- * manuscripts, so Sundanese is here, with Javanese, the other large language of Java.
+ * The languages that the onboarding and the languages page show as choices: the most used
+ * languages, by the number of speakers. A writer types the tag of each other language.
  */
 export const COMMON_LANGUAGES = [
 	"en",
-	"id",
-	"su",
-	"jv",
-	"ms",
+	"zh",
 	"es",
+	"hi",
+	"ar",
 	"pt",
 	"fr",
-	"de",
+	"ru",
 	"ja",
+	"de",
+	"id",
 	"ko",
-	"zh",
 ] as const;
 
 const SUGGESTIONS_MAX = 3;

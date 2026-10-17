@@ -9,12 +9,12 @@ describe("SettingsSummary", () => {
 			<SettingsSummary
 				settings={{
 					site: { name: "rimzzlabs", url: null },
-					languages: { languages: ["en", "su"], defaultLanguage: "su" },
+					languages: { languages: ["en", "ja"], defaultLanguage: "ja" },
 				}}
 			/>,
 		);
 		expect(screen.getByText("No address")).toBeTruthy();
-		expect(screen.getByText("English, Basa Sunda")).toBeTruthy();
-		expect(screen.getByText("Basa Sunda")).toBeTruthy();
+		expect(screen.getByText("English, 日本語")).toBeTruthy();
+		expect(screen.getByText("日本語")).toBeTruthy();
 	});
 });
