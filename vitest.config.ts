@@ -7,7 +7,7 @@ export default defineConfig({
 		coverage: {
 			provider: "v8",
 			// Each source file counts, also a file that no test imports. `pnpm test` fails
-			// when a number is below its threshold. AGENTS.md, "Tests", has the rules.
+			// when a number is below its threshold. `docs/testing.md` has the rules.
 			include: ["apps/*/src/**/*.{ts,tsx}", "packages/*/src/**/*.{ts,tsx}"],
 			exclude: [
 				"**/*.d.ts",
