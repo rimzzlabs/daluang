@@ -125,8 +125,8 @@ export function FieldsSettings(props: FieldsSettingsProps) {
 						key={suggestion.name}
 						type="button"
 						variant="outline"
-						size="xs"
-						className="font-mono"
+						size="sm"
+						className="font-mono max-sm:h-11"
 						aria-label={`Add the field ${suggestion.name}`}
 						onClick={() => add(suggestion)}
 					>

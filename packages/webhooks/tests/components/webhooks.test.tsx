@@ -33,14 +33,14 @@ beforeEach(() => {
 });
 
 describe("Webhooks", () => {
-	it("shows a loading state, then the empty state with its action", async () => {
+	it("shows a loading state, then the empty state, with one primary action", async () => {
 		client.listWebhooksOfCms.mockResolvedValue(R.Ok([]));
 		render(<Webhooks />);
 		expect(screen.getByText("Loading the webhooks")).toBeTruthy();
 		expect(await screen.findByText("No webhooks yet")).toBeTruthy();
 		expect(
 			screen.getAllByRole("button", { name: "Add a webhook" }),
-		).toHaveLength(2);
+		).toHaveLength(1);
 	});
 
 	it("shows why the list failed, and tries again", async () => {
@@ -57,11 +57,9 @@ describe("Webhooks", () => {
 		client.addWebhook.mockResolvedValue(R.Ok(WEBHOOK));
 		render(<Webhooks />);
 		await screen.findByText("No webhooks yet");
-		const [headerButton] = screen.getAllByRole("button", {
-			name: "Add a webhook",
-		});
-		if (headerButton === undefined) throw new Error("No button.");
-		await userEvent.click(headerButton);
+		await userEvent.click(
+			screen.getByRole("button", { name: "Add a webhook" }),
+		);
 		const dialog = screen.getByRole("dialog");
 		await userEvent.type(within(dialog).getByLabelText("Webhook name"), "Site");
 		await userEvent.type(
