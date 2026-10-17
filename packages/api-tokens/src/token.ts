@@ -18,7 +18,11 @@ function base64Url(bytes: Uint8Array): string {
 	);
 }
 
-/** A new token: the prefix and 32 random bytes. Daluang shows it to the writer one time. */
+/**
+ * Side effect: reads 32 random bytes from `crypto`. Nobody can guess a random token.
+ *
+ * A new token: the prefix and 32 random bytes. Daluang shows it to the writer one time.
+ */
 export function generateTokenSecret(): string {
 	const bytes = crypto.getRandomValues(new Uint8Array(SECRET_BYTES));
 	return `${TOKEN_PREFIX}${base64Url(bytes)}`;

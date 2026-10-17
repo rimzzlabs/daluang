@@ -10,7 +10,11 @@ function toTokens(rows: readonly unknown[]): readonly ApiToken[] {
 	);
 }
 
-/** Each token, the newest first. */
+/**
+ * Side effect: reads the table `api_token` of D1, because D1 keeps the tokens.
+ *
+ * Each token, the newest first.
+ */
 export async function listTokens(db: D1Database): Promise<readonly ApiToken[]> {
 	const result = await db
 		.prepare(`select ${COLUMNS} from "api_token" order by "createdAt" desc`)
@@ -30,7 +34,12 @@ export interface CreatedToken {
 	secret: string;
 }
 
-/** Makes a token. D1 keeps its hash and its start. */
+/**
+ * Side effect: writes a row with a random ID to D1. The token must stay valid after this
+ * request.
+ *
+ * Makes a token. D1 keeps its hash and its start.
+ */
 export async function createToken(create: TokenCreate): Promise<CreatedToken> {
 	const secret = generateTokenSecret();
 	const token: ApiToken = {
@@ -60,7 +69,11 @@ export interface TokenRef {
 	id: string;
 }
 
-/** Revokes a token: D1 deletes it. False when no token has the ID. */
+/**
+ * Side effect: deletes a row from D1. A revoked token must fail at the next request.
+ *
+ * Revokes a token: D1 deletes it. False when no token has the ID.
+ */
 export async function deleteToken(ref: TokenRef): Promise<boolean> {
 	const result = await ref.db
 		.prepare('delete from "api_token" where "id" = ?1')
@@ -74,7 +87,11 @@ export interface TokenLookup {
 	hash: string;
 }
 
-/** The token with this hash, or `None`. */
+/**
+ * Side effect: reads D1, because only D1 knows which tokens exist.
+ *
+ * The token with this hash, or `None`.
+ */
 export async function findTokenByHash(
 	lookup: TokenLookup,
 ): Promise<O.Option<ApiToken>> {
@@ -93,7 +110,11 @@ export interface TokenUse {
 	before: Date;
 }
 
-/** Records the time of a use. One write in each interval is enough for the list. */
+/**
+ * Side effect: writes the time of the last use to D1. The list of tokens shows it.
+ *
+ * Records the time of a use. One write in each interval is enough for the list.
+ */
 export async function markTokenUsed(use: TokenUse): Promise<void> {
 	await use.db
 		.prepare(

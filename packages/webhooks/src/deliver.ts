@@ -12,7 +12,11 @@ export interface WebhookSend {
 	fetcher: typeof fetch;
 }
 
-// An async function: a throw of `fetch`, also a throw before its promise, is a rejection.
+/**
+ * Side effect: one POST to the URL of the webhook, for `sendWebhook`.
+ *
+ * An async function: a throw of `fetch`, also a throw before its promise, is a rejection.
+ */
 async function post(send: WebhookSend, sentAt: Date): Promise<Response> {
 	// Workers refuses a call of `fetch` with another `this`, so the call has none.
 	const { fetcher } = send;
@@ -29,6 +33,8 @@ async function post(send: WebhookSend, sentAt: Date): Promise<Response> {
 }
 
 /**
+ * Side effect: a POST to the webhook URL. The deploy hook of the site starts a rebuild.
+ *
  * Sends one delivery: a POST with the event as JSON. The CMS does not follow a redirect,
  * so a webhook cannot send the request to another host. A status of 2xx is delivered. A
  * request that fails or takes too long is failed, with no status code.

@@ -17,6 +17,9 @@ export interface TokenCheck {
 }
 
 /**
+ * Side effect: reads the token from D1, and writes its last use. A revoked token must
+ * fail at once.
+ *
  * The token of a request: `Authorization: Bearer dlg_…`. A token that D1 does not have is
  * `unknown`: it is revoked, or it never existed. A valid token records its last use.
  */
