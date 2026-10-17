@@ -166,34 +166,111 @@ Do not add a library that this list does not name. Ask first.
 
 ## Architecture rules
 
-The code follows domain-driven design. A domain is one area of the product, with its
-own words and its own rules: for example, the editor, the notes, or the media.
+A domain is one area of the product, with its own words: for example, the notes, the
+settings, or the webhooks. A package holds the logic of one domain as plain functions.
+An app connects that logic to a person, to a framework, and to the runtime.
 
-1. **A domain is a package.** The code of a domain goes in `packages/<domain>`, for
-   example `packages/wysiwyg` for the editor. The package holds the model, the logic,
-   the schemas, the components, and the hooks of that domain.
-2. **The package name is the domain name.** Use the words of the domain in its code. Do
-   not name a package for a technical layer, for example `utils`, `helpers`, or `types`.
-3. **Packages are source-only.** `exports` points at `.ts` and `.tsx` files, and Vite
-   compiles them with the app. A package has no build step.
-4. **A package does not import an app.** Across workspaces, import by package name.
-5. **Dependencies go in one direction.** `@daluang/tsconfig` and `@daluang/ui` import
-   no domain package. A domain package can import `@daluang/ui` and another domain
-   package. Do not make a cycle.
-6. **The app is thin.** `apps/cms` holds pages, islands, and wiring. Logic that handles
-   data goes in the package of its domain.
+### Packages
+
+These rules are for the domain packages. `packages/ui` and `packages/tsconfig` are not
+domain packages.
+
+1. **A package holds the logic of one domain.** It holds functions, zod schemas, types,
+   and constants. Name the package for its domain, for example `notes` or `webhooks`. Do
+   not name a package for a technical layer: `utils`, `helpers`, or `types`.
+2. **A package has no UI.** Do not put JSX, a React component, a hook, or HTML in a
+   domain package. The UI primitives that `apps/cms` and `apps/web` share are in
+   `packages/ui`.
+3. **A package does not import a framework.** Do not import `react`, `astro`, `astro:*`,
+   or `cloudflare:workers` in a domain package. A library of the domain is correct: zod,
+   ts-belt, ts-pattern, and Better Auth on the server. `Request` and `Response` are Web
+   standards, so a package can hold the handler of an endpoint.
+4. **Write plain functions and data.** Do not add a class, a repository layer, or a
+   service object. Use the words of the domain in the names.
+5. **A computation is a pure function.** It gets each input as a parameter and returns a
+   new value. It changes no input and no state outside the function. It does not read the
+   clock, a random value, the environment, the network, or a global variable. For the
+   same input, it gives the same output.
+6. **Keep each side effect in a function of its own.** A side effect is a read or a write
+   outside the function: D1, `fetch`, the clock, a random value, or a log. A side-effect
+   function calls pure functions for its logic. A pure function never calls a side-effect
+   function.
+7. **A side-effect function gets each external system as a parameter:** the D1 binding,
+   `fetch`, or the clock (`now: () => Date`). A test then gives a fake. `sendWebhook` of
+   `packages/webhooks/src/deliver.ts` gets `fetcher` and `now` in this way. A random
+   value from `crypto` is the exception: the function can call `crypto` directly.
+8. **A comment above a side-effect function gives the side effect and its reason.** Start
+   the comment with `Side effect:`, so that a search finds each one:
+
+   ```ts
+   /** Side effect: a POST to the webhook URL. The deploy hook of the site starts a rebuild. */
+   export async function sendWebhook(send: WebhookSend): Promise<Delivery> {
+   ```
+
+9. **Packages are source-only.** `exports` points at `.ts` files, and Vite compiles them
+   with the app. A package has no build step.
+10. **Each entry is one file that defines its symbols.** Do not add a file that only
+    exports from other files.
+11. **Dependencies go in one direction.** `@daluang/tsconfig` and `@daluang/ui` import no
+    domain package. A domain package can import another domain package. It does not
+    import `@daluang/ui` or an app. Do not make a cycle. Across workspaces, import by
+    package name.
+
+### Apps
+
+1. **The app connects the domains to a person and to the runtime.** It holds the pages,
+   the components, the hooks, the endpoint files, the middleware, the Astro integrations,
+   and the read of the environment. Logic that handles data goes in the package of its
+   domain.
+2. **Group the files of `src/` by kind, then by domain:**
+
+   | Folder                 | Holds                                                                                  |
+   | ---------------------- | -------------------------------------------------------------------------------------- |
+   | `components/<domain>/` | The components of one domain, for example `components/webhooks/webhook-card.tsx`       |
+   | `components/shared/`   | A component that two or more domains use, and that is not a primitive                  |
+   | `hooks/<domain>/`      | The hooks of one domain. `hooks/shared/` holds a hook that two or more domains use.    |
+   | `lib/<domain>/`        | The code of one domain with no JSX: the calls of an endpoint, the middleware, and more |
+   | `lib/shared/`          | The code with no JSX that two or more domains use                                      |
+   | `pages/`               | The Astro routes only                                                                  |
+   | `layouts/`             | The Astro layouts                                                                      |
+   | `routes/`              | The router of the app island, its root, and one route file for each page               |
+   | `styles/`              | The global CSS                                                                         |
+
+3. **A domain folder has the name of its package:** `auth`, `notes`, `settings`,
+   `api-tokens`, or `webhooks`. A domain of the app only has its own name, for example
+   `shell` or `security`.
+4. **If a second domain imports a file, move the file to `shared/`.** A primitive stays in
+   `packages/ui`.
+5. **A file in `pages/` is thin.** A page renders components. An endpoint reads the
+   request, calls a function of its domain, and returns the answer. Do not put a
+   component or logic in `pages/`.
+6. **One module reads the environment of a domain.** `lib/<domain>/env.ts` reads the
+   bindings and the variables from `cloudflare:workers`. It validates them with the zod
+   schema of the package. All other code gets a value as a parameter. Do not read
+   `import.meta.env` or `process.env` for a server value.
 7. **The app imports with `@/`.** `@/` is `apps/cms/src`. Do not write `../` in the app.
    A file in the same folder keeps `./`. In a package, import by relative path.
-8. **Each entry is one file that defines its symbols.** Do not add a file that only
-   exports from other files.
-9. **A package with endpoints has an Astro layer.** `packages/<domain>/src/astro/` holds
-   an Astro integration, the route entry files, and the wiring. The app adds the
-   integration in `astro.config.ts`.
-10. **One module reads the environment of a domain.** A module reads the bindings and the
-    variables from `cloudflare:workers` and validates them with a zod schema.
-    `packages/auth/src/astro/env.ts` reads the auth variables and the `DB` binding with
-    the schema of `@daluang/auth/env`. All other code gets a value as a parameter. Do not
-    read `import.meta.env` or `process.env` for a server value.
+8. `apps/web` obeys the same layout. `apps/docs` obeys the layout of Vocs: its pages are
+   the Markdown files in `src/pages/`.
+
+### Code that does not obey these rules yet
+
+The code below came before these rules. Move it in small pull requests, one package or
+one folder in each. Do not move it as part of another change. Until the code moves, the
+topic docs give the path where it is now.
+
+| Code now                                                                  | Target                                                                                               |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `src/components/` of `auth`, `settings`, `api-tokens`, and `webhooks`     | `apps/cms/src/components/<domain>/`                                                                  |
+| `packages/settings/src/settings-store.ts`: a store with state, and a hook | The store to `apps/cms/src/lib/settings/`, and `useSettings` to `apps/cms/src/hooks/settings/`       |
+| `src/astro/` of each package: the integration, the routes, the middleware | The routes to `apps/cms/src/pages/api/`. The middleware and `env.ts` to `apps/cms/src/lib/<domain>/` |
+| `src/client.ts` of each package: the calls of `fetch` and of Better Auth  | `apps/cms/src/lib/<domain>/`. The error codes and the schemas stay in the package.                   |
+| The side-effect functions of `packages/*`, with no `Side effect:` comment | The same file, with the comment                                                                      |
+| `apps/cms/src/security/`                                                  | `apps/cms/src/lib/security/`                                                                         |
+| `apps/cms/src/lib/app-pages.ts`                                           | `apps/cms/src/lib/shell/app-pages.ts`                                                                |
+
+When the last package with components moves, delete the `@source` lines of the packages
+in `apps/cms/src/styles/global.css`. Delete each row of this table when its code moves.
 
 ## Git
 

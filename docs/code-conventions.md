@@ -13,7 +13,7 @@ architecture (packages and apps) are in `AGENTS.md`.
 - Import a symbol from the module that defines it. Do not write an `index.ts` that only
   exports from other files.
 - A package lists its entries in `exports`. One pattern for each folder is correct:
-  `"./components/*": "./src/components/*.tsx"`.
+  `"./*": "./src/*.ts"`.
 
 ## Functions and types
 
@@ -137,8 +137,8 @@ see `docs/app-shell.md`.
 - Use a token of the theme: `bg-background`, `text-muted-foreground`, `border-border`. Do
   not write a color value in a class.
 - **Tailwind CSS scans only the files that it knows.** `theme.css` adds `packages/ui`.
-  `apps/cms/src/styles/global.css` adds each domain package with components, with an
-  `@source` line. Add the line for a new domain package, or its classes are missing.
+  `apps/cms/src/styles/global.css` adds each domain package that still has components,
+  with an `@source` line. A new domain package has no components, so it needs no line.
 - Do not write an arbitrary value in a class: `w-[400px]`, `text-[15px]`, `bg-[#fff]`. Use
   a step of the scale, or add a token to `theme.css`.
 - A variant in square brackets is correct only when Tailwind CSS has no named variant for
