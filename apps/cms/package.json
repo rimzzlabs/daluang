@@ -26,6 +26,7 @@
 		"@phosphor-icons/react": "catalog:",
 		"@tailwindcss/vite": "catalog:",
 		"@tanstack/react-router": "catalog:",
+		"better-auth": "catalog:",
 		"astro": "catalog:",
 		"react": "catalog:",
 		"react-dom": "catalog:",

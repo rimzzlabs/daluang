@@ -11,7 +11,7 @@ This page tells which code needs a test, where the test goes, and how coverage c
   `src/`. The test of `src/guard.ts` is `tests/guard.test.ts`.
 - A test calls a function with parameters. Do not mock a framework module, for example
   `astro:middleware`. A test can replace a module of its own workspace with `vi.mock`, as
-  the component tests of `packages/auth` do with `src/client.ts`.
+  the component tests of `apps/cms` do with `@/lib/auth/client`.
 - A test that passes prints nothing. A test of a failure collects the log it expects with
   `vi.spyOn(console, "error")` and checks it.
 

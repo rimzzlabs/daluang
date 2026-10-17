@@ -1,5 +1,5 @@
+import { SIGN_IN_PATH } from "@daluang/auth/paths";
 import { createAuthClient } from "better-auth/react";
-import { SIGN_IN_PATH } from "./paths";
 
 // The browser client of Better Auth. The CMS serves `/api/auth` on its own origin.
 const authClient = createAuthClient();

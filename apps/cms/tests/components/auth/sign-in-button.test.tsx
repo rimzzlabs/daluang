@@ -8,7 +8,7 @@ const client = vi.hoisted(() => ({
 	startGitHubSignIn: vi.fn(),
 	signOut: vi.fn(),
 }));
-vi.mock("@daluang/auth/client", () => client);
+vi.mock("@/lib/auth/client", () => client);
 
 describe("SignInButton", () => {
 	beforeEach(() => {
