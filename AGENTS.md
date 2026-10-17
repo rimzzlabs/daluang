@@ -295,7 +295,6 @@ topic docs give the path where it is now.
 | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `packages/settings/src/settings-store.ts`: a store with state, and a hook | The store to `apps/cms/src/lib/settings/`, and `useSettings` to `apps/cms/src/hooks/settings/`       |
 | `src/astro/` of each package: the integration, the routes, the middleware | The routes to `apps/cms/src/pages/api/`. The middleware and `env.ts` to `apps/cms/src/lib/<domain>/` |
-| `src/client.ts` of `settings`: the calls of `fetch`                       | `apps/cms/src/lib/<domain>/client.ts`. A schema that the server also uses stays in the package.      |
 | The side-effect functions of `packages/*`, with no `Side effect:` comment | The same file, with the comment                                                                      |
 | `apps/cms/src/security/`                                                  | `apps/cms/src/lib/security/`                                                                         |
 | `apps/cms/src/lib/app-pages.ts`                                           | `apps/cms/src/lib/shell/app-pages.ts`                                                                |

@@ -1,9 +1,5 @@
 import type { FieldDefinition } from "@daluang/notes/field-definitions";
 import {
-	SAVE_ERROR_MESSAGES,
-	type SaveSettingsError,
-} from "@daluang/settings/client";
-import {
 	type FieldDraft,
 	type FieldErrors,
 	fieldDrafts,
@@ -22,6 +18,10 @@ import {
 import { Spinner } from "@daluang/ui/components/spinner";
 import { A, R } from "@mobily/ts-belt";
 import { type FormEvent, useState } from "react";
+import {
+	SAVE_ERROR_MESSAGES,
+	type SaveSettingsError,
+} from "@/lib/settings/client";
 import { FieldForm } from "./field-form";
 
 /** What the dialog does: add a field, or change the field at `index`. */

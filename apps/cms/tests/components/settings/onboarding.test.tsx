@@ -15,7 +15,7 @@ const client = vi.hoisted(() => ({
 		server: "Server.",
 	},
 }));
-vi.mock("@daluang/settings/client", () => client);
+vi.mock("@/lib/settings/client", () => client);
 
 const LANGUAGES = { languages: ["en"], defaultLanguage: "en" };
 

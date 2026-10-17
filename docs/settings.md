@@ -2,7 +2,8 @@
 
 This page tells how the CMS keeps its settings, and how the first sign-in asks for them.
 The logic is in `packages/settings`. The settings pages and the onboarding are in
-`apps/cms/src/components/settings/`.
+`apps/cms/src/components/settings/`, and their calls of the endpoint are in
+`apps/cms/src/lib/settings/client.ts`.
 
 ## Store
 

@@ -1,6 +1,6 @@
 import { R } from "@mobily/ts-belt";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { openPage, saveSettings } from "../src/client";
+import { openPage, saveSettings } from "@/lib/settings/client";
 
 const SITE = { name: "rimzzlabs", url: null };
 const STORED = { site: SITE, languages: null, fields: null };

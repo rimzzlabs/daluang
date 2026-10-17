@@ -2,11 +2,6 @@ import { EXTRA_FIELDS_MAX } from "@daluang/notes/extra-fields";
 import type { FieldDefinition } from "@daluang/notes/field-definitions";
 import { CORE_FIELDS } from "@daluang/notes/metadata";
 import {
-	SAVE_ERROR_MESSAGES,
-	type SaveSettingsError,
-	saveSettings,
-} from "@daluang/settings/client";
-import {
 	fieldDrafts,
 	newFieldDraft,
 	openSuggestions,
@@ -39,6 +34,11 @@ import {
 import { A, R } from "@mobily/ts-belt";
 import { ListDashesIcon, PlusIcon } from "@phosphor-icons/react";
 import { useState } from "react";
+import {
+	SAVE_ERROR_MESSAGES,
+	type SaveSettingsError,
+	saveSettings,
+} from "@/lib/settings/client";
 import { FieldDialog, type FieldEdit } from "./field-dialog";
 import { FieldList } from "./field-list";
 

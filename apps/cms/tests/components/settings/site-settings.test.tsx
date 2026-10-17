@@ -16,7 +16,7 @@ const client = vi.hoisted(() => ({
 		server: "Server.",
 	},
 }));
-vi.mock("@daluang/settings/client", () => client);
+vi.mock("@/lib/settings/client", () => client);
 
 const SETTINGS = {
 	site: { name: "rimzzlabs", url: "https://rimzzlabs.com" },
