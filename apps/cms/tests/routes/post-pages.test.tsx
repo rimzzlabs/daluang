@@ -5,6 +5,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { createChangesStore } from "@/lib/notes/changes-store";
+import { readNote } from "@/lib/notes/client";
 import { EditPostPage, NewPostPage } from "@/routes/post-pages";
 import { createAppRouter } from "@/routes/router";
 import { settingsStore } from "../settings";
@@ -13,6 +14,26 @@ vi.mock("@/lib/notes/client", async (importOriginal) => ({
 	...(await importOriginal<object>()),
 	addNote: () => Promise.resolve(R.Ok({})),
 	listPostsOfCms: () => Promise.resolve(R.Ok({ posts: [], count: 0 })),
+	readNote: vi.fn((id: string) =>
+		Promise.resolve(
+			R.Ok({
+				id,
+				title: "Jotai recipes",
+				slug: "jotai",
+				language: "en",
+				description: "",
+				keywords: [],
+				status: "draft",
+				publishedAt: null,
+				updatedAt: "2026-10-18T12:00:00.000Z",
+				createdAt: "2026-10-18T12:00:00.000Z",
+				fields: {},
+				body: "# Jotai",
+				published: null,
+				mark: null,
+			}),
+		),
+	),
 }));
 
 describe("post pages", () => {
@@ -48,9 +69,28 @@ describe("post pages", () => {
 		await waitFor(() => expect(router.state.location.pathname).toBe("/"));
 	});
 
-	it("says that the page of a post comes later", () => {
-		render(<EditPostPage />);
-		expect(screen.getByRole("heading", { name: "Edit post" })).toBeTruthy();
-		expect(screen.getByText("This page comes in a later step.")).toBeTruthy();
+	it("opens the post of the ID in the path", async () => {
+		render(
+			<EditPostPage
+				settings={settingsStore()}
+				changes={createChangesStore(0)}
+				linkKind="anchor"
+				pathname="/posts/n1"
+			/>,
+		);
+		expect(await screen.findByDisplayValue("Jotai recipes")).toBeTruthy();
+	});
+
+	it("reads no post for a path with no ID", async () => {
+		render(
+			<EditPostPage
+				settings={settingsStore()}
+				changes={createChangesStore(0)}
+				linkKind="anchor"
+				pathname="/posts"
+			/>,
+		);
+		await screen.findByDisplayValue("Jotai recipes");
+		expect(readNote).toHaveBeenLastCalledWith("");
 	});
 });

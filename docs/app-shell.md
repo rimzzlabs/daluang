@@ -56,8 +56,8 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
   the island read the same value.
 - `findAppPage` takes the first match. A page with no parameter comes first, so
   `/posts/new` is not a post with the ID `new`.
-- `/posts/new` and `/posts/$id` are the pages of the editor. `/posts/$id` uses
-  `LaterPage` until the page of a post comes.
+- `/posts/new` and `/posts/$id` are the pages of the editor. `EditPostPage` reads the ID
+  of the post with `pageParams`.
 - A page that navigates after an action, for example after Save, reads the router with
   `useRouter({ warn: false })`. The server renders the page with no router, and only an
   action in the island navigates.
