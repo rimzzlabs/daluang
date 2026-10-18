@@ -6,6 +6,7 @@ import {
 	deleteNote,
 	findNote,
 	listNotes,
+	setNoteStatus,
 	updateNote,
 } from "../src/store";
 import { createFakeD1 } from "./fake-d1";
@@ -153,5 +154,30 @@ describe("deleteNote", () => {
 		expect(await deleteNote({ db, id: note.id })).toBe(true);
 		expect(O.isNone(await findNote({ db, id: note.id }))).toBe(true);
 		expect(await deleteNote({ db, id: note.id })).toBe(false);
+	});
+});
+
+describe("setNoteStatus", () => {
+	it("sets publishedAt at the first publish, and keeps it after", async () => {
+		const { db } = createFakeD1();
+		const note = await createNote({ db, draft: DRAFT, now: FIRST });
+		const ref = { db, id: note.id };
+		expect(
+			await setNoteStatus({ ...ref, status: "published", now: FIRST }),
+		).toBe(true);
+		await setNoteStatus({ ...ref, status: "draft", now: LATER });
+		await setNoteStatus({ ...ref, status: "published", now: LATER });
+		expect(await findNote(ref)).toEqual({
+			...note,
+			status: "published",
+			publishedAt: FIRST.toISOString(),
+		});
+	});
+
+	it("gives false for an ID that no note has", async () => {
+		const { db } = createFakeD1();
+		expect(
+			await setNoteStatus({ db, id: "nope", status: "published", now: FIRST }),
+		).toBe(false);
 	});
 });

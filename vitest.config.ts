@@ -49,12 +49,15 @@ export default defineConfig({
 				"apps/cms/src/lib/webhooks/env.ts",
 				"apps/cms/src/pages/api/webhooks.ts",
 				"apps/cms/src/pages/api/webhooks/\\[...path\\].ts",
-				// The env module and the route file of the notes are wiring also. They need the
+				// The env module and the route files of the notes are wiring also. They need the
 				// Workers runtime, and they give the request to `handleNotesRequest`, which has
 				// tests.
 				"apps/cms/src/lib/notes/env.ts",
 				"apps/cms/src/pages/api/notes.ts",
 				"apps/cms/src/pages/api/notes/\\[id\\].ts",
+				"apps/cms/src/pages/api/notes/\\[id\\]/\\[action\\].ts",
+				// It builds the `notify` of the route files from `deliverEvent`, which has tests.
+				"apps/cms/src/lib/notes/notify.ts",
 				// The security layer of the CMS app is wiring. The middleware needs
 				// `astro:middleware` to load, and the integration is one call of the setup hook.
 				// They give each response to `withSecurityHeaders`, which has tests.
