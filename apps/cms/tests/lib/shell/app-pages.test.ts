@@ -6,6 +6,7 @@ import {
 	matchesPage,
 	NOT_FOUND_TITLE,
 	normalizePath,
+	pageParams,
 	pageTitle,
 } from "@/lib/shell/app-pages";
 
@@ -31,6 +32,17 @@ describe("findAppPage", () => {
 		expect(findAppPage("/posts/new")?.path).toBe("/posts/new");
 		expect(findAppPage("/posts")).toBeUndefined();
 		expect(findAppPage("/posts/n1/more")).toBeUndefined();
+	});
+});
+
+describe("pageParams", () => {
+	it("gives the value of each parameter of a page", () => {
+		expect(pageParams("/posts/$id", "/posts/n1/")).toEqual({ id: "n1" });
+		expect(pageParams("/settings/site", "/settings/site")).toEqual({});
+	});
+
+	it("gives no value for a path of another page", () => {
+		expect(pageParams("/posts/$id", "/media")).toEqual({});
 	});
 });
 

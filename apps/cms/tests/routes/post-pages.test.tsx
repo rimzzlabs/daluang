@@ -22,6 +22,7 @@ describe("post pages", () => {
 				settings={settingsStore()}
 				changes={createChangesStore(0)}
 				linkKind="anchor"
+				pathname="/posts/new"
 			/>,
 		);
 		expect(screen.getByRole("heading", { name: "New post" })).toBeTruthy();

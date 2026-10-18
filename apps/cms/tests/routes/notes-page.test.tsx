@@ -18,6 +18,7 @@ describe("NotesPage", () => {
 				settings={settingsStore()}
 				changes={createChangesStore(0)}
 				linkKind="anchor"
+				pathname="/"
 			/>,
 		);
 		expect(

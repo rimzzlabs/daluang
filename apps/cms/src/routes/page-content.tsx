@@ -18,6 +18,8 @@ export interface AppPageProps {
 	changes: ChangesStore;
 	/** `anchor` in the HTML of the server, `router` in the app island. */
 	linkKind: NavLinkKind;
+	/** The path of the page, for a page with a parameter: `/posts/n1`. */
+	pathname: string;
 }
 
 /** The component of each page. The router and the HTML of the server use the same map. */
@@ -36,10 +38,10 @@ export const PAGE_COMPONENTS: Record<
 	"/settings/fields": FieldsPage,
 };
 
-export interface PageContentProps
-	extends Pick<AppPageProps, "settings" | "changes"> {
-	pathname: string;
-}
+export type PageContentProps = Pick<
+	AppPageProps,
+	"settings" | "changes" | "pathname"
+>;
 
 /**
  * The page of a path, for the HTML that the server sends before the island starts. A path
@@ -50,6 +52,11 @@ export function PageContent(props: PageContentProps) {
 	if (O.isNone(page)) return null;
 	const Page = PAGE_COMPONENTS[page.path];
 	return (
-		<Page settings={props.settings} changes={props.changes} linkKind="anchor" />
+		<Page
+			settings={props.settings}
+			changes={props.changes}
+			linkKind="anchor"
+			pathname={props.pathname}
+		/>
 	);
 }

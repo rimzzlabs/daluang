@@ -23,7 +23,7 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
   (`navLinkElement`).
 - `routes/` holds the router, the root of the island, and a component for each page.
 - **Each page gets `AppPageProps`**: `settings`, a `SettingsStore`, `changes`, a
-  `ChangesStore`, and `linkKind`.
+  `ChangesStore`, `linkKind`, and `pathname`.
   `PageContent` of the server gives `anchor`, and `routePage` of the router gives
   `router`. A route component is `routePage(path)`. A link in a page is `NavLink`.
 - The island makes one `SettingsStore` from the settings of the server, and puts it in the
@@ -51,6 +51,9 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
 
 - A path of `APP_PAGES` can have a parameter, as in TanStack Router: `/posts/$id`.
   `matchesPage` matches a parameter with one segment that is not empty.
+- `pageParams` gives the value of each parameter in a path: `{ id: "n1" }` for
+  `/posts/n1`. A page reads its parameters from `pathname`, so the HTML of the server and
+  the island read the same value.
 - `findAppPage` takes the first match. A page with no parameter comes first, so
   `/posts/new` is not a post with the ID `new`.
 - `/posts/new` and `/posts/$id` are the pages of the editor. `/posts/$id` uses
