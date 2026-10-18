@@ -22,6 +22,8 @@ const NOTE = {
 	createdAt: "2026-10-18T00:00:00.000Z",
 	fields: {},
 	body: "# Jotai",
+	published: null,
+	mark: null,
 };
 
 const SUMMARY = {
@@ -32,6 +34,7 @@ const SUMMARY = {
 	status: "draft",
 	publishedAt: null,
 	updatedAt: "2026-10-18T00:00:00.000Z",
+	mark: null,
 };
 
 const DRAFT = {

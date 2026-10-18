@@ -12,6 +12,21 @@ in `packages/notes`.
   keywords, the extra fields, and the body. The CMS sets the ID, the status, and the
   dates. A new note is a draft.
 
+## The published copy and the mark
+
+- A note has a working copy, which the writer edits, and a published copy, which the
+  sites read. The column `published` of `apps/cms/migrations/0006_note_changes.sql` holds
+  the published copy as JSON (`PublishedCopy`), or `null` when the sites do not have the
+  note.
+- The column `mark` holds `publish`, `unpublish`, or `delete` (`NOTE_MARKS`), or `null`.
+  A mark waits for Publish changes. `markNote` of the store writes it.
+- `noteChange` of `src/change.ts` gives the change of a note, or `None`: `publish` for a
+  marked note that the sites do not have, `edit` for a published note whose working copy
+  differs from its published copy, `unpublish` and `delete` for a marked note.
+- `isPublishedCopy` compares the content only: the title, the slug, the language, the
+  description, the keywords, the extra fields, and the body. A save with no change of
+  content makes no change.
+
 ## The draft
 
 `noteDraftSchema` of `src/note-draft.ts` checks a draft against the settings of the CMS.
@@ -84,9 +99,9 @@ It gets the languages setting and the field definitions as `DraftRules`.
   current settings, because a field can be required since its last save. A note that the
   check refuses answers 422. The route file is
   `apps/cms/src/pages/api/notes/[id]/[action].ts`.
-- A publish sets the status `published` with `setNoteStatus` of the store. The first
-  publish sets `publishedAt`, and a later publish keeps it. A publish of a published note
-  sends its saved changes to the sites.
+- A publish sets the status `published` with `setNoteStatus` of the store, and copies the
+  working copy to the published copy. The first publish sets `publishedAt`, and a later
+  publish keeps it. A publish of a published note sends its saved changes to the sites.
 - `POST /api/notes/<id>/unpublish` sets the status `draft` and keeps `publishedAt`. A
   draft stays a draft, with no event.
 - Each publish and each unpublish tells each site to rebuild: the handler calls `notify`

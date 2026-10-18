@@ -14,6 +14,8 @@ const NOTE = {
 	createdAt: "2026-10-18T00:00:00.000Z",
 	fields: { featured: true, related: ["a"] },
 	body: "# Jotai",
+	published: null,
+	mark: null,
 };
 
 describe("noteSchema", () => {
@@ -22,6 +24,18 @@ describe("noteSchema", () => {
 		expect(noteSchema.safeParse({ ...NOTE, status: "gone" }).success).toBe(
 			false,
 		);
+		const published = {
+			title: "Jotai",
+			slug: "jotai-recipes",
+			language: "en",
+			description: "",
+			keywords: [],
+			fields: {},
+			body: "# Jotai",
+			updatedAt: "2026-10-18T00:00:00.000Z",
+		};
+		const live = { ...NOTE, published, mark: "unpublish" };
+		expect(noteSchema.parse(live)).toEqual(live);
 	});
 });
 
@@ -35,6 +49,7 @@ describe("noteSummarySchema", () => {
 			status: "draft",
 			publishedAt: null,
 			updatedAt: "2026-10-18T00:00:00.000Z",
+			mark: null,
 		});
 	});
 });
