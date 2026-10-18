@@ -1,6 +1,7 @@
 import {
 	inLanguage,
 	type ListedNote,
+	type NoteAction,
 	type NoteMarkAction,
 } from "@daluang/notes/note-list";
 import { Button } from "@daluang/ui/components/button";
@@ -33,6 +34,7 @@ import {
 	type NotesError,
 } from "@/lib/notes/client";
 import type { SettingsStore } from "@/lib/settings/settings-store";
+import { DeletePostDialog } from "./delete-post-dialog";
 import { LanguageFilter } from "./language-filter";
 import { NoPosts } from "./no-posts";
 import { PostList } from "./post-list";
@@ -54,6 +56,12 @@ async function readPosts(changes: ChangesStore): Promise<ListState> {
 	);
 }
 
+interface DeleteTarget {
+	open: boolean;
+	/** The dialog keeps the post while it closes, so its title does not change. */
+	post: ListedNote | null;
+}
+
 export interface PostsProps {
 	settings: SettingsStore;
 	changes: ChangesStore;
@@ -62,9 +70,9 @@ export interface PostsProps {
 
 /**
  * The posts page: each post with its language, its status, and the change that waits for
- * Publish changes. The menu of a post marks it for Publish changes, or cancels its mark. A
- * CMS with more than one language can show the posts of one language. With no post, the
- * page shows the steps to set up a site.
+ * Publish changes. The menu of a post marks it for Publish changes, cancels its mark, or
+ * deletes it. A CMS with more than one language can show the posts of one language. With
+ * no post, the page shows the steps to set up a site.
  */
 export function Posts(props: PostsProps) {
 	const { changes } = props;
@@ -72,6 +80,10 @@ export function Posts(props: PostsProps) {
 	const [list, setList] = useState<ListState>({ status: "loading" });
 	const [language, setLanguage] = useState<string | null>(null);
 	const [markError, setMarkError] = useState<NotesError | null>(null);
+	const [deleting, setDeleting] = useState<DeleteTarget>({
+		open: false,
+		post: null,
+	});
 
 	// The posts are on the server, an external system. The page reads them when it opens.
 	useEffect(() => {
@@ -94,6 +106,18 @@ export function Posts(props: PostsProps) {
 		);
 		setMarkError(error);
 		if (error === null) setList(await readPosts(changes));
+	}
+
+	function act(post: ListedNote, action: NoteAction) {
+		if (action === "delete") {
+			setDeleting({ open: true, post });
+			return;
+		}
+		mark(post, action);
+	}
+
+	async function reload() {
+		setList(await readPosts(changes));
 	}
 
 	async function retry() {
@@ -163,12 +187,18 @@ export function Posts(props: PostsProps) {
 									</EmptyHeader>
 								</Empty>
 							) : (
-								<PostList posts={shown} onAction={mark} />
+								<PostList posts={shown} onAction={act} />
 							)}
 						</>
 					);
 				})
 				.exhaustive()}
+			<DeletePostDialog
+				open={deleting.open}
+				post={deleting.post}
+				onOpenChange={(open) => setDeleting({ ...deleting, open })}
+				onDeleted={reload}
+			/>
 		</Page>
 	);
 }

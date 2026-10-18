@@ -155,7 +155,11 @@ It gets the languages setting and the field definitions as `DraftRules`.
   language.
 - `PostMenu` is the menu of each post. `noteActions` of `src/note-list.ts` gives its
   items: Publish for a draft, Unpublish for a published post, and Cancel the change for a
-  post with a mark. An edit has no mark, so its menu shows Unpublish.
+  post with a mark. An edit has no mark, so its menu shows Unpublish. Each post also has
+  Delete, with the exception of a post that waits to delete.
+- Delete opens `DeletePostDialog`, which asks for a confirmation and calls
+  `deleteNoteOfCms`. A draft goes at once. A published post only gets the mark `delete`,
+  so its site keeps it until Publish changes.
 - An item calls `markNoteOfCms`. Then the page reads the list again, so the badges and
   the number of the navbar change. A failed mark shows its message above the list.
 - The page writes the number of changes of the server to the store of the navbar.

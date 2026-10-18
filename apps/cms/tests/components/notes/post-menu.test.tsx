@@ -29,7 +29,9 @@ describe("PostMenu", () => {
 		);
 		await openMenu();
 		const publish = await screen.findByRole("menuitem", { name: "Publish" });
-		expect(screen.getAllByRole("menuitem")).toHaveLength(1);
+		expect(
+			screen.getAllByRole("menuitem").map((item) => item.textContent),
+		).toEqual(["Publish", "Delete"]);
 		await userEvent.click(publish);
 		expect(onAction).toHaveBeenCalledWith("publish");
 	});
@@ -44,5 +46,17 @@ describe("PostMenu", () => {
 			await screen.findByRole("menuitem", { name: "Cancel the change" }),
 		);
 		expect(onAction).toHaveBeenCalledWith("cancel");
+	});
+
+	it("deletes a post", async () => {
+		const onAction = vi.fn();
+		render(
+			<PostMenu post={{ note: NOTE, change: null }} onAction={onAction} />,
+		);
+		await openMenu();
+		await userEvent.click(
+			await screen.findByRole("menuitem", { name: "Delete" }),
+		);
+		expect(onAction).toHaveBeenCalledWith("delete");
 	});
 });

@@ -52,16 +52,21 @@ export const NOTE_MARK_ACTIONS = ["publish", "unpublish", "cancel"] as const;
 
 export type NoteMarkAction = (typeof NOTE_MARK_ACTIONS)[number];
 
+/** An action of the menu of a listed note: a mark, a cancel, or a delete. */
+export type NoteAction = NoteMarkAction | "delete";
+
 /**
  * The actions of a listed note. A note with a mark can cancel it. A draft can wait to
- * publish, and a published note can wait to unpublish. An edit has no mark.
+ * publish, and a published note can wait to unpublish. An edit has no mark. Each note can
+ * be deleted, with the exception of a note that waits to delete.
  */
-export function noteActions(listed: ListedNote): readonly NoteMarkAction[] {
+export function noteActions(listed: ListedNote): readonly NoteAction[] {
 	return match(listed.change)
-		.with(P.union("publish", "unpublish", "delete"), () => ["cancel"] as const)
+		.with("delete", () => ["cancel"] as const)
+		.with(P.union("publish", "unpublish"), () => ["cancel", "delete"] as const)
 		.with(P.union("edit", null), () => {
 			const published = listed.note.status === "published";
-			return [published ? "unpublish" : "publish"] as const;
+			return [published ? "unpublish" : "publish", "delete"] as const;
 		})
 		.exhaustive();
 }
