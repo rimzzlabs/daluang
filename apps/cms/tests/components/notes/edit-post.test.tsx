@@ -41,6 +41,7 @@ function renderEditPost(changes = createChangesStore(0)) {
 			settings={settingsStore()}
 			changes={changes}
 			linkKind="anchor"
+			onOpenPost={vi.fn()}
 		/>,
 	);
 	return changes;
@@ -53,6 +54,7 @@ describe("EditPost", () => {
 		expect(screen.getByRole("status").textContent).toBe("Loading the post");
 		expect(await screen.findByDisplayValue("Jotai recipes")).toBeTruthy();
 		expect(screen.getByText("Published")).toBeTruthy();
+		expect(screen.getByRole("button", { name: "Translate" })).toBeTruthy();
 		expect(client.readNote).toHaveBeenCalledWith("n1");
 	});
 

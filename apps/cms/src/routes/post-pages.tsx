@@ -18,6 +18,8 @@ export function NewPostPage(props: AppPageProps) {
 
 export function EditPostPage(props: AppPageProps) {
 	const id = pageParams("/posts/$id", props.pathname).id ?? "";
+	// The server renders this page with no router. Only Translate navigates, in the island.
+	const router = useRouter({ warn: false });
 	// A new ID is a new post: the key resets the state of the page.
 	return (
 		<EditPost
@@ -26,6 +28,9 @@ export function EditPostPage(props: AppPageProps) {
 			settings={props.settings}
 			changes={props.changes}
 			linkKind={props.linkKind}
+			onOpenPost={(next) =>
+				router.navigate({ to: "/posts/$id", params: { id: next } })
+			}
 		/>
 	);
 }
