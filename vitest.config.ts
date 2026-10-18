@@ -58,6 +58,10 @@ export default defineConfig({
 				"apps/cms/src/pages/api/notes/\\[id\\]/\\[action\\].ts",
 				// It builds the `notify` of the route files from `deliverEvent`, which has tests.
 				"apps/cms/src/lib/notes/notify.ts",
+				// The content API: its route file, and the `authorize` that it builds from
+				// `verifyApiToken`. Both functions have tests.
+				"apps/cms/src/pages/api/content/notes.ts",
+				"apps/cms/src/lib/notes/authorize.ts",
 				// The security layer of the CMS app is wiring. The middleware needs
 				// `astro:middleware` to load, and the integration is one call of the setup hook.
 				// They give each response to `withSecurityHeaders`, which has tests.

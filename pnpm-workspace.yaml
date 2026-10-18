@@ -31,6 +31,7 @@ catalog:
   better-auth: ^1.7.10
   class-variance-authority: ^0.7.1
   cn: ^0.4.0
+  comark: ^0.7.0
   jsdom: ^30.1.3
   lefthook: ^2.2.2
   oxc-transform-react: ^0.152.0

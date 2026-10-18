@@ -1,4 +1,4 @@
-import { O } from "@mobily/ts-belt";
+import { A, O } from "@mobily/ts-belt";
 import { describe, expect, it } from "vitest";
 import type { NoteDraft } from "../src/note";
 import {
@@ -6,6 +6,7 @@ import {
 	deleteNote,
 	findNote,
 	listNotes,
+	listPublishedNotes,
 	setNoteStatus,
 	updateNote,
 } from "../src/store";
@@ -179,5 +180,23 @@ describe("setNoteStatus", () => {
 		expect(
 			await setNoteStatus({ db, id: "nope", status: "published", now: FIRST }),
 		).toBe(false);
+	});
+});
+
+describe("listPublishedNotes", () => {
+	it("gives the published notes with their body, the last published first", async () => {
+		const { db } = createFakeD1();
+		const first = await createNote({ db, draft: DRAFT, now: FIRST });
+		const second = await createNote({
+			db,
+			draft: { ...DRAFT, slug: "jotai-state-manager" },
+			now: FIRST,
+		});
+		await createNote({ db, draft: { ...DRAFT, slug: "a-draft" }, now: FIRST });
+		await setNoteStatus({ db, id: first.id, status: "published", now: FIRST });
+		await setNoteStatus({ db, id: second.id, status: "published", now: LATER });
+		const notes = await listPublishedNotes(db);
+		expect(A.map(notes, (note) => note.id)).toEqual([second.id, first.id]);
+		expect(notes[0]?.body).toBe(DRAFT.body);
 	});
 });
