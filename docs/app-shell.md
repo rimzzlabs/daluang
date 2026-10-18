@@ -53,8 +53,11 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
   `matchesPage` matches a parameter with one segment that is not empty.
 - `findAppPage` takes the first match. A page with no parameter comes first, so
   `/posts/new` is not a post with the ID `new`.
-- `/posts/new` and `/posts/$id` are the pages of the editor. They use `LaterPage` until
-  the editor comes.
+- `/posts/new` and `/posts/$id` are the pages of the editor. `/posts/$id` uses
+  `LaterPage` until the page of a post comes.
+- A page that navigates after an action, for example after Save, reads the router with
+  `useRouter({ warn: false })`. The server renders the page with no router, and only an
+  action in the island navigates.
 
 ## Preferences
 

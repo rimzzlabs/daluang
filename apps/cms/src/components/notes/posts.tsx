@@ -4,7 +4,7 @@ import {
 	type NoteAction,
 	type NoteMarkAction,
 } from "@daluang/notes/note-list";
-import { Button } from "@daluang/ui/components/button";
+import { Button, buttonVariants } from "@daluang/ui/components/button";
 import {
 	Empty,
 	EmptyDescription,
@@ -14,6 +14,7 @@ import {
 } from "@daluang/ui/components/empty";
 import {
 	Page,
+	PageActions,
 	PageDescription,
 	PageHeader,
 	PageHeading,
@@ -21,10 +22,10 @@ import {
 } from "@daluang/ui/components/page";
 import { Skeleton } from "@daluang/ui/components/skeleton";
 import { A, R } from "@mobily/ts-belt";
-import { TranslateIcon } from "@phosphor-icons/react";
+import { PlusIcon, TranslateIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { match } from "ts-pattern";
-import type { NavLinkKind } from "@/components/shell/nav-link";
+import { NavLink, type NavLinkKind } from "@/components/shell/nav-link";
 import { useSettings } from "@/hooks/settings/use-settings";
 import type { ChangesStore } from "@/lib/notes/changes-store";
 import {
@@ -138,6 +139,16 @@ export function Posts(props: PostsProps) {
 						site when you select Publish changes.
 					</PageDescription>
 				</PageHeading>
+				<PageActions>
+					<NavLink
+						kind={props.linkKind}
+						href="/posts/new"
+						className={buttonVariants()}
+					>
+						<PlusIcon data-icon="inline-start" />
+						New post
+					</NavLink>
+				</PageActions>
 			</PageHeader>
 			{match(list)
 				.with({ status: "loading" }, () => (

@@ -1,7 +1,9 @@
+import { buttonVariants } from "@daluang/ui/components/button";
 import {
 	ArrowRightIcon,
 	KeyIcon,
 	ListDashesIcon,
+	PlusIcon,
 	WebhooksLogoIcon,
 } from "@phosphor-icons/react";
 import type { ComponentType } from "react";
@@ -41,7 +43,7 @@ export interface NoPostsProps {
 	linkKind: NavLinkKind;
 }
 
-/** The posts page with no post: the steps to set up a site. */
+/** The posts page with no post: a link to write the first post, and the steps to set up a site. */
 export function NoPosts(props: NoPostsProps) {
 	return (
 		<section className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16">
@@ -50,8 +52,16 @@ export function NoPosts(props: NoPostsProps) {
 					No posts yet
 				</h1>
 				<p className="mt-2 text-pretty text-muted-foreground">
-					The editor comes in the next step. Your posts will show here.
+					Write your first post in Markdown. Your posts will show here.
 				</p>
+				<NavLink
+					kind={props.linkKind}
+					href="/posts/new"
+					className={buttonVariants({ className: "mt-6" })}
+				>
+					<PlusIcon data-icon="inline-start" />
+					New post
+				</NavLink>
 			</div>
 			<h2 className="mt-10 text-sm font-medium">Set up your site</h2>
 			<ul className="mt-3 flex flex-col gap-2">

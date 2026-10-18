@@ -48,6 +48,9 @@ describe("Posts", () => {
 		expect(await screen.findByText("Jotai recipes")).toBeTruthy();
 		expect(screen.getByText("To publish")).toBeTruthy();
 		expect(changes.read()).toBe(3);
+		expect(
+			screen.getByRole("link", { name: "New post" }).getAttribute("href"),
+		).toBe("/posts/new");
 	});
 
 	it("shows the steps to set up a site when no post exists", async () => {
