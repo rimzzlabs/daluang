@@ -27,6 +27,16 @@ in `packages/notes`.
   description, the keywords, the extra fields, and the body. A save with no change of
   content makes no change.
 
+## Publish changes in the store
+
+- `listChanges` of the store gives each note with a change (`PendingChange`): its summary
+  and its change, the last changed first.
+- `applyChanges` applies each change in one D1 batch, which is one transaction. A
+  `publish` and an `edit` copy the working copy to the published copy, an `unpublish`
+  clears the published copy, and a `delete` removes the note. Each one clears the mark,
+  and the first publish sets `publishedAt`. The batch copies the working copy in SQL, so an
+  edit that comes after the list also goes to the published copy.
+
 ## The draft
 
 `noteDraftSchema` of `src/note-draft.ts` checks a draft against the settings of the CMS.

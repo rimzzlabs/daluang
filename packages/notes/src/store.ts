@@ -1,5 +1,7 @@
 import { A, O, pipe } from "@mobily/ts-belt";
+import { match, P } from "ts-pattern";
 import { z } from "zod";
+import { type NoteChange, noteChange } from "./change";
 import { extraFieldsSchema } from "./extra-fields";
 import { NOTE_STATUSES, type NoteStatus } from "./metadata";
 import {
@@ -244,4 +246,92 @@ export async function deleteNote(ref: NoteRef): Promise<boolean> {
 		.bind(ref.id)
 		.run();
 	return result.meta.changes > 0;
+}
+
+/** A note with a change that waits for Publish changes. */
+export interface PendingChange {
+	note: NoteSummary;
+	change: NoteChange;
+}
+
+function summaryOf(note: Note): NoteSummary {
+	return {
+		id: note.id,
+		title: note.title,
+		slug: note.slug,
+		language: note.language,
+		status: note.status,
+		publishedAt: note.publishedAt,
+		updatedAt: note.updatedAt,
+		mark: note.mark,
+	};
+}
+
+/**
+ * Side effect: reads each note of D1, because only D1 knows which notes changed.
+ *
+ * Each note with a change that waits for Publish changes, the last changed first.
+ */
+export async function listChanges(
+	db: D1Database,
+): Promise<readonly PendingChange[]> {
+	const result = await db
+		.prepare(`select ${COLUMNS} from "note" order by "updatedAt" desc`)
+		.all();
+	return pipe(
+		parseRows(result.results, noteRowSchema),
+		A.filterMap((note) =>
+			O.map(noteChange(note), (change) => ({ note: summaryOf(note), change })),
+		),
+	);
+}
+
+const PUBLISH_SQL = `update "note" set "status" = 'published', "publishedAt" = coalesce("publishedAt", ?2), "published" = ${WORKING_COPY_JSON}, "mark" = null where "id" = ?1`;
+
+const UNPUBLISH_SQL = `update "note" set "status" = 'draft', "published" = null, "mark" = null where "id" = ?1`;
+
+interface ChangeWrite {
+	db: D1Database;
+	pending: PendingChange;
+	at: string;
+}
+
+function changeStatement(write: ChangeWrite): D1PreparedStatement {
+	const { db, pending, at } = write;
+	return match(pending.change)
+		.with(P.union("publish", "edit"), () =>
+			db.prepare(PUBLISH_SQL).bind(pending.note.id, at),
+		)
+		.with("unpublish", () => db.prepare(UNPUBLISH_SQL).bind(pending.note.id))
+		.with("delete", () =>
+			db.prepare('delete from "note" where "id" = ?1').bind(pending.note.id),
+		)
+		.exhaustive();
+}
+
+export interface ChangesApply {
+	db: D1Database;
+	now: Date;
+}
+
+/**
+ * Side effect: writes each change to D1 in one batch, which is one transaction. The sites
+ * then read the new published copies at their next build.
+ *
+ * Applies each change. A publish and an edit copy the working copy to the published copy,
+ * an unpublish clears the published copy, and a delete removes the note. Each one clears
+ * the mark, and the first publish sets `publishedAt`. Gives the applied changes.
+ */
+export async function applyChanges(
+	apply: ChangesApply,
+): Promise<readonly PendingChange[]> {
+	const pending = await listChanges(apply.db);
+	if (A.isEmpty(pending)) return pending;
+	const at = apply.now.toISOString();
+	await apply.db.batch([
+		...A.map(pending, (item) =>
+			changeStatement({ db: apply.db, pending: item, at }),
+		),
+	]);
+	return pending;
 }
