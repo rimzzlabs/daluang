@@ -9,8 +9,12 @@ export const WEBHOOKS_MAX = 10;
 /** The deliveries that the CMS keeps for each webhook, the newest ones. */
 export const DELIVERIES_KEPT = 20;
 
-/** The events that the CMS sends. `test` is the delivery of the button "Send a test". */
-export const WEBHOOK_EVENTS = ["test"] as const;
+/**
+ * The events that the CMS sends. `test` is the delivery of the button "Send a test".
+ * `publish` and `unpublish` go to each webhook when a post goes to a site or leaves it,
+ * so that the site rebuilds.
+ */
+export const WEBHOOK_EVENTS = ["test", "publish", "unpublish"] as const;
 
 export type WebhookEvent = (typeof WEBHOOK_EVENTS)[number];
 

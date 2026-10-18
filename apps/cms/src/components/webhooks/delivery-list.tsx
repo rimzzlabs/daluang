@@ -7,7 +7,11 @@ export interface DeliveryListProps {
 	deliveries: readonly Delivery[];
 }
 
-const EVENT_LABELS: Record<Delivery["event"], string> = { test: "Test" };
+const EVENT_LABELS: Record<Delivery["event"], string> = {
+	test: "Test",
+	publish: "Publish",
+	unpublish: "Unpublish",
+};
 
 function answerLabel(delivery: Delivery): string {
 	if (delivery.statusCode === null) return "No answer";

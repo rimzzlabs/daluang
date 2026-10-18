@@ -5,6 +5,7 @@ import {
 	deleteWebhook,
 	findWebhookUrl,
 	listWebhooks,
+	listWebhookTargets,
 	recordDelivery,
 } from "../src/store";
 import { DELIVERIES_KEPT } from "../src/webhook";
@@ -85,5 +86,21 @@ describe("deleteWebhook", () => {
 				.get()?.count,
 		).toBe(0);
 		await expect(deleteWebhook({ db, id })).resolves.toBe(false);
+	});
+});
+
+describe("listWebhookTargets", () => {
+	it("gives the ID and the full URL of each webhook, the oldest first", async () => {
+		const { db } = createFakeD1();
+		const first = await createWebhook({ db, webhook: HOOK, now: NOW });
+		const second = await createWebhook({
+			db,
+			webhook: { name: "Docs", url: "https://example.org/deploy/e5f6" },
+			now: new Date("2026-10-17T01:00:00.000Z"),
+		});
+		expect(await listWebhookTargets(db)).toEqual([
+			{ id: first.id, url: HOOK.url },
+			{ id: second.id, url: "https://example.org/deploy/e5f6" },
+		]);
 	});
 });
