@@ -72,14 +72,15 @@ export async function listNotes(
 /**
  * Side effect: reads the published notes of D1, because a site builds its pages from them.
  *
- * Each published note with its body, the last published first. A draft is not in the list.
+ * Each note that has a published copy, the last published first. A draft is not in the
+ * list.
  */
 export async function listPublishedNotes(
 	db: D1Database,
 ): Promise<readonly Note[]> {
 	const result = await db
 		.prepare(
-			`select ${COLUMNS} from "note" where "status" = 'published' order by "publishedAt" desc`,
+			`select ${COLUMNS} from "note" where "published" is not null order by "publishedAt" desc`,
 		)
 		.all();
 	return parseRows(result.results, noteRowSchema);

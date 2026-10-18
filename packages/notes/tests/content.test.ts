@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { CONTENT_NOTES_API_PATH, handleContentRequest } from "../src/content";
 import type { NoteDraft } from "../src/note";
-import { createNote, setNoteStatus } from "../src/store";
+import { createNote, setNoteStatus, updateNote } from "../src/store";
 import { createFakeD1 } from "./fake-d1";
 
 const NOW = new Date("2026-10-18T00:00:00.000Z");
@@ -30,7 +30,7 @@ function read(db: D1Database, valid: boolean, method = "GET") {
 }
 
 describe("handleContentRequest", () => {
-	it("gives each published note with its Comark document, and no draft", async () => {
+	it("gives the published copy of each note with its Comark document, and no draft", async () => {
 		const { db } = createFakeD1();
 		const published = await createNote({ db, draft: DRAFT, now: NOW });
 		await setNoteStatus({
@@ -47,19 +47,12 @@ describe("handleContentRequest", () => {
 		await expect(answer.json()).resolves.toEqual({
 			notes: [
 				{
-					...published,
+					...DRAFT,
+					id: published.id,
 					status: "published",
 					publishedAt: NOW.toISOString(),
-					published: {
-						title: DRAFT.title,
-						slug: DRAFT.slug,
-						language: DRAFT.language,
-						description: DRAFT.description,
-						keywords: DRAFT.keywords,
-						fields: DRAFT.fields,
-						body: DRAFT.body,
-						updatedAt: NOW.toISOString(),
-					},
+					createdAt: NOW.toISOString(),
+					updatedAt: NOW.toISOString(),
 					document: {
 						frontmatter: {},
 						meta: {},
@@ -76,6 +69,21 @@ describe("handleContentRequest", () => {
 				},
 			],
 		});
+	});
+
+	it("keeps an edit of a published note away from the sites", async () => {
+		const { db } = createFakeD1();
+		const note = await createNote({ db, draft: DRAFT, now: NOW });
+		await setNoteStatus({ db, id: note.id, status: "published", now: NOW });
+		const edit = { ...DRAFT, title: "Unfinished title", body: "# Half" };
+		await updateNote({ db, id: note.id, draft: edit, now: NOW });
+		const body: unknown = await (await read(db, true).response).json();
+		expect(body).toEqual({
+			notes: [
+				expect.objectContaining({ title: DRAFT.title, body: DRAFT.body }),
+			],
+		});
+		expect(JSON.stringify(body)).not.toContain("Unfinished");
 	});
 
 	it("answers 401 with no valid API token", async () => {
