@@ -44,6 +44,16 @@ Run each script from the root.
 | `pnpm commit`           | The commit prompt of commitlint                                                              |
 | `pnpm db:migrate:local` | Apply `apps/cms/migrations` to the local D1 database                                         |
 
+`pnpm preview` starts a server that keeps running in the background, also after its
+command ends. Before a preview of a new build, stop the old server:
+
+```sh
+pnpm --filter @daluang/cms exec astro preview stop
+```
+
+`astro preview status` gives the server and its age. A server that started before the
+build serves the old build.
+
 `apps/cms` and `apps/web` each have a `cf:deploy` script, which runs `wrangler deploy`.
 Do not run it. `docs/infrastructure.md` tells how a release deploys.
 

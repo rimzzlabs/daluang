@@ -23,3 +23,6 @@ Security Policy works. The code is in `apps/cms/src/lib/security/`.
 - An image from another host needs the host in `img-src`. The avatar comes from
   `avatars.githubusercontent.com`.
 - `astro dev` sends no policy. To check the policy, run `pnpm build`, then `pnpm preview`.
+  The preview server of Astro 7 keeps running in the background. After a new build, stop
+  it with `pnpm --filter @daluang/cms exec astro preview stop`, or it serves the old
+  build.
