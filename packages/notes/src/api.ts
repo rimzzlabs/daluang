@@ -16,8 +16,6 @@ import {
 } from "./store";
 import { isSlugTaken } from "./translation";
 
-export const NOTES_API_PATH = "/api/notes";
-
 // The JSON of a draft holds its body and its metadata. The metadata is far below 64 KB.
 const REQUEST_MAX_BYTES = NOTE_BODY_MAX_BYTES + 64 * 1024;
 
