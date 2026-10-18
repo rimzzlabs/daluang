@@ -1,7 +1,8 @@
 import { A, D, O, pipe, R, S } from "@mobily/ts-belt";
 import { match } from "ts-pattern";
+import type { ExtraFields } from "./extra-fields";
 import type { FieldDefinition } from "./field-definitions";
-import type { NoteDraft } from "./note";
+import type { Note, NoteDraft } from "./note";
 import { type DraftRules, noteDraftSchema } from "./note-draft";
 import { slugify } from "./slug";
 
@@ -20,6 +21,11 @@ export interface NoteForm {
 	keywords: string;
 	/** The input of each defined field, by the name of the field. */
 	fields: Record<string, FieldInput>;
+	/**
+	 * The stored extra fields that the settings do not define. The editor does not show
+	 * them, and a save keeps them as they are.
+	 */
+	kept: ExtraFields;
 	body: string;
 }
 
@@ -47,7 +53,56 @@ export function emptyNoteForm(rules: DraftRules): NoteForm {
 			A.map((definition) => [definition.name, emptyInput(definition)] as const),
 			D.fromPairs,
 		),
+		kept: {},
 		body: "",
+	};
+}
+
+/** The input of a stored value. A value of another type becomes text, as well as it can. */
+function storedInput(
+	definition: FieldDefinition,
+	value: ExtraFields[string] | undefined,
+): FieldInput {
+	if (value === undefined) return emptyInput(definition);
+	if (definition.type === "boolean") return value === true;
+	if (Array.isArray(value)) return A.join(value, ", ");
+	return String(value);
+}
+
+/**
+ * The form of a stored post. The slug counts as typed, so a new title does not change the
+ * address of the post.
+ */
+export function noteFormOf(
+	note: Note,
+	definitions: readonly FieldDefinition[],
+): NoteForm {
+	const defined = A.map(definitions, (definition) => definition.name);
+	return {
+		title: note.title,
+		slug: note.slug,
+		slugTouched: true,
+		language: note.language,
+		description: note.description,
+		keywords: A.join(note.keywords, ", "),
+		fields: pipe(
+			definitions,
+			A.map(
+				(definition) =>
+					[
+						definition.name,
+						storedInput(definition, note.fields[definition.name]),
+					] as const,
+			),
+			D.fromPairs,
+		),
+		kept: pipe(
+			note.fields,
+			D.toPairs,
+			A.reject(([name]) => A.includes(defined, name)),
+			D.fromPairs,
+		),
+		body: note.body,
 	};
 }
 
@@ -132,7 +187,7 @@ export function parseNoteForm(
 		language: form.language,
 		description: form.description,
 		keywords: splitList(form.keywords),
-		fields: draftFields(form, rules.fields),
+		fields: { ...form.kept, ...draftFields(form, rules.fields) },
 		body: form.body,
 	});
 	if (result.success) return R.Ok(result.data);

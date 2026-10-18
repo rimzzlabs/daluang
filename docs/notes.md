@@ -61,6 +61,10 @@ It gets the languages setting and the field definitions as `DraftRules`.
   field. The keywords are one text, with a comma between two keywords.
 - `emptyNoteForm` starts a new post in the default language, with an empty input for each
   defined field.
+- `noteFormOf` gives the form of a stored post. Its slug counts as typed, so a new title
+  does not change the address of the post. A stored value of another type becomes text.
+- `kept` holds the stored extra fields that the settings do not define. The editor does
+  not show them, and `parseNoteForm` puts them back in the draft, so a save keeps them.
 - `withTitle` makes the slug from the title with `slugify`, until the writer types a slug.
   `withSlug` keeps the typed slug. An empty slug follows the title again.
 - `parseNoteForm` turns each input into the value of its type, then checks the draft with

@@ -4,6 +4,7 @@ import type { FieldDefinition } from "../src/field-definitions";
 import {
 	emptyNoteForm,
 	type NoteForm,
+	noteFormOf,
 	parseNoteForm,
 	withSlug,
 	withTitle,
@@ -61,6 +62,7 @@ describe("emptyNoteForm", () => {
 				series: "",
 				relatedPosts: "",
 			},
+			kept: {},
 			body: "",
 		});
 	});
@@ -128,6 +130,69 @@ describe("parseNoteForm", () => {
 			language: "Choose a language of this CMS.",
 			"fields.readingTime": "Reading time needs a number.",
 			"fields.series": "Give Series a value.",
+		});
+	});
+});
+
+describe("noteFormOf", () => {
+	const NOTE = {
+		id: "n1",
+		title: "Jotai recipes",
+		slug: "jotai",
+		language: "en",
+		description: "Small recipes.",
+		keywords: ["react", "jotai"],
+		status: "draft" as const,
+		publishedAt: null,
+		updatedAt: "2026-10-18T12:00:00.000Z",
+		createdAt: "2026-10-18T12:00:00.000Z",
+		fields: {
+			featured: true,
+			readingTime: 7,
+			relatedPosts: ["a", "b"],
+			legacyId: "old-1",
+		},
+		body: "# Jotai",
+		published: null,
+		mark: null,
+	};
+
+	it("gives the input of each stored value, and keeps the slug", () => {
+		const form = noteFormOf(NOTE, FIELDS);
+		expect(form).toEqual({
+			title: "Jotai recipes",
+			slug: "jotai",
+			slugTouched: true,
+			language: "en",
+			description: "Small recipes.",
+			keywords: "react, jotai",
+			fields: {
+				featured: true,
+				readingTime: "7",
+				series: "",
+				relatedPosts: "a, b",
+			},
+			kept: { legacyId: "old-1" },
+			body: "# Jotai",
+		});
+		expect(withTitle(form, "New title").slug).toBe("jotai");
+	});
+
+	it("keeps a field that the settings do not define after a save", () => {
+		const form = { ...noteFormOf(NOTE, FIELDS), fields: { series: "React" } };
+		expect(R.getExn(parseNoteForm(form, RULES)).fields).toEqual({
+			legacyId: "old-1",
+			series: "React",
+		});
+	});
+
+	it("gives text for a stored value of another type", () => {
+		const changed = { ...NOTE, fields: { featured: "yes", series: 3 } };
+		expect(noteFormOf(changed, FIELDS).fields).toEqual({
+			featured: false,
+			readingTime: "",
+			series: "3",
+			relatedPosts: "",
 		});
 	});
 });
