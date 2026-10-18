@@ -36,7 +36,7 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
 ## Menus
 
 - `NAV_GROUPS` in `apps/cms/src/components/shell/app-sidebar.tsx` holds the menus of the
-  sidebar: Write (Posts, Media), Publish (API tokens, Webhooks), and Settings (Site,
+  sidebar: Write (Dashboard, Posts, Media), Publish (API tokens, Webhooks), and Settings (Site,
   Languages, Fields).
 - Each item has a page in `APP_PAGES` (`apps/cms/src/lib/shell/app-pages.ts`), a component in
   `PAGE_COMPONENTS` (`routes/page-content.tsx`), and a route in `routes/router.ts`. Add
@@ -44,8 +44,15 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
 - A page with no feature yet uses `LaterPage`, which says what the page will do.
 - An item is active on its page and on each page below its path. `/` is active only on
   `/`.
-- An item can have a `section`: each page below that path also makes the item active.
-  Posts has the section `/posts`, so it is active in the editor.
+- Posts is at `/posts`, so it is also active on the pages of the editor below it.
+
+## The dashboard
+
+- `/` is the dashboard: `Dashboard` of `apps/cms/src/components/dashboard/dashboard.tsx`.
+  It shows the name of the site, a link to its address, **New post**, and `SetupSteps`:
+  the links to the fields, the API tokens, and the webhooks.
+- `siteHost` of `packages/settings/src/site.ts` gives the address with no scheme, for
+  example `rimzzlabs.com`.
 
 ## Pages with a parameter
 

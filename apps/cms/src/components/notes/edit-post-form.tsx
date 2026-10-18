@@ -103,7 +103,7 @@ export function EditPostForm(props: EditPostFormProps) {
 			<div className="flex justify-end gap-2">
 				<NavLink
 					kind={props.linkKind}
-					href="/"
+					href="/posts"
 					className={buttonVariants({ variant: "outline" })}
 				>
 					Back to the posts

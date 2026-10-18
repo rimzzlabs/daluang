@@ -30,7 +30,7 @@ describe("findAppPage", () => {
 	it("finds the page of a post by its ID, and the page of a new post", () => {
 		expect(findAppPage("/posts/n1")?.path).toBe("/posts/$id");
 		expect(findAppPage("/posts/new")?.path).toBe("/posts/new");
-		expect(findAppPage("/posts")).toBeUndefined();
+		expect(findAppPage("/posts")?.title).toBe("Posts");
 		expect(findAppPage("/posts/n1/more")).toBeUndefined();
 	});
 });

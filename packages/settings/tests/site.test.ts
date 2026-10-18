@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canonicalSiteUrl, siteSettingSchema } from "../src/site";
+import { canonicalSiteUrl, siteHost, siteSettingSchema } from "../src/site";
 
 describe("canonicalSiteUrl", () => {
 	it.each([
@@ -52,5 +52,12 @@ describe("siteSettingSchema", () => {
 		expect(result.error?.issues[0]?.message).toBe(
 			"Use an address such as https://example.com.",
 		);
+	});
+});
+
+describe("siteHost", () => {
+	it("gives the address with no scheme and no slash at the end", () => {
+		expect(siteHost("https://rimzzlabs.com")).toBe("rimzzlabs.com");
+		expect(siteHost("http://localhost:4321/blog/")).toBe("localhost:4321/blog");
 	});
 });

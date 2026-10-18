@@ -112,7 +112,7 @@ export function EditPost(props: EditPostProps) {
 						</p>
 						<NavLink
 							kind={props.linkKind}
-							href="/"
+							href="/posts"
 							className={buttonVariants({ variant: "outline", size: "sm" })}
 						>
 							Back to the posts

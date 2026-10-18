@@ -5,7 +5,8 @@ import { A, D, O, pipe, S } from "@mobily/ts-belt";
  * segment that starts with `$` is a parameter, as in the paths of TanStack Router.
  */
 export const APP_PAGES = [
-	{ path: "/", title: "Posts" },
+	{ path: "/", title: "Dashboard" },
+	{ path: "/posts", title: "Posts" },
 	{ path: "/posts/new", title: "New post" },
 	{ path: "/posts/$id", title: "Edit post" },
 	{ path: "/media", title: "Media" },

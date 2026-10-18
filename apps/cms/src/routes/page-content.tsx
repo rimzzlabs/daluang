@@ -5,6 +5,7 @@ import type { ChangesStore } from "@/lib/notes/changes-store";
 import type { SettingsStore } from "@/lib/settings/settings-store";
 import { type AppPagePath, findAppPage } from "@/lib/shell/app-pages";
 import { ApiTokensPage } from "./api-tokens-page";
+import { DashboardPage } from "./dashboard-page";
 import { MediaPage } from "./later-pages";
 import { NotesPage } from "./notes-page";
 import { EditPostPage, NewPostPage } from "./post-pages";
@@ -27,7 +28,8 @@ export const PAGE_COMPONENTS: Record<
 	AppPagePath,
 	(props: AppPageProps) => ReactElement
 > = {
-	"/": NotesPage,
+	"/": DashboardPage,
+	"/posts": NotesPage,
 	"/posts/new": NewPostPage,
 	"/posts/$id": EditPostPage,
 	"/media": MediaPage,

@@ -11,7 +11,7 @@ export function NewPostPage(props: AppPageProps) {
 		<NewPost
 			settings={props.settings}
 			linkKind={props.linkKind}
-			onSaved={() => router.navigate({ to: "/" })}
+			onSaved={() => router.navigate({ to: "/posts" })}
 		/>
 	);
 }

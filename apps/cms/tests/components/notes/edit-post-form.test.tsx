@@ -101,6 +101,6 @@ describe("EditPostForm", () => {
 			screen
 				.getByRole("link", { name: "Back to the posts" })
 				.getAttribute("href"),
-		).toBe("/");
+		).toBe("/posts");
 	});
 });

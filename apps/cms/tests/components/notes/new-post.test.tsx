@@ -70,6 +70,6 @@ describe("NewPost", () => {
 		renderNewPost();
 		expect(
 			screen.getByRole("link", { name: "Cancel" }).getAttribute("href"),
-		).toBe("/");
+		).toBe("/posts");
 	});
 });

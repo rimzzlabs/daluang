@@ -67,7 +67,7 @@ describe("post pages", () => {
 			"Jotai",
 		);
 		await userEvent.click(screen.getByRole("button", { name: "Save draft" }));
-		await waitFor(() => expect(router.state.location.pathname).toBe("/"));
+		await waitFor(() => expect(router.state.location.pathname).toBe("/posts"));
 	});
 
 	it("opens the post of the ID in the path", async () => {
