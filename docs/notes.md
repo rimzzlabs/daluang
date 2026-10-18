@@ -47,3 +47,17 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - `createNote` and `updateNote` throw when D1 refuses the slug: another note has it in the
   same language.
 - `src/env.ts` has the schema of the `DB` binding of the domain.
+
+## The endpoint
+
+- `GET /api/notes` gives the summary of each note. `POST /api/notes` adds a draft and
+  answers 201 with the note. `handleNotesRequest` of `src/api.ts` answers, and the route
+  file is `apps/cms/src/pages/api/notes.ts`.
+- The route file reads the stored settings with `readSettings` of the settings package,
+  and gives them to the handler. The settings package imports the notes package, so the
+  notes package cannot import the settings.
+- A draft that `noteDraftSchema` refuses answers 422, with the path and the message of
+  each issue. A slug that a note has in the same language answers 409 (`slug-taken`).
+- Before the onboarding saves the languages, a write answers 409 (`settings-needed`).
+- A body of another type answers 415, a body that is not JSON 400, and a body above
+  `NOTE_BODY_MAX_BYTES` and 64 KB of metadata 413.
