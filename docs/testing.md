@@ -31,6 +31,10 @@ This page tells which code needs a test, where the test goes, and how coverage c
 
 - The tests run in the `node` environment, in the `vmThreads` pool. A React component test
   uses `@testing-library/react`, and its first line is `// @vitest-environment jsdom`.
+- jsdom has no layout. `apps/cms/tests/setup.ts` gives a text range no box, because
+  CodeMirror measures text. jsdom sends no input that CodeMirror reads, so
+  `typeInEditor` of `apps/cms/tests/components/notes/editor.ts` gives a change to the
+  editor through its API.
 - `packages/auth/tests/fake-d1.ts` is a D1 binding on `node:sqlite`, with the migrations
   of `apps/cms/migrations`. A test of `createAuth` uses it, and a test checks that the
   migrations match the schema of Better Auth.

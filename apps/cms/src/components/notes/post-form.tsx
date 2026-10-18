@@ -13,13 +13,14 @@ import {
 	FieldSet,
 } from "@daluang/ui/components/field";
 import { Input } from "@daluang/ui/components/input";
+import { Skeleton } from "@daluang/ui/components/skeleton";
 import { Textarea } from "@daluang/ui/components/textarea";
 import {
 	ToggleGroup,
 	ToggleGroupItem,
 } from "@daluang/ui/components/toggle-group";
 import { A } from "@mobily/ts-belt";
-import { useId } from "react";
+import { lazy, Suspense, useId } from "react";
 import { ExtraFieldInput } from "./extra-field-input";
 import { FormField } from "./form-field";
 
@@ -30,6 +31,13 @@ const SLUG_HELP = {
 		"The last part of the address of the post. It follows the title until you change it.",
 	typed: "The last part of the address of the post.",
 };
+
+// CodeMirror and the grammars of Markdown are large. Only the pages of the editor load them.
+const MarkdownEditor = lazy(() =>
+	import("./markdown-editor").then((module) => ({
+		default: module.MarkdownEditor,
+	})),
+);
 
 export interface PostFormProps {
 	value: NoteForm;
@@ -164,16 +172,16 @@ export function PostForm(props: PostFormProps) {
 				help="Markdown. A preview comes in a later step."
 				error={errors.body}
 			>
-				<Textarea
-					id={`${id}-body`}
-					name="body"
-					value={value.body}
-					className="min-h-80 font-mono"
-					spellCheck={false}
-					aria-invalid={errors.body !== undefined}
-					aria-describedby={`${id}-body-help`}
-					onChange={(event) => change({ body: event.target.value })}
-				/>
+				<Suspense fallback={<Skeleton className="h-80 w-full rounded-xl" />}>
+					<MarkdownEditor
+						id={`${id}-body`}
+						label="Body"
+						defaultValue={value.body}
+						invalid={errors.body !== undefined}
+						describedBy={`${id}-body-help`}
+						onChange={(body) => change({ body })}
+					/>
+				</Suspense>
 			</FormField>
 		</FieldGroup>
 	);

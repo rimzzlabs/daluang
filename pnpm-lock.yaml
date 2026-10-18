@@ -182,6 +182,21 @@ catalogs:
     '@cloudflare/workers-types':
       specifier: ^5.20261015.1
       version: 5.20261015.1
+    '@codemirror/commands':
+      specifier: ^6.11.1
+      version: 6.11.1
+    '@codemirror/lang-markdown':
+      specifier: ^6.5.2
+      version: 6.5.2
+    '@codemirror/language':
+      specifier: ^6.13.1
+      version: 6.13.1
+    '@codemirror/state':
+      specifier: ^6.7.6
+      version: 6.7.6
+    '@codemirror/view':
+      specifier: ^6.43.14
+      version: 6.43.14
     '@commitlint/cli':
       specifier: ^21.2.3
       version: 21.2.3
@@ -200,6 +215,9 @@ catalogs:
     '@fontsource-variable/lora':
       specifier: ^5.3.0
       version: 5.3.0
+    '@lezer/highlight':
+      specifier: ^1.2.5
+      version: 1.2.5
     '@mobily/ts-belt':
       specifier: 4.0.0-rc.5
       version: 4.0.0-rc.5
@@ -343,6 +361,21 @@ importers:
       '@astrojs/react':
         specifier: 'catalog:'
         version: 7.1.0(@types/node@24.19.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(jiti@2.7.0)(oxc-transform-react@0.152.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
+      '@codemirror/commands':
+        specifier: 'catalog:'
+        version: 6.11.1
+      '@codemirror/lang-markdown':
+        specifier: 'catalog:'
+        version: 6.5.2
+      '@codemirror/language':
+        specifier: 'catalog:'
+        version: 6.13.1
+      '@codemirror/state':
+        specifier: 'catalog:'
+        version: 6.7.6
+      '@codemirror/view':
+        specifier: 'catalog:'
+        version: 6.43.14
       '@daluang/api-tokens':
         specifier: workspace:*
         version: link:../../packages/api-tokens
@@ -361,6 +394,9 @@ importers:
       '@daluang/webhooks':
         specifier: workspace:*
         version: link:../../packages/webhooks
+      '@lezer/highlight':
+        specifier: 'catalog:'
+        version: 1.2.5
       '@mobily/ts-belt':
         specifier: 'catalog:'
         version: 4.0.0-rc.5
@@ -1258,6 +1294,9 @@ packages:
   '@codemirror/lang-json@6.0.2':
     resolution: {integrity: sha512-x2OtO+AvwEHrEwR0FyyPtfDUiloG3rnVTSZV1W8UteaLL8/MajQd8DpvUb2YVzC+/T18aSDv0H9mu+xw0EStoQ==}
 
+  '@codemirror/lang-markdown@6.5.2':
+    resolution: {integrity: sha512-AwBOdkWYuA//WcM0xO5PfHPUcmz/O2i5o0Nsg1U69SII/loCJlFI1Romd9xp2HYb1kYJRGZotyqRghuHH5n8Kw==}
+
   '@codemirror/lang-xml@6.1.0':
     resolution: {integrity: sha512-3z0blhicHLfwi2UgkZYRPioSgVTo9PV5GP5ducFH6FaHy0IAJRg+ixj5gTR1gnT/glAIC8xv4w2VL1LoZfs+Jg==}
 
@@ -1921,6 +1960,9 @@ packages:
 
   '@lezer/lr@1.4.11':
     resolution: {integrity: sha512-UwgZcl1R66H2hDzBrA7kWyYmX6s8p5TQ+e/t7CuvgCtBEPxbEPaHYHu+pJBvTvDotEJpuQkJjbXuHiw5Cixxgw==}
+
+  '@lezer/markdown@1.8.0':
+    resolution: {integrity: sha512-X6w3A2NpyhdtGqTWRJB8gR4QDXBaFMbTOs780ZdZ15KKCfBXOQTKcB3Vr+W6tqJHVlealt53tLmHRvOqPTQgYA==}
 
   '@lezer/xml@1.0.6':
     resolution: {integrity: sha512-CdDwirL0OEaStFue/66ZmFSeppuL6Dwjlk8qk153mSQwiSH/Dlri4GNymrNWnUmPl2Um7QfV1FO9KFUyX3Twww==}
@@ -7088,6 +7130,16 @@ snapshots:
       '@codemirror/language': 6.13.1
       '@lezer/json': 1.0.3
 
+  '@codemirror/lang-markdown@6.5.2':
+    dependencies:
+      '@codemirror/autocomplete': 6.20.3
+      '@codemirror/lang-html': 6.4.12
+      '@codemirror/language': 6.13.1
+      '@codemirror/state': 6.7.6
+      '@codemirror/view': 6.43.14
+      '@lezer/common': 1.5.3
+      '@lezer/markdown': 1.8.0
+
   '@codemirror/lang-xml@6.1.0':
     dependencies:
       '@codemirror/autocomplete': 6.20.3
@@ -7740,6 +7792,11 @@ snapshots:
   '@lezer/lr@1.4.11':
     dependencies:
       '@lezer/common': 1.5.3
+
+  '@lezer/markdown@1.8.0':
+    dependencies:
+      '@lezer/common': 1.5.3
+      '@lezer/highlight': 1.2.5
 
   '@lezer/xml@1.0.6':
     dependencies:
