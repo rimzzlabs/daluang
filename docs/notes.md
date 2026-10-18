@@ -71,6 +71,10 @@ It gets the languages setting and the field definitions as `DraftRules`.
 
 ## The inputs of the editor
 
+- `PostForm` of `apps/cms/src/components/notes/post-form.tsx` shows the inputs of a
+  `NoteForm`: the title, the slug, the language, the description, the keywords, the extra
+  fields, and the body. It shows the error of each path of `NoteFormErrors`.
+- The language choice shows only in a CMS with more than one language.
 - `ExtraFieldInput` shows one extra field: a checkbox for yes or no, and a text box for a
   text, a number, or a list. A number asks for a decimal keyboard on a phone.
 - `FormField` puts a label, a control, and its help text or its error together. An
