@@ -50,6 +50,9 @@ describe("PostForm", () => {
 			"value",
 			"resep-jotai",
 		);
+		expect(
+			screen.getByText(/It follows the title until you change it/),
+		).toBeTruthy();
 		await userEvent.click(screen.getByRole("button", { name: "Indonesia" }));
 		await userEvent.type(
 			screen.getByRole("textbox", { name: "Description (optional)" }),
@@ -88,6 +91,9 @@ describe("PostForm", () => {
 		);
 		await userEvent.click(screen.getByRole("button", { name: "English" }));
 		expect(last.slug).toBe("jotai");
+		expect(
+			screen.getByText("The last part of the address of the post."),
+		).toBeTruthy();
 		expect(last.language).toBe("en");
 	});
 

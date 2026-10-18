@@ -23,6 +23,14 @@ import { useId } from "react";
 import { ExtraFieldInput } from "./extra-field-input";
 import { FormField } from "./form-field";
 
+// The help of the slug. A typed slug, or the slug of a stored post, no longer follows
+// the title.
+const SLUG_HELP = {
+	follows:
+		"The last part of the address of the post. It follows the title until you change it.",
+	typed: "The last part of the address of the post.",
+};
+
 export interface PostFormProps {
 	value: NoteForm;
 	errors: NoteFormErrors;
@@ -63,7 +71,7 @@ export function PostForm(props: PostFormProps) {
 			<FormField
 				id={`${id}-slug`}
 				label="Slug"
-				help="The last part of the address of the post. It follows the title until you change it."
+				help={SLUG_HELP[value.slugTouched ? "typed" : "follows"]}
 				error={errors.slug}
 			>
 				<Input
