@@ -32,6 +32,15 @@ The first site that reads the notes is rimzzlabs.com. Its source is in
   for example an Astro component or a React island. The CMS does not decide how a
   component looks on a site. The preview of the CMS renders each component with a simple
   default, so the preview and a site can look different.
+- **The sites change only when the writer selects Publish changes.** A note has a working
+  copy, which the writer edits, and a published copy, which the content API gives to the
+  sites. An edit changes only the working copy.
+- **A change is a note that the sites do not have in its current form**: a note marked to
+  publish, a note marked to unpublish or to delete, and a published note whose working
+  copy differs from its published copy. Publish, unpublish, and delete only mark a note.
+- **The navbar of each page shows the number of changes, and the button Publish changes.**
+  The button copies each change to the published copy, removes each deleted note, and
+  sends one `publish` event to each webhook. Ten changes then cost one rebuild of a site.
 - **D1 keeps the Markdown of a note**, in the row of the note, with its metadata and its
   extra fields. One write saves all of them. A row of D1 can hold 2 MB, and the largest
   post of rimzzlabs.com has 30 KB.
