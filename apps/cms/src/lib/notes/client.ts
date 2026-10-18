@@ -11,7 +11,11 @@ import {
 	noteSchema,
 	noteSummarySchema,
 } from "@daluang/notes/note";
-import { type ListedNote, listedNotes } from "@daluang/notes/note-list";
+import {
+	type ListedNote,
+	listedNotes,
+	type NoteMarkAction,
+} from "@daluang/notes/note-list";
 import { R } from "@mobily/ts-belt";
 import { match, P } from "ts-pattern";
 import { z } from "zod";
@@ -144,17 +148,17 @@ export async function deleteNoteOfCms(
 	return R.map(response, () => true as const);
 }
 
-export interface NoteStatusAction {
+export interface NoteMark {
 	id: string;
-	action: "publish" | "unpublish";
+	action: NoteMarkAction;
 }
 
-/** Publishes a post, or takes it back to a draft. Each site then rebuilds. */
-export async function changeNoteStatus(
-	change: NoteStatusAction,
+/** Marks a post to publish or to unpublish at Publish changes, or clears its mark. */
+export async function markNoteOfCms(
+	mark: NoteMark,
 ): Promise<R.Result<Note, NotesError>> {
 	const body = await readBody(
-		await send(`${notePath(change.id)}/${change.action}`, { method: "POST" }),
+		await send(`${notePath(mark.id)}/${mark.action}`, { method: "POST" }),
 		oneSchema,
 	);
 	return R.map(body, (one) => one.note);

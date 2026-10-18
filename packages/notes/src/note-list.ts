@@ -1,4 +1,5 @@
 import { A, O, pipe } from "@mobily/ts-belt";
+import { match, P } from "ts-pattern";
 import type { NoteChange } from "./change";
 import type { NoteSummary } from "./note";
 
@@ -41,4 +42,26 @@ export function inLanguage(
 ): readonly ListedNote[] {
 	if (language === null) return listed;
 	return A.filter(listed, (item) => item.note.language === language);
+}
+
+/**
+ * The actions of `POST /api/notes/<id>/<action>`: a mark for Publish changes, or `cancel`,
+ * which clears the mark.
+ */
+export const NOTE_MARK_ACTIONS = ["publish", "unpublish", "cancel"] as const;
+
+export type NoteMarkAction = (typeof NOTE_MARK_ACTIONS)[number];
+
+/**
+ * The actions of a listed note. A note with a mark can cancel it. A draft can wait to
+ * publish, and a published note can wait to unpublish. An edit has no mark.
+ */
+export function noteActions(listed: ListedNote): readonly NoteMarkAction[] {
+	return match(listed.change)
+		.with(P.union("publish", "unpublish", "delete"), () => ["cancel"] as const)
+		.with(P.union("edit", null), () => {
+			const published = listed.note.status === "published";
+			return [published ? "unpublish" : "publish"] as const;
+		})
+		.exhaustive();
 }

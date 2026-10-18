@@ -1,4 +1,8 @@
-import { inLanguage, type ListedNote } from "@daluang/notes/note-list";
+import {
+	inLanguage,
+	type ListedNote,
+	type NoteMarkAction,
+} from "@daluang/notes/note-list";
 import { Button } from "@daluang/ui/components/button";
 import {
 	Empty,
@@ -24,6 +28,7 @@ import { useSettings } from "@/hooks/settings/use-settings";
 import type { ChangesStore } from "@/lib/notes/changes-store";
 import {
 	listPostsOfCms,
+	markNoteOfCms,
 	NOTES_ERROR_MESSAGES,
 	type NotesError,
 } from "@/lib/notes/client";
@@ -57,14 +62,16 @@ export interface PostsProps {
 
 /**
  * The posts page: each post with its language, its status, and the change that waits for
- * Publish changes. A CMS with more than one language can show the posts of one language.
- * With no post, the page shows the steps to set up a site.
+ * Publish changes. The menu of a post marks it for Publish changes, or cancels its mark. A
+ * CMS with more than one language can show the posts of one language. With no post, the
+ * page shows the steps to set up a site.
  */
 export function Posts(props: PostsProps) {
 	const { changes } = props;
 	const { languages } = useSettings(props.settings).languages;
 	const [list, setList] = useState<ListState>({ status: "loading" });
 	const [language, setLanguage] = useState<string | null>(null);
+	const [markError, setMarkError] = useState<NotesError | null>(null);
 
 	// The posts are on the server, an external system. The page reads them when it opens.
 	useEffect(() => {
@@ -76,6 +83,18 @@ export function Posts(props: PostsProps) {
 			current = false;
 		};
 	}, [changes]);
+
+	async function mark(post: ListedNote, action: NoteMarkAction) {
+		setMarkError(null);
+		const result = await markNoteOfCms({ id: post.note.id, action });
+		const error = R.match(
+			result,
+			(): NotesError | null => null,
+			(failed) => failed,
+		);
+		setMarkError(error);
+		if (error === null) setList(await readPosts(changes));
+	}
 
 	async function retry() {
 		setList({ status: "loading" });
@@ -126,6 +145,11 @@ export function Posts(props: PostsProps) {
 									onChange={setLanguage}
 								/>
 							) : null}
+							{markError === null ? null : (
+								<p role="alert" className="text-sm text-destructive">
+									{NOTES_ERROR_MESSAGES[markError]}
+								</p>
+							)}
 							{A.isEmpty(shown) ? (
 								<Empty className="flex-none border border-border p-8">
 									<EmptyHeader>
@@ -139,7 +163,7 @@ export function Posts(props: PostsProps) {
 									</EmptyHeader>
 								</Empty>
 							) : (
-								<PostList posts={shown} />
+								<PostList posts={shown} onAction={mark} />
 							)}
 						</>
 					);

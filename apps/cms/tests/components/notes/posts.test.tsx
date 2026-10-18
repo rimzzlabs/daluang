@@ -10,6 +10,7 @@ import { SETTINGS, settingsStore } from "../../settings";
 
 const client = vi.hoisted(() => ({
 	listPostsOfCms: vi.fn(),
+	markNoteOfCms: vi.fn(),
 	NOTES_ERROR_MESSAGES: { offline: "Offline." },
 }));
 
@@ -31,6 +32,7 @@ const POST = {
 
 beforeEach(() => {
 	client.listPostsOfCms.mockReset();
+	client.markNoteOfCms.mockReset();
 });
 
 describe("Posts", () => {
@@ -131,5 +133,50 @@ describe("Posts", () => {
 		expect(await screen.findByText("Jotai recipes")).toBeTruthy();
 		expect(screen.queryByRole("group", { name: "Language" })).toBeNull();
 		expect(screen.queryByRole("button", { name: "All" })).toBeNull();
+	});
+
+	it("marks a post, then reads the list again", async () => {
+		const draft = { ...POST, change: null };
+		client.listPostsOfCms
+			.mockResolvedValueOnce(R.Ok({ posts: [draft], count: 0 }))
+			.mockResolvedValueOnce(R.Ok({ posts: [POST], count: 1 }));
+		client.markNoteOfCms.mockResolvedValue(R.Ok(POST.note));
+		const changes = createChangesStore(0);
+		render(
+			<Posts settings={settingsStore()} changes={changes} linkKind="anchor" />,
+		);
+		await userEvent.click(
+			await screen.findByRole("button", { name: "Actions of Jotai recipes" }),
+		);
+		await userEvent.click(
+			await screen.findByRole("menuitem", { name: "Publish" }),
+		);
+		expect(client.markNoteOfCms).toHaveBeenCalledWith({
+			id: "n1",
+			action: "publish",
+		});
+		expect(await screen.findByText("To publish")).toBeTruthy();
+		expect(changes.read()).toBe(1);
+	});
+
+	it("shows the message of a failed mark, and keeps the list", async () => {
+		client.listPostsOfCms.mockResolvedValue(R.Ok({ posts: [POST], count: 1 }));
+		client.markNoteOfCms.mockResolvedValue(R.Error("offline"));
+		render(
+			<Posts
+				settings={settingsStore()}
+				changes={createChangesStore(0)}
+				linkKind="anchor"
+			/>,
+		);
+		await userEvent.click(
+			await screen.findByRole("button", { name: "Actions of Jotai recipes" }),
+		);
+		await userEvent.click(
+			await screen.findByRole("menuitem", { name: "Cancel the change" }),
+		);
+		expect((await screen.findByRole("alert")).textContent).toBe("Offline.");
+		expect(screen.getByText("Jotai recipes")).toBeTruthy();
+		expect(client.listPostsOfCms).toHaveBeenCalledOnce();
 	});
 });
