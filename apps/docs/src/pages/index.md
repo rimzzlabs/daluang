@@ -17,9 +17,11 @@ Daluang is in early development. The CMS has these parts now:
 - The settings of the site, the languages, and the extra fields of a post.
 - The [API tokens](/guide/api-tokens) of a site, and the [webhooks](/guide/webhooks) that
   tell a site to rebuild.
+- The posts: [write, change, translate, and publish](/guide/write-a-post) them in the
+  editor, and read them in an [Astro site](/guide/astro-site).
 
-The editor and the post storage come in later releases. [Deploy](/guide/deploy) tells you
-how to host your own copy.
+A post is text only for now. Images and videos come in a later release.
+[Deploy](/guide/deploy) tells you how to host your own copy.
 
 ## The parts
 
