@@ -34,6 +34,18 @@ const notesRoute = createRoute({
 	component: routePage("/"),
 });
 
+const newPostRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/posts/new",
+	component: routePage("/posts/new"),
+});
+
+const postRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/posts/$id",
+	component: routePage("/posts/$id"),
+});
+
 const mediaRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/media",
@@ -72,6 +84,8 @@ const fieldsRoute = createRoute({
 
 export const routeTree = rootRoute.addChildren([
 	notesRoute,
+	newPostRoute,
+	postRoute,
 	mediaRoute,
 	apiTokensRoute,
 	webhooksRoute,
