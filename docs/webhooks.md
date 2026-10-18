@@ -8,8 +8,11 @@ They give each request to `handleWebhooksRequest`, with the `DB` binding of
 `apps/cms/src/lib/webhooks/env.ts`.
 
 - A webhook is a URL that gets a POST with `{ "event", "sentAt" }`, for example the
-  deploy hook of a site on Cloudflare Pages. The only event now is `test`, from the button
-  "Send a test". The publish of a note comes with the notes.
+  deploy hook of a site on Cloudflare Pages. The events are `test`, from the button "Send
+  a test", and `publish` and `unpublish`, for a post that goes to a site or leaves it.
+- `deliverEvent` of `src/deliver-event.ts` sends one event to each webhook at the same
+  time, and records each delivery. A failed delivery does not stop the others.
+  `listWebhookTargets` of the store gives it the ID and the full URL of each webhook.
 - **The URL of a deploy hook is its secret.** The list shows only its host and its last 4
   characters (`urlHint`). Only a delivery reads the URL from D1.
 - `isWebhookUrl` accepts only `https` with a public host name. It refuses `localhost`, an

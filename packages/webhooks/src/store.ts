@@ -149,6 +149,28 @@ export async function findWebhookUrl(
 	);
 }
 
+/** The ID and the URL of a webhook, for a delivery. */
+export interface WebhookTarget {
+	id: string;
+	url: string;
+}
+
+/**
+ * Side effect: reads the ID and the URL of each webhook from D1. Only a delivery reads
+ * the URL, because the URL is a secret.
+ */
+export async function listWebhookTargets(
+	db: D1Database,
+): Promise<readonly WebhookTarget[]> {
+	const result = await db
+		.prepare('select "id", "url" from "webhook" order by "createdAt"')
+		.all();
+	return parseRows(
+		result.results,
+		z.object({ id: z.string(), url: z.string() }),
+	);
+}
+
 export interface DeliveryRecord {
 	db: D1Database;
 	webhookId: string;
