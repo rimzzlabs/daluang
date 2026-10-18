@@ -1,5 +1,6 @@
 import { R } from "@mobily/ts-belt";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { createChangesStore } from "@/lib/notes/changes-store";
 import {
 	addNote,
 	deleteNoteOfCms,
@@ -9,6 +10,7 @@ import {
 	markNoteOfCms,
 	publishChanges,
 	readNote,
+	refreshChangeCount,
 	saveNote,
 } from "@/lib/notes/client";
 
@@ -194,5 +196,21 @@ describe("the posts client", () => {
 	it("fails when a list fails", async () => {
 		answer(new Response(null, { status: 401 }));
 		await expect(listPostsOfCms()).resolves.toEqual(R.Error("signed-out"));
+	});
+});
+
+describe("refreshChangeCount", () => {
+	it("gives the number of changes of the server to the store", async () => {
+		answer(Response.json({ count: 2, changes: [] }));
+		const changes = createChangesStore(0);
+		await refreshChangeCount(changes);
+		expect(changes.read()).toBe(2);
+	});
+
+	it("keeps the number when the server does not answer", async () => {
+		answer(new Error("offline"));
+		const changes = createChangesStore(5);
+		await refreshChangeCount(changes);
+		expect(changes.read()).toBe(5);
 	});
 });
