@@ -93,6 +93,15 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - `FormField` puts a label, a control, and its help text or its error together. An
   optional value has "(optional)" after its label.
 
+## Translations
+
+- Two notes with the same slug and different languages are translations of each other.
+  `translationsOf` of `src/translation.ts` gives them.
+- `missingLanguages` gives each language of the CMS that has no translation of a note
+  yet, in the order of the setting.
+- `translationDraft` copies a note into another language, with the same slug. The writer
+  then translates its text.
+
 ## The store
 
 - **D1 keeps each note in one row of the table `note`**
