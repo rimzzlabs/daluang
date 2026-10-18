@@ -13,6 +13,7 @@
 	"dependencies": {
 		"@daluang/auth": "workspace:*",
 		"@mobily/ts-belt": "catalog:",
+		"ts-pattern": "catalog:",
 		"zod": "catalog:"
 	},
 	"devDependencies": {
