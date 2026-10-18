@@ -34,8 +34,12 @@ in `packages/notes`.
 - `applyChanges` applies each change in one D1 batch, which is one transaction. A
   `publish` and an `edit` copy the working copy to the published copy, an `unpublish`
   clears the published copy, and a `delete` removes the note. Each one clears the mark,
-  and the first publish sets `publishedAt`. The batch copies the working copy in SQL, so an
-  edit that comes after the list also goes to the published copy.
+  and the first publish sets `publishedAt`. A later publish keeps it. The batch copies the
+  working copy in SQL, so an edit that comes after the list also goes to the published
+  copy.
+- **Only `applyChanges` publishes a note.** No other function of the store writes the
+  status or the published copy. A test publishes with `publishNotes` of
+  `packages/notes/tests/publish.ts`: a mark, then `applyChanges`.
 
 ## The draft
 

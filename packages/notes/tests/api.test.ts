@@ -4,8 +4,8 @@ import type { NoteSettings } from "../src/api";
 import { handleNotesRequest } from "../src/api";
 import { NOTES_API_PATH } from "../src/note";
 import { NOTE_BODY_MAX_BYTES } from "../src/note-draft";
-import { setNoteStatus } from "../src/store";
 import { createFakeD1 } from "./fake-d1";
+import { publishNotes } from "./publish";
 
 const ORIGIN = "http://localhost:4321";
 const NOW = new Date("2026-10-18T00:00:00.000Z");
@@ -253,7 +253,7 @@ async function noteOf(response: Response) {
 
 /** Publishes a note at once, as Publish changes does. */
 async function publishNow(db: D1Database, id: string) {
-	await setNoteStatus({ db, id, status: "published", now: NOW });
+	await publishNotes({ db, ids: [id], now: NOW });
 }
 
 describe("/api/notes/<id>/publish, /unpublish, and /cancel", () => {

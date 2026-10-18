@@ -7,10 +7,10 @@ import {
 	findNote,
 	listChanges,
 	markNote,
-	setNoteStatus,
 	updateNote,
 } from "../src/store";
 import { createFakeD1 } from "./fake-d1";
+import { publishNotes } from "./publish";
 
 const FIRST = new Date("2026-10-18T00:00:00.000Z");
 const LATER = new Date("2026-10-18T01:00:00.000Z");
@@ -37,8 +37,11 @@ async function fourChanges() {
 		add("to-delete"),
 		add("quiet"),
 	]);
-	for (const note of [edited, toUnpublish, toDelete, quiet])
-		await setNoteStatus({ db, id: note.id, status: "published", now: FIRST });
+	await publishNotes({
+		db,
+		ids: A.map([edited, toUnpublish, toDelete, quiet], (note) => note.id),
+		now: FIRST,
+	});
 	await markNote({ db, id: toPublish.id, mark: "publish" });
 	await updateNote({
 		db,
@@ -76,12 +79,24 @@ describe("listChanges", () => {
 	it("gives no changes when each copy is current", async () => {
 		const { db } = createFakeD1();
 		const note = await createNote({ db, draft: DRAFT, now: FIRST });
-		await setNoteStatus({ db, id: note.id, status: "published", now: FIRST });
+		await publishNotes({ db, ids: [note.id], now: FIRST });
 		expect(await listChanges(db)).toEqual([]);
 	});
 });
 
 describe("applyChanges", () => {
+	it("keeps the first publishedAt after an unpublish and a new publish", async () => {
+		const { db } = createFakeD1();
+		const note = await createNote({ db, draft: DRAFT, now: FIRST });
+		const ref = { db, id: note.id };
+		await publishNotes({ db, ids: [note.id], now: FIRST });
+		await markNote({ ...ref, mark: "unpublish" });
+		await applyChanges({ db, now: LATER });
+		expect(O.getExn(await findNote(ref)).published).toBeNull();
+		await publishNotes({ db, ids: [note.id], now: LATER });
+		expect(O.getExn(await findNote(ref)).publishedAt).toBe(FIRST.toISOString());
+	});
+
 	it("applies each change in one batch, and leaves no change", async () => {
 		const notes = await fourChanges();
 		const { db } = notes;
