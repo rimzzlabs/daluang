@@ -11,6 +11,7 @@ import {
 	findNote,
 	listNotes,
 	type NoteRef,
+	setNoteStatus,
 	updateNote,
 } from "./store";
 import { isSlugTaken } from "./translation";
@@ -29,6 +30,9 @@ export type NotesApiError =
 	| "invalid-note"
 	| "slug-taken"
 	| "settings-needed";
+
+/** The events of a note that tell each site to rebuild. */
+export type NoteEvent = "publish" | "unpublish";
 
 /** A refused value of a draft: the path of the field, and the message for the writer. */
 export interface NoteIssue {
@@ -50,9 +54,17 @@ export interface NotesRequest {
 	db: D1Database;
 	/** The ID of `/api/notes/<id>`, or `undefined` for `/api/notes`. */
 	id: string | undefined;
+	/** The action of `/api/notes/<id>/<action>`, or `undefined` for the other paths. */
+	action: string | undefined;
 	settings: NoteSettings;
 	/** The clock. The route file gives `() => new Date()`, and a test gives a fixed time. */
 	now: () => Date;
+	/** Tells each site to rebuild. The route file sends the event to each webhook. */
+	notify: (event: NoteEvent) => Promise<void>;
+}
+
+interface NoteAction extends NotesRequest {
+	id: string;
 }
 
 interface NoteWrite extends NotesRequest {
@@ -162,6 +174,69 @@ async function writeDraft(
 	);
 }
 
+/**
+ * Side effect: writes the status `published` to D1, and tells each site to rebuild. A
+ * published note must reach each site.
+ *
+ * Checks the note again first: a field can be required since its last save. A publish of
+ * a published note sends its saved changes to the sites.
+ */
+async function publishFrom(action: NoteAction): Promise<Response> {
+	const found = await findNote({ db: action.db, id: action.id });
+	if (O.isNone(found)) return errorResponse("not-found", 404);
+	const { languages } = action.settings;
+	if (languages === null) return errorResponse("settings-needed", 409);
+	const checked = noteDraftSchema({
+		languages,
+		fields: action.settings.fields ?? [],
+	}).safeParse(found);
+	if (!checked.success)
+		return Response.json(
+			{ error: "invalid-note", issues: toIssues(checked.error) },
+			{ status: 422 },
+		);
+	await setNoteStatus({
+		db: action.db,
+		id: action.id,
+		status: "published",
+		now: action.now(),
+	});
+	await action.notify("publish");
+	return getNote({ db: action.db, id: action.id });
+}
+
+/**
+ * Side effect: writes the status `draft` to D1, and tells each site to rebuild. A note that
+ * leaves the sites must leave at their next build.
+ *
+ * A draft stays a draft, with no event.
+ */
+async function unpublishFrom(action: NoteAction): Promise<Response> {
+	const found = await findNote({ db: action.db, id: action.id });
+	if (O.isNone(found)) return errorResponse("not-found", 404);
+	if (found.status === "draft") return Response.json({ note: found });
+	await setNoteStatus({
+		db: action.db,
+		id: action.id,
+		status: "draft",
+		now: action.now(),
+	});
+	await action.notify("unpublish");
+	return getNote({ db: action.db, id: action.id });
+}
+
+/**
+ * Side effect: deletes a note from D1, and tells each site to rebuild when the note was
+ * published. A deleted note must leave the sites.
+ */
+async function deleteFrom(action: NoteAction): Promise<Response> {
+	const found = await findNote({ db: action.db, id: action.id });
+	if (O.isNone(found)) return errorResponse("not-found", 404);
+	await deleteNote({ db: action.db, id: action.id });
+	if (found.status === "published") await action.notify("unpublish");
+	return new Response(null, { status: 204 });
+}
+
 function notAllowed(allow: string): Promise<Response> {
 	return Promise.resolve(
 		Response.json(
@@ -177,11 +252,23 @@ function notAllowed(allow: string): Promise<Response> {
  *
  * The endpoint of the notes. `GET /api/notes` lists them, and `POST /api/notes` adds a
  * draft. `GET`, `PATCH`, and `DELETE /api/notes/<id>` read, change, and delete one note.
- * The sign-in guard checks the session and the origin before this handler runs.
+ * `POST /api/notes/<id>/publish` and `/unpublish` change its status, and tell each site
+ * to rebuild. The sign-in guard checks the session and the origin before this handler
+ * runs.
  */
 export function handleNotesRequest(params: NotesRequest): Promise<Response> {
 	const { request, db, id } = params;
-	return match({ method: request.method, id })
+	return match({ method: request.method, id, action: params.action })
+		.with({ method: "POST", id: P.string, action: "publish" }, (route) =>
+			publishFrom({ ...params, id: route.id }),
+		)
+		.with({ method: "POST", id: P.string, action: "unpublish" }, (route) =>
+			unpublishFrom({ ...params, id: route.id }),
+		)
+		.with({ action: P.union("publish", "unpublish") }, () => notAllowed("POST"))
+		.with({ action: P.string }, () =>
+			Promise.resolve(errorResponse("not-found", 404)),
+		)
 		.with({ method: "GET", id: undefined }, async () =>
 			Response.json({ notes: await listNotes(db) }),
 		)
@@ -197,11 +284,9 @@ export function handleNotesRequest(params: NotesRequest): Promise<Response> {
 				updateFrom({ ...params, id: route.id, draft }),
 			),
 		)
-		.with({ method: "DELETE", id: P.string }, async (route) => {
-			const deleted = await deleteNote({ db, id: route.id });
-			if (!deleted) return errorResponse("not-found", 404);
-			return new Response(null, { status: 204 });
-		})
+		.with({ method: "DELETE", id: P.string }, (route) =>
+			deleteFrom({ ...params, id: route.id }),
+		)
 		.with({ id: P.string }, () => notAllowed("GET, PATCH, DELETE"))
 		.exhaustive();
 }

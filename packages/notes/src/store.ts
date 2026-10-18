@@ -1,7 +1,7 @@
 import { A, O, pipe } from "@mobily/ts-belt";
 import { z } from "zod";
 import { extraFieldsSchema } from "./extra-fields";
-import { NOTE_STATUSES } from "./metadata";
+import { NOTE_STATUSES, type NoteStatus } from "./metadata";
 import type { Note, NoteDraft, NoteSummary } from "./note";
 
 const COLUMNS =
@@ -150,6 +150,32 @@ export async function updateNote(update: NoteUpdate): Promise<boolean> {
 			draft.body,
 			update.now.toISOString(),
 		)
+		.run();
+	return result.meta.changes > 0;
+}
+
+export interface NoteStatusChange {
+	db: D1Database;
+	id: string;
+	status: NoteStatus;
+	now: Date;
+}
+
+/**
+ * Side effect: writes the status of a note to D1, so that each site reads it at its next
+ * build.
+ *
+ * Publishes a note, or takes it back to a draft. The first publish sets `publishedAt`, and
+ * a later publish keeps it. A draft keeps it also. False when no note has the ID.
+ */
+export async function setNoteStatus(
+	change: NoteStatusChange,
+): Promise<boolean> {
+	const result = await change.db
+		.prepare(
+			`update "note" set "status" = ?2, "publishedAt" = case when ?2 = 'published' then coalesce("publishedAt", ?3) else "publishedAt" end where "id" = ?1`,
+		)
+		.bind(change.id, change.status, change.now.toISOString())
 		.run();
 	return result.meta.changes > 0;
 }

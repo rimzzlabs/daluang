@@ -65,3 +65,22 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - Before the onboarding saves the languages, a write answers 409 (`settings-needed`).
 - A body of another type answers 415, a body that is not JSON 400, and a body above
   `NOTE_BODY_MAX_BYTES` and 64 KB of metadata 413.
+
+## Publish
+
+- `POST /api/notes/<id>/publish` checks the note again with `noteDraftSchema` and the
+  current settings, because a field can be required since its last save. A note that the
+  check refuses answers 422. The route file is
+  `apps/cms/src/pages/api/notes/[id]/[action].ts`.
+- A publish sets the status `published` with `setNoteStatus` of the store. The first
+  publish sets `publishedAt`, and a later publish keeps it. A publish of a published note
+  sends its saved changes to the sites.
+- `POST /api/notes/<id>/unpublish` sets the status `draft` and keeps `publishedAt`. A
+  draft stays a draft, with no event.
+- Each publish and each unpublish tells each site to rebuild: the handler calls `notify`
+  with `publish` or `unpublish`. A `DELETE` of a published note sends `unpublish`.
+- The handler gets `notify` as a parameter, so the notes package does not import the
+  webhooks package. `notifySites` of `apps/cms/src/lib/notes/notify.ts` gives each event
+  to `deliverEvent` of the webhooks package.
+- A save of a published note sends no event. The next publish or the next build of a site
+  takes the change.
