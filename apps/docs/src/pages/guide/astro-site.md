@@ -4,8 +4,7 @@ An Astro site reads the published posts of the CMS at its build, through the con
 Each post comes with its Markdown and its Comark document. The site renders the document
 with its own components, so the site decides how each component looks.
 
-The page to write and publish a post comes in a later release. The content API is ready
-now.
+[Write a post](/guide/write-a-post) tells how to write and publish the posts.
 
 ## What the content API gives
 

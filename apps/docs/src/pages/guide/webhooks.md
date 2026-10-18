@@ -4,8 +4,8 @@ A webhook is a URL that the CMS sends a POST to. Use the deploy hook of your sit
 site can rebuild with the new posts.
 
 The CMS sends a webhook when you select **Send a test**. It also sends one when you select
-**Publish changes**: one delivery for all the changes, so a site rebuilds one time. The
-page to write and publish a post comes in a later release.
+**Publish changes**: one delivery for all the changes, so a site rebuilds one time.
+[Write a post](/guide/write-a-post) tells how to publish.
 
 ## Add the deploy hook of a site on Cloudflare Pages
 
