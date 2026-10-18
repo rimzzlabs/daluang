@@ -2,16 +2,17 @@ import { A, O } from "@mobily/ts-belt";
 import { describe, expect, it } from "vitest";
 import type { NoteDraft } from "../src/note";
 import {
+	applyChanges,
 	createNote,
 	deleteNote,
 	findNote,
 	listNotes,
 	listPublishedNotes,
 	markNote,
-	setNoteStatus,
 	updateNote,
 } from "../src/store";
 import { createFakeD1 } from "./fake-d1";
+import { publishNotes } from "./publish";
 
 const FIRST = new Date("2026-10-18T00:00:00.000Z");
 const LATER = new Date("2026-10-18T01:00:00.000Z");
@@ -163,41 +164,6 @@ describe("deleteNote", () => {
 	});
 });
 
-describe("setNoteStatus", () => {
-	it("sets publishedAt at the first publish, and keeps it after", async () => {
-		const { db } = createFakeD1();
-		const note = await createNote({ db, draft: DRAFT, now: FIRST });
-		const ref = { db, id: note.id };
-		expect(
-			await setNoteStatus({ ...ref, status: "published", now: FIRST }),
-		).toBe(true);
-		await setNoteStatus({ ...ref, status: "draft", now: LATER });
-		await setNoteStatus({ ...ref, status: "published", now: LATER });
-		expect(await findNote(ref)).toEqual({
-			...note,
-			status: "published",
-			publishedAt: FIRST.toISOString(),
-			published: {
-				title: DRAFT.title,
-				slug: DRAFT.slug,
-				language: DRAFT.language,
-				description: DRAFT.description,
-				keywords: DRAFT.keywords,
-				fields: DRAFT.fields,
-				body: DRAFT.body,
-				updatedAt: FIRST.toISOString(),
-			},
-		});
-	});
-
-	it("gives false for an ID that no note has", async () => {
-		const { db } = createFakeD1();
-		expect(
-			await setNoteStatus({ db, id: "nope", status: "published", now: FIRST }),
-		).toBe(false);
-	});
-});
-
 describe("listPublishedNotes", () => {
 	it("gives the published notes with their body, the last published first", async () => {
 		const { db } = createFakeD1();
@@ -208,8 +174,8 @@ describe("listPublishedNotes", () => {
 			now: FIRST,
 		});
 		await createNote({ db, draft: { ...DRAFT, slug: "a-draft" }, now: FIRST });
-		await setNoteStatus({ db, id: first.id, status: "published", now: FIRST });
-		await setNoteStatus({ db, id: second.id, status: "published", now: LATER });
+		await publishNotes({ db, ids: [first.id], now: FIRST });
+		await publishNotes({ db, ids: [second.id], now: LATER });
 		const notes = await listPublishedNotes(db);
 		expect(A.map(notes, (note) => note.id)).toEqual([second.id, first.id]);
 		expect(notes[0]?.body).toBe(DRAFT.body);
@@ -220,7 +186,7 @@ describe("the published copy and the mark", () => {
 	it("keeps the published copy while the working copy changes", async () => {
 		const { db } = createFakeD1();
 		const note = await createNote({ db, draft: DRAFT, now: FIRST });
-		await setNoteStatus({ db, id: note.id, status: "published", now: FIRST });
+		await publishNotes({ db, ids: [note.id], now: FIRST });
 		const draft = { ...DRAFT, title: "More Jotai recipes" };
 		await updateNote({ db, id: note.id, draft, now: LATER });
 		const found = O.getExn(await findNote({ db, id: note.id }));
@@ -231,9 +197,9 @@ describe("the published copy and the mark", () => {
 	it("clears the published copy and the mark when a note goes back to a draft", async () => {
 		const { db } = createFakeD1();
 		const note = await createNote({ db, draft: DRAFT, now: FIRST });
-		await setNoteStatus({ db, id: note.id, status: "published", now: FIRST });
+		await publishNotes({ db, ids: [note.id], now: FIRST });
 		await markNote({ db, id: note.id, mark: "unpublish" });
-		await setNoteStatus({ db, id: note.id, status: "draft", now: LATER });
+		await applyChanges({ db, now: LATER });
 		const found = O.getExn(await findNote({ db, id: note.id }));
 		expect(found.published).toBeNull();
 		expect(found.mark).toBeNull();

@@ -3,7 +3,7 @@ import { match, P } from "ts-pattern";
 import { z } from "zod";
 import { type NoteChange, noteChange } from "./change";
 import { extraFieldsSchema } from "./extra-fields";
-import { NOTE_STATUSES, type NoteStatus } from "./metadata";
+import { NOTE_STATUSES } from "./metadata";
 import {
 	NOTE_MARKS,
 	type Note,
@@ -183,34 +183,6 @@ export async function updateNote(update: NoteUpdate): Promise<boolean> {
 			draft.body,
 			update.now.toISOString(),
 		)
-		.run();
-	return result.meta.changes > 0;
-}
-
-export interface NoteStatusChange {
-	db: D1Database;
-	id: string;
-	status: NoteStatus;
-	now: Date;
-}
-
-/**
- * Side effect: writes the status of a note to D1, so that each site reads it at its next
- * build.
- *
- * Publishes a note, or takes it back to a draft. A publish copies the working copy to the
- * published copy, and a draft has no published copy. The first publish sets `publishedAt`,
- * and a later publish keeps it. A draft keeps it also. Each one clears the mark. False when
- * no note has the ID.
- */
-export async function setNoteStatus(
-	change: NoteStatusChange,
-): Promise<boolean> {
-	const result = await change.db
-		.prepare(
-			`update "note" set "status" = ?2, "publishedAt" = case when ?2 = 'published' then coalesce("publishedAt", ?3) else "publishedAt" end, "published" = case when ?2 = 'published' then ${WORKING_COPY_JSON} else null end, "mark" = null where "id" = ?1`,
-		)
-		.bind(change.id, change.status, change.now.toISOString())
 		.run();
 	return result.meta.changes > 0;
 }

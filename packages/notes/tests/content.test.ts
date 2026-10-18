@@ -1,8 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import { CONTENT_NOTES_API_PATH, handleContentRequest } from "../src/content";
 import type { NoteDraft } from "../src/note";
-import { createNote, setNoteStatus, updateNote } from "../src/store";
+import { createNote, updateNote } from "../src/store";
 import { createFakeD1 } from "./fake-d1";
+import { publishNotes } from "./publish";
 
 const NOW = new Date("2026-10-18T00:00:00.000Z");
 const URL_OF_API = `http://localhost:4321${CONTENT_NOTES_API_PATH}`;
@@ -33,12 +34,7 @@ describe("handleContentRequest", () => {
 	it("gives the published copy of each note with its Comark document, and no draft", async () => {
 		const { db } = createFakeD1();
 		const published = await createNote({ db, draft: DRAFT, now: NOW });
-		await setNoteStatus({
-			db,
-			id: published.id,
-			status: "published",
-			now: NOW,
-		});
+		await publishNotes({ db, ids: [published.id], now: NOW });
 		await createNote({ db, draft: { ...DRAFT, slug: "a-draft" }, now: NOW });
 		const { authorize, response } = read(db, true);
 		const answer = await response;
@@ -74,7 +70,7 @@ describe("handleContentRequest", () => {
 	it("keeps an edit of a published note away from the sites", async () => {
 		const { db } = createFakeD1();
 		const note = await createNote({ db, draft: DRAFT, now: NOW });
-		await setNoteStatus({ db, id: note.id, status: "published", now: NOW });
+		await publishNotes({ db, ids: [note.id], now: NOW });
 		const edit = { ...DRAFT, title: "Unfinished title", body: "# Half" };
 		await updateNote({ db, id: note.id, draft: edit, now: NOW });
 		const body: unknown = await (await read(db, true).response).json();
