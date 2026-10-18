@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { isAuthApiPath, isOpenAuthPath, signInUrl } from "../src/paths";
+import {
+	isAuthApiPath,
+	isContentApiPath,
+	isOpenAuthPath,
+	signInUrl,
+} from "../src/paths";
 
 describe("isAuthApiPath", () => {
 	it("is true for an endpoint of Better Auth", () => {
@@ -41,5 +46,17 @@ describe("signInUrl", () => {
 
 	it("keeps the path and its search in next", () => {
 		expect(signInUrl("/notes?x=1")).toBe("/sign-in?next=%2Fnotes%3Fx%3D1");
+	});
+});
+
+describe("isContentApiPath", () => {
+	it("is true for an endpoint of the content API", () => {
+		expect(isContentApiPath("/api/content/notes")).toBe(true);
+	});
+
+	it("is false for an endpoint of the CMS and for a path that only starts alike", () => {
+		expect(isContentApiPath("/api/notes")).toBe(false);
+		expect(isContentApiPath("/api/contents")).toBe(false);
+		expect(isContentApiPath("/api/content")).toBe(false);
 	});
 });

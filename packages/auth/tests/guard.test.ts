@@ -81,6 +81,23 @@ describe("decideAccess", () => {
 			decideAccess(write({ method: "POST", origin: "https://evil.example" })),
 		).toEqual({ action: "forbidden" });
 	});
+
+	it("opens the content API with no session: the endpoint checks the token", () => {
+		expect(decideAccess(read("/api/content/notes", false))).toEqual({
+			action: "continue",
+		});
+	});
+
+	it("refuses a write from another origin to the content API also", () => {
+		expect(
+			decideAccess({
+				url: at("/api/content/notes"),
+				method: "POST",
+				origin: "https://evil.example",
+				signedIn: false,
+			}),
+		).toEqual({ action: "forbidden" });
+	});
 });
 
 describe("isCrossOriginWrite", () => {

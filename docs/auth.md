@@ -41,8 +41,12 @@ the instance, the guard middleware, and the read of the environment.
 ## The guard
 
 - The guard (`apps/cms/src/lib/auth/middleware.ts`) needs a session for each page and
-  each endpoint, with two exceptions: `/sign-in`, and `/api/auth/*`. A page with no
-  session redirects to `/sign-in?next=<path>`. An endpoint with no session answers 401.
+  each endpoint, with three exceptions: `/sign-in`, `/api/auth/*`, and `/api/content/*`.
+  A page with no session redirects to `/sign-in?next=<path>`. An endpoint with no session
+  answers 401.
+- **A site reads `/api/content/*` with an API token, not a session.** `isContentApiPath`
+  of `packages/auth/src/paths.ts` names the path, and the endpoint checks the token. The
+  guard still refuses a write from another origin to it.
 - **A write from another origin answers 403, also with a session.** A write is `POST`,
   `PUT`, `PATCH`, or `DELETE`. `isCrossOriginWrite` of `packages/auth/src/guard.ts`
   compares the `Origin` header with the origin of the request. A write with no `Origin`

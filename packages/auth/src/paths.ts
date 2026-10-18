@@ -4,6 +4,9 @@ export const SIGN_IN_PATH = "/sign-in";
 
 const AUTH_API_PREFIX = "/api/auth/";
 
+// The endpoints that a site reads at its build, with an API token and no session.
+const CONTENT_API_PREFIX = "/api/content/";
+
 /**
  * The endpoints of Better Auth that the CMS uses: the sign-in with GitHub, its callback,
  * the session, the sign-out, and the error page of a failed callback. Each other endpoint
@@ -21,6 +24,14 @@ export const OPEN_AUTH_PATHS = [
 /** True for a path that Better Auth answers itself. */
 export function isAuthApiPath(pathname: string): boolean {
 	return S.startsWith(pathname, AUTH_API_PREFIX);
+}
+
+/**
+ * True for an endpoint that a site reads with an API token: `Authorization: Bearer dlg_…`.
+ * The sign-in guard needs no session for it, because the endpoint checks the token.
+ */
+export function isContentApiPath(pathname: string): boolean {
+	return S.startsWith(pathname, CONTENT_API_PREFIX);
 }
 
 /** True for an endpoint of Better Auth that the CMS opens. See `OPEN_AUTH_PATHS`. */

@@ -1,5 +1,5 @@
 import { A, S } from "@mobily/ts-belt";
-import { SIGN_IN_PATH, signInUrl } from "./paths";
+import { isContentApiPath, SIGN_IN_PATH, signInUrl } from "./paths";
 import { safeNext } from "./safe-next";
 
 export interface AccessRequest {
@@ -31,7 +31,8 @@ export function isCrossOriginWrite(request: AccessRequest): boolean {
 }
 
 /**
- * The rule of the sign-in guard. A write from another origin is refused. The sign-in page is
+ * The rule of the sign-in guard. A write from another origin is refused. An endpoint of the
+ * content API needs no session: it checks the API token of the site. The sign-in page is
  * open to a person who is not signed in, and it sends a signed-in person on to `next`. Each
  * other page needs a session: with no session, a page redirects to the sign-in page and an
  * endpoint answers 401.
@@ -39,6 +40,7 @@ export function isCrossOriginWrite(request: AccessRequest): boolean {
 export function decideAccess(request: AccessRequest): AccessDecision {
 	if (isCrossOriginWrite(request)) return { action: "forbidden" };
 	const { pathname, search, searchParams } = request.url;
+	if (isContentApiPath(pathname)) return { action: "continue" };
 	if (pathname === SIGN_IN_PATH) {
 		if (!request.signedIn) return { action: "continue" };
 		return { action: "redirect", location: safeNext(searchParams.get("next")) };

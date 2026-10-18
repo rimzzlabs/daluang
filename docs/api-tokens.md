@@ -8,8 +8,9 @@ They give each request to `handleTokensRequest`, with the `DB` binding of
 `apps/cms/src/lib/api-tokens/env.ts`.
 
 - A site reads the published notes with a token: `Authorization: Bearer dlg_…`. The
-  content API that reads the notes comes in a later step. `verifyApiToken` of
-  `packages/api-tokens/src/verify.ts` is its check.
+  content API that reads the notes is below `/api/content/`, and the sign-in guard needs
+  no session there (`docs/auth.md`). `verifyApiToken` of
+  `packages/api-tokens/src/verify.ts` is the check of the token.
 - **D1 keeps the SHA-256 hash of a token, never the token**
   (`apps/cms/migrations/0003_api_tokens.sql`). A token has 32 random bytes, so a fast hash
   is safe. The column `start` keeps the prefix and 4 characters, to tell the tokens apart.
