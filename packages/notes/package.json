@@ -11,10 +11,12 @@
 		"typecheck": "tsc"
 	},
 	"dependencies": {
+		"@daluang/auth": "workspace:*",
 		"@mobily/ts-belt": "catalog:",
 		"zod": "catalog:"
 	},
 	"devDependencies": {
+		"@cloudflare/workers-types": "catalog:",
 		"@daluang/tsconfig": "workspace:*",
 		"@types/node": "catalog:",
 		"typescript": "catalog:",

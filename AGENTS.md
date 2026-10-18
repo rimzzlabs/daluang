@@ -78,9 +78,9 @@ the `catalog` in `pnpm-workspace.yaml`.
   list, the rule of the sign-in guard, the session types, and the auth env schema. The
   sign-in button, the user menu, the route of `/api/auth/*`, and the guard middleware are
   in `apps/cms`. See `docs/auth.md`.
-- `packages/notes` (`@daluang/notes`): the model of a note. The language tag, the
-  languages setting, the slug, the core metadata, the extra fields and their definitions,
-  and the rule of a translation.
+- `packages/notes` (`@daluang/notes`): the model of a note and its store in D1. The
+  language tag, the languages setting, the slug, the core metadata, the extra fields and
+  their definitions, and the rule of a translation. See `docs/notes.md`.
 - `packages/api-tokens` (`@daluang/api-tokens`): the API tokens that let a site read the
   published notes. Make, list, revoke, and check a token, and the handler of the endpoint
   `/api/tokens`. The page and the route files of the tokens are in `apps/cms`. See
@@ -116,6 +116,7 @@ commit as the change.
 | `docs/infrastructure.md`   | The hosting, the Workers, the release, the deploy, and the checks of CI   |
 | `docs/auth.md`             | The sign-in with GitHub, the allow list, and the guard                    |
 | `docs/security-headers.md` | The headers of each response and the Content Security Policy              |
+| `docs/notes.md`            | The model of a note, and its store in D1                                  |
 | `docs/settings.md`         | The settings, their store in D1, and the onboarding                       |
 | `docs/api-tokens.md`       | The tokens that let a site read the published notes                       |
 | `docs/webhooks.md`         | The webhooks that tell a site to rebuild                                  |
