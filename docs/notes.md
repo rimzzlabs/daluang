@@ -211,6 +211,10 @@ It gets the languages setting and the field definitions as `DraftRules`.
 
 ## The page of a post
 
+- `EditPost` of `apps/cms/src/components/notes/edit-post.tsx` is the page of
+  `/posts/<id>`. It reads the post with `readNote`, and shows its status and
+  `EditPostForm`. A key of the ID resets the page for another post. A post that does not
+  exist shows its message, with a link back to the list.
 - `EditPostForm` of `apps/cms/src/components/notes/edit-post-form.tsx` is the form of a
   stored post. It starts with `noteFormOf`, and **Save** sends the draft to `saveNote`.
 - A save of a published post changes only its working copy. After a save,

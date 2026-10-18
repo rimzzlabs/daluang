@@ -1,6 +1,7 @@
 import { useRouter } from "@tanstack/react-router";
+import { EditPost } from "@/components/notes/edit-post";
 import { NewPost } from "@/components/notes/new-post";
-import { LaterPage } from "@/components/shell/later-page";
+import { pageParams } from "@/lib/shell/app-pages";
 import type { AppPageProps } from "./page-content";
 
 export function NewPostPage(props: AppPageProps) {
@@ -15,11 +16,16 @@ export function NewPostPage(props: AppPageProps) {
 	);
 }
 
-export function EditPostPage() {
+export function EditPostPage(props: AppPageProps) {
+	const id = pageParams("/posts/$id", props.pathname).id ?? "";
+	// A new ID is a new post: the key resets the state of the page.
 	return (
-		<LaterPage
-			title="Edit post"
-			description="Change a post. The change goes to your site at Publish changes."
+		<EditPost
+			key={id}
+			id={id}
+			settings={props.settings}
+			changes={props.changes}
+			linkKind={props.linkKind}
 		/>
 	);
 }
