@@ -1,4 +1,5 @@
-import { A } from "@mobily/ts-belt";
+import { A, pipe } from "@mobily/ts-belt";
+import type { NoteDraft } from "./note";
 
 /** The two fields that place a note among its translations. */
 export interface NoteKey {
@@ -35,4 +36,40 @@ export function isSlugTaken<T extends NoteKey>(
 		(other) =>
 			other.slug === query.note.slug && other.language === query.note.language,
 	);
+}
+
+export interface MissingQuery<T extends NoteKey> extends TranslationQuery<T> {
+	/** The languages of the CMS, in the order of the setting. */
+	languages: readonly string[];
+}
+
+/** The languages of the CMS that have no translation of a note yet, in the order of the setting. */
+export function missingLanguages<T extends NoteKey>(
+	query: MissingQuery<T>,
+): readonly string[] {
+	const translated = pipe(
+		translationsOf(query),
+		A.map((other) => other.language),
+	);
+	return A.reject(
+		query.languages,
+		(language) =>
+			language === query.note.language || A.includes(translated, language),
+	);
+}
+
+/**
+ * The draft of a new translation: a copy of the note in another language, with the same
+ * slug. The writer then translates its text.
+ */
+export function translationDraft(note: NoteDraft, language: string): NoteDraft {
+	return {
+		title: note.title,
+		slug: note.slug,
+		language,
+		description: note.description,
+		keywords: note.keywords,
+		fields: note.fields,
+		body: note.body,
+	};
 }
