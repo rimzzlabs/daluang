@@ -3,7 +3,7 @@
 A site reads the published posts of the CMS with an API token. Give each site its own
 token. Then you can revoke the token of one site, and the other sites keep their access.
 
-The API that reads the posts comes in a later release. You can make the tokens now.
+A site sends its token to the content API. See [Astro site](/guide/astro-site).
 
 ## Make a token
 
