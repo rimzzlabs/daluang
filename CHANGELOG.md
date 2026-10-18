@@ -1,5 +1,49 @@
 # Changelog
 
+## [0.4.0](https://github.com/rimzzlabs/daluang/compare/v0.3.0...v0.4.0) (2026-10-18)
+
+
+### Features
+
+* **cms:** add the form of a post ([#50](https://github.com/rimzzlabs/daluang/issues/50)) ([29b77b1](https://github.com/rimzzlabs/daluang/commit/29b77b15eb360577b7072d65f3c6ce94d8a6a7b7))
+* **cms:** add the inputs of the extra fields ([#49](https://github.com/rimzzlabs/daluang/issues/49)) ([0f39395](https://github.com/rimzzlabs/daluang/commit/0f393950cc362795492278a6749b18abc0270050))
+* **cms:** add the routes of the editor ([#46](https://github.com/rimzzlabs/daluang/issues/46)) ([fcab597](https://github.com/rimzzlabs/daluang/commit/fcab59763b51c23f7f62131b8bf980ecd67ba617))
+* **cms:** delete a post from the posts list ([#45](https://github.com/rimzzlabs/daluang/issues/45)) ([42cfda9](https://github.com/rimzzlabs/daluang/commit/42cfda9000af0f8bd243a0dd183aabf0bc6ff534))
+* **cms:** edit the body in codemirror ([#58](https://github.com/rimzzlabs/daluang/issues/58)) ([1e1c1bf](https://github.com/rimzzlabs/daluang/commit/1e1c1bfb1f61a61041caafee4d13995551ab1b53))
+* **cms:** filter the posts by language ([#43](https://github.com/rimzzlabs/daluang/issues/43)) ([a825d28](https://github.com/rimzzlabs/daluang/commit/a825d2806b08aedb76cee9e26efa0d04d833891e))
+* **cms:** give each page its path ([#53](https://github.com/rimzzlabs/daluang/issues/53)) ([1913378](https://github.com/rimzzlabs/daluang/commit/1913378dad9dc5fa558db600fdf6b858e4ed1ebf))
+* **cms:** link each post to its page ([#56](https://github.com/rimzzlabs/daluang/issues/56)) ([d4e4dc8](https://github.com/rimzzlabs/daluang/commit/d4e4dc8cc3f18be200df7fadb04854c9b9135028))
+* **cms:** list the posts on the posts page ([#42](https://github.com/rimzzlabs/daluang/issues/42)) ([a63ea4f](https://github.com/rimzzlabs/daluang/commit/a63ea4f43d80864a03012882e2d8cd898243e67f))
+* **cms:** mark a post from the posts list ([#44](https://github.com/rimzzlabs/daluang/issues/44)) ([b067f85](https://github.com/rimzzlabs/daluang/commit/b067f85f41029338b19531980cb78f43e44a01b5))
+* **cms:** open a dashboard at the root ([#64](https://github.com/rimzzlabs/daluang/issues/64)) ([bb898f3](https://github.com/rimzzlabs/daluang/commit/bb898f32f8d8d3bc404fd3e2bc18bcd525a447db))
+* **cms:** open the page of a post ([#55](https://github.com/rimzzlabs/daluang/issues/55)) ([74122af](https://github.com/rimzzlabs/daluang/commit/74122afd7b5efbf8d3db62e006c4bfc787c7d6d7))
+* **cms:** preview the body with comark ([#59](https://github.com/rimzzlabs/daluang/issues/59)) ([433ebbc](https://github.com/rimzzlabs/daluang/commit/433ebbc242da727c0a238a77664860d7578a35e8))
+* **cms:** publish the changes from the navbar ([#40](https://github.com/rimzzlabs/daluang/issues/40)) ([554dd63](https://github.com/rimzzlabs/daluang/commit/554dd6380be54c90b47297c50a4ce44918544a80))
+* **cms:** read and publish the changes from the browser ([#39](https://github.com/rimzzlabs/daluang/issues/39)) ([8bc1fcb](https://github.com/rimzzlabs/daluang/commit/8bc1fcbe7f139fb6f607cfd5d7f57b382ff102e1))
+* **cms:** save a stored post ([#54](https://github.com/rimzzlabs/daluang/issues/54)) ([63d71cc](https://github.com/rimzzlabs/daluang/commit/63d71cced7f8e804bf900f3ca94a8aa63d6652e6))
+* **cms:** translate a post ([#61](https://github.com/rimzzlabs/daluang/issues/61)) ([c67c19c](https://github.com/rimzzlabs/daluang/commit/c67c19c0ba5317e45540195a98f0bf23debce75f))
+* **cms:** write a new post ([#51](https://github.com/rimzzlabs/daluang/issues/51)) ([3e7a99e](https://github.com/rimzzlabs/daluang/commit/3e7a99e2281d80a850fc3ffb6fc61fb15a694bdf))
+* **notes:** draft a translation of a note ([#60](https://github.com/rimzzlabs/daluang/issues/60)) ([9218c35](https://github.com/rimzzlabs/daluang/commit/9218c35f09632ebaf98e7c36e0da3fb68f56034f))
+* **notes:** give each listed note its change ([#41](https://github.com/rimzzlabs/daluang/issues/41)) ([6d49daf](https://github.com/rimzzlabs/daluang/commit/6d49daff7450138a5b22628152cf564ab23bfb73))
+* **notes:** give the sites the published copy of each note ([#36](https://github.com/rimzzlabs/daluang/issues/36)) ([6db8787](https://github.com/rimzzlabs/daluang/commit/6db87879d3494711820e59f17721c7dad45ed2ca))
+* **notes:** keep a published copy and a mark of each note ([#35](https://github.com/rimzzlabs/daluang/issues/35)) ([9784a6e](https://github.com/rimzzlabs/daluang/commit/9784a6e335b7337bb2452d56e473ca74ff96ea79))
+* **notes:** list the changes of the notes and apply them in one batch ([#37](https://github.com/rimzzlabs/daluang/issues/37)) ([f06658e](https://github.com/rimzzlabs/daluang/commit/f06658e7ebffce2395436d6077cf0c0e0bb0b99f))
+* **notes:** open a stored post in the form ([#52](https://github.com/rimzzlabs/daluang/issues/52)) ([cab0577](https://github.com/rimzzlabs/daluang/commit/cab0577a549d7ed0c4c62b5aa3a60ef992bdca33))
+* **notes:** publish the changes of the notes in one request ([#38](https://github.com/rimzzlabs/daluang/issues/38)) ([48ef611](https://github.com/rimzzlabs/daluang/commit/48ef6116eb1e4be450999b38f6a0a4e38b35198a))
+* **notes:** turn the editor form into a draft ([#48](https://github.com/rimzzlabs/daluang/issues/48)) ([60764c1](https://github.com/rimzzlabs/daluang/commit/60764c1bad704835ce4cc476c1f13d1803735c6e))
+* **ui:** add the textarea primitive ([#47](https://github.com/rimzzlabs/daluang/issues/47)) ([8e39fc9](https://github.com/rimzzlabs/daluang/commit/8e39fc9cc1a30baefffb6bf5f5fbbc36d2af1620))
+
+
+### Bug Fixes
+
+* **cms:** describe the slug of a stored post ([#57](https://github.com/rimzzlabs/daluang/issues/57)) ([1042d74](https://github.com/rimzzlabs/daluang/commit/1042d7448c6bdddac058b4769956f66914e63204))
+
+
+### Documentation
+
+* change the sites only at publish changes ([#33](https://github.com/rimzzlabs/daluang/issues/33)) ([624f7b2](https://github.com/rimzzlabs/daluang/commit/624f7b2099b2769c4597a64b918c58d9d1d4db46))
+* **docs:** guide the writing of a post ([#62](https://github.com/rimzzlabs/daluang/issues/62)) ([66fdb30](https://github.com/rimzzlabs/daluang/commit/66fdb3083730072fe46819e11fb1449d60669e1a))
+
 ## [0.3.0](https://github.com/rimzzlabs/daluang/compare/v0.2.0...v0.3.0) (2026-10-18)
 
 
