@@ -136,6 +136,14 @@ It gets the languages setting and the field definitions as `DraftRules`.
   webhooks package. `notifySites` of `apps/cms/src/lib/notes/notify.ts` gives the event to
   `deliverEvent` of the webhooks package.
 
+## The list of the posts
+
+- `listedNotes` of `src/note-list.ts` gives each note of `GET /api/notes` with its change
+  of `GET /api/changes`, or `null` for a note with no change. The order of the notes
+  stays.
+- `dayLabel` of `src/date-label.ts` gives the day of an ISO time for a list, in English,
+  in the time zone of the browser: `Oct 18, 2026`.
+
 ## The Publish changes button
 
 - `PublishChanges` of `apps/cms/src/components/notes/publish-changes.tsx` is in the
