@@ -2,13 +2,23 @@ import { A, O, pipe } from "@mobily/ts-belt";
 import { z } from "zod";
 import { extraFieldsSchema } from "./extra-fields";
 import { NOTE_STATUSES, type NoteStatus } from "./metadata";
-import type { Note, NoteDraft, NoteSummary } from "./note";
+import {
+	NOTE_MARKS,
+	type Note,
+	type NoteDraft,
+	type NoteMark,
+	type NoteSummary,
+	publishedCopySchema,
+} from "./note";
 
 const COLUMNS =
-	'"id", "slug", "language", "title", "description", "keywords", "status", "publishedAt", "fields", "body", "createdAt", "updatedAt"';
+	'"id", "slug", "language", "title", "description", "keywords", "status", "publishedAt", "fields", "body", "createdAt", "updatedAt", "published", "mark"';
 
 const SUMMARY_COLUMNS =
-	'"id", "slug", "language", "title", "status", "publishedAt", "updatedAt"';
+	'"id", "slug", "language", "title", "status", "publishedAt", "updatedAt", "mark"';
+
+// The working copy of a note as the JSON of a published copy, in SQL.
+const WORKING_COPY_JSON = `json_object('title', "title", 'slug', "slug", 'language', "language", 'description', "description", 'keywords', json("keywords"), 'fields', json("fields"), 'body', "body", 'updatedAt', "updatedAt")`;
 
 /** A column of JSON text, read with the schema of its value. */
 function jsonColumn<T>(schema: z.ZodType<T>) {
@@ -26,6 +36,7 @@ const summaryRowSchema = z.object({
 	status: z.enum(NOTE_STATUSES),
 	publishedAt: z.string().nullable(),
 	updatedAt: z.string(),
+	mark: z.enum(NOTE_MARKS).nullable(),
 });
 
 const noteRowSchema: z.ZodType<Note> = summaryRowSchema.extend({
@@ -34,6 +45,7 @@ const noteRowSchema: z.ZodType<Note> = summaryRowSchema.extend({
 	fields: jsonColumn(extraFieldsSchema),
 	body: z.string(),
 	createdAt: z.string(),
+	published: z.null().or(jsonColumn(publishedCopySchema)),
 });
 
 function parseRows<T>(
@@ -112,10 +124,12 @@ export async function createNote(create: NoteCreate): Promise<Note> {
 		publishedAt: null,
 		createdAt: at,
 		updatedAt: at,
+		published: null,
+		mark: null,
 	};
 	await create.db
 		.prepare(
-			`insert into "note" (${COLUMNS}) values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)`,
+			`insert into "note" (${COLUMNS}) values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, null, null)`,
 		)
 		.bind(
 			note.id,
@@ -181,17 +195,39 @@ export interface NoteStatusChange {
  * Side effect: writes the status of a note to D1, so that each site reads it at its next
  * build.
  *
- * Publishes a note, or takes it back to a draft. The first publish sets `publishedAt`, and
- * a later publish keeps it. A draft keeps it also. False when no note has the ID.
+ * Publishes a note, or takes it back to a draft. A publish copies the working copy to the
+ * published copy, and a draft has no published copy. The first publish sets `publishedAt`,
+ * and a later publish keeps it. A draft keeps it also. Each one clears the mark. False when
+ * no note has the ID.
  */
 export async function setNoteStatus(
 	change: NoteStatusChange,
 ): Promise<boolean> {
 	const result = await change.db
 		.prepare(
-			`update "note" set "status" = ?2, "publishedAt" = case when ?2 = 'published' then coalesce("publishedAt", ?3) else "publishedAt" end where "id" = ?1`,
+			`update "note" set "status" = ?2, "publishedAt" = case when ?2 = 'published' then coalesce("publishedAt", ?3) else "publishedAt" end, "published" = case when ?2 = 'published' then ${WORKING_COPY_JSON} else null end, "mark" = null where "id" = ?1`,
 		)
 		.bind(change.id, change.status, change.now.toISOString())
+		.run();
+	return result.meta.changes > 0;
+}
+
+export interface NoteMarking {
+	db: D1Database;
+	id: string;
+	mark: NoteMark | null;
+}
+
+/**
+ * Side effect: writes the mark of a note to D1, so that Publish changes finds it.
+ *
+ * Marks a note to publish, to unpublish, or to delete, or clears its mark. False when no
+ * note has the ID.
+ */
+export async function markNote(marking: NoteMarking): Promise<boolean> {
+	const result = await marking.db
+		.prepare('update "note" set "mark" = ?2 where "id" = ?1')
+		.bind(marking.id, marking.mark)
 		.run();
 	return result.meta.changes > 0;
 }

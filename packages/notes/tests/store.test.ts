@@ -7,6 +7,7 @@ import {
 	findNote,
 	listNotes,
 	listPublishedNotes,
+	markNote,
 	setNoteStatus,
 	updateNote,
 } from "../src/store";
@@ -36,6 +37,8 @@ describe("createNote", () => {
 			publishedAt: null,
 			createdAt: FIRST.toISOString(),
 			updatedAt: FIRST.toISOString(),
+			published: null,
+			mark: null,
 		});
 		expect(await findNote({ db, id: note.id })).toEqual(note);
 	});
@@ -79,6 +82,7 @@ describe("listNotes", () => {
 				status: "draft",
 				publishedAt: null,
 				updatedAt: LATER.toISOString(),
+				mark: null,
 			},
 			{
 				id: first.id,
@@ -88,6 +92,7 @@ describe("listNotes", () => {
 				status: "draft",
 				publishedAt: null,
 				updatedAt: FIRST.toISOString(),
+				mark: null,
 			},
 		]);
 	});
@@ -172,6 +177,16 @@ describe("setNoteStatus", () => {
 			...note,
 			status: "published",
 			publishedAt: FIRST.toISOString(),
+			published: {
+				title: DRAFT.title,
+				slug: DRAFT.slug,
+				language: DRAFT.language,
+				description: DRAFT.description,
+				keywords: DRAFT.keywords,
+				fields: DRAFT.fields,
+				body: DRAFT.body,
+				updatedAt: FIRST.toISOString(),
+			},
 		});
 	});
 
@@ -198,5 +213,39 @@ describe("listPublishedNotes", () => {
 		const notes = await listPublishedNotes(db);
 		expect(A.map(notes, (note) => note.id)).toEqual([second.id, first.id]);
 		expect(notes[0]?.body).toBe(DRAFT.body);
+	});
+});
+
+describe("the published copy and the mark", () => {
+	it("keeps the published copy while the working copy changes", async () => {
+		const { db } = createFakeD1();
+		const note = await createNote({ db, draft: DRAFT, now: FIRST });
+		await setNoteStatus({ db, id: note.id, status: "published", now: FIRST });
+		const draft = { ...DRAFT, title: "More Jotai recipes" };
+		await updateNote({ db, id: note.id, draft, now: LATER });
+		const found = O.getExn(await findNote({ db, id: note.id }));
+		expect(found.title).toBe("More Jotai recipes");
+		expect(found.published?.title).toBe(DRAFT.title);
+	});
+
+	it("clears the published copy and the mark when a note goes back to a draft", async () => {
+		const { db } = createFakeD1();
+		const note = await createNote({ db, draft: DRAFT, now: FIRST });
+		await setNoteStatus({ db, id: note.id, status: "published", now: FIRST });
+		await markNote({ db, id: note.id, mark: "unpublish" });
+		await setNoteStatus({ db, id: note.id, status: "draft", now: LATER });
+		const found = O.getExn(await findNote({ db, id: note.id }));
+		expect(found.published).toBeNull();
+		expect(found.mark).toBeNull();
+	});
+
+	it("marks a note, clears the mark, and gives false for an unknown ID", async () => {
+		const { db } = createFakeD1();
+		const note = await createNote({ db, draft: DRAFT, now: FIRST });
+		expect(await markNote({ db, id: note.id, mark: "publish" })).toBe(true);
+		expect(O.getExn(await findNote({ db, id: note.id })).mark).toBe("publish");
+		await markNote({ db, id: note.id, mark: null });
+		expect(O.getExn(await findNote({ db, id: note.id })).mark).toBeNull();
+		expect(await markNote({ db, id: "nope", mark: "delete" })).toBe(false);
 	});
 });

@@ -50,6 +50,16 @@ describe("handleContentRequest", () => {
 					...published,
 					status: "published",
 					publishedAt: NOW.toISOString(),
+					published: {
+						title: DRAFT.title,
+						slug: DRAFT.slug,
+						language: DRAFT.language,
+						description: DRAFT.description,
+						keywords: DRAFT.keywords,
+						fields: DRAFT.fields,
+						body: DRAFT.body,
+						updatedAt: NOW.toISOString(),
+					},
 					document: {
 						frontmatter: {},
 						meta: {},
