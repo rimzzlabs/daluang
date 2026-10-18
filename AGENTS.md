@@ -196,6 +196,9 @@ before the first commit of a session.
 - Better Auth (`better-auth`) for sign-in with GitHub, with Cloudflare D1 as its database.
 - Cloudflare D1 is the database of the CMS. The binding is `DB`.
 - Comark for Markdown: `comark` parses, `@comark/react` and `@comark/html` render.
+- CodeMirror 6 for the Markdown editor of the CMS: `@codemirror/state`, `@codemirror/view`,
+  and `@codemirror/lang-markdown`. It keeps the text as the writer types it, also the
+  syntax of Comark, and it draws only the visible lines. It comes in with the editor.
 - Vocs 2 (with Waku) for the documentation site. `react-server-dom-webpack` has the exact
   version of `react`, for the RSC runtime of Waku.
 - Fonts: Inter (sans), Lora (serif), and JetBrains Mono (mono). `apps/cms` loads them
