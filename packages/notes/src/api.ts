@@ -1,11 +1,18 @@
 import { A, O, pipe, R, S } from "@mobily/ts-belt";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import type { z } from "zod";
 import type { FieldDefinition } from "./field-definitions";
 import type { LanguagesSetting } from "./languages-setting";
 import type { NoteDraft } from "./note";
 import { NOTE_BODY_MAX_BYTES, noteDraftSchema } from "./note-draft";
-import { createNote, listNotes } from "./store";
+import {
+	createNote,
+	deleteNote,
+	findNote,
+	listNotes,
+	type NoteRef,
+	updateNote,
+} from "./store";
 import { isSlugTaken } from "./translation";
 
 export const NOTES_API_PATH = "/api/notes";
@@ -41,6 +48,8 @@ export interface NoteSettings {
 export interface NotesRequest {
 	request: Request;
 	db: D1Database;
+	/** The ID of `/api/notes/<id>`, or `undefined` for `/api/notes`. */
+	id: string | undefined;
 	settings: NoteSettings;
 	/** The clock. The route file gives `() => new Date()`, and a test gives a fixed time. */
 	now: () => Date;
@@ -48,6 +57,10 @@ export interface NotesRequest {
 
 interface NoteWrite extends NotesRequest {
 	draft: NoteDraft;
+}
+
+interface NoteChange extends NoteWrite {
+	id: string;
 }
 
 function errorResponse(error: NotesApiError, status: number): Response {
@@ -94,21 +107,49 @@ async function readDraft(
 /**
  * Side effect: reads the notes of D1. Only D1 knows which slugs exist.
  *
- * True when a note has the slug of the draft in its language.
+ * True when a note other than `id` has the slug of the draft in its language.
  */
-async function isSlugInUse(write: NoteWrite): Promise<boolean> {
-	return isSlugTaken({ note: write.draft, notes: await listNotes(write.db) });
+async function isSlugTakenByOther(write: NoteWrite): Promise<boolean> {
+	const notes = await listNotes(write.db);
+	return isSlugTaken({
+		note: write.draft,
+		notes: A.reject(notes, (note) => note.id === write.id),
+	});
 }
 
 /** Side effect: writes a new note to D1, so that the draft stays after this request. */
 async function createFrom(write: NoteWrite): Promise<Response> {
-	if (await isSlugInUse(write)) return errorResponse("slug-taken", 409);
+	if (await isSlugTakenByOther(write)) return errorResponse("slug-taken", 409);
 	const note = await createNote({
 		db: write.db,
 		draft: write.draft,
 		now: write.now(),
 	});
 	return Response.json({ note }, { status: 201 });
+}
+
+/** Side effect: writes a draft over a note of D1, so that the change stays. */
+async function updateFrom(write: NoteChange): Promise<Response> {
+	if (await isSlugTakenByOther(write)) return errorResponse("slug-taken", 409);
+	const updated = await updateNote({
+		db: write.db,
+		id: write.id,
+		draft: write.draft,
+		now: write.now(),
+	});
+	if (!updated) return errorResponse("not-found", 404);
+	return getNote({ db: write.db, id: write.id });
+}
+
+/** Side effect: reads one note of D1. */
+async function getNote(ref: NoteRef): Promise<Response> {
+	return pipe(
+		await findNote(ref),
+		O.match(
+			(note) => Response.json({ note }),
+			() => errorResponse("not-found", 404),
+		),
+	);
 }
 
 /** Side effect: writes D1 when the draft of the request is valid. */
@@ -135,15 +176,32 @@ function notAllowed(allow: string): Promise<Response> {
  * CMS.
  *
  * The endpoint of the notes. `GET /api/notes` lists them, and `POST /api/notes` adds a
- * draft. The sign-in guard checks the session and the origin before this handler runs.
+ * draft. `GET`, `PATCH`, and `DELETE /api/notes/<id>` read, change, and delete one note.
+ * The sign-in guard checks the session and the origin before this handler runs.
  */
 export function handleNotesRequest(params: NotesRequest): Promise<Response> {
-	return match(params.request.method)
-		.with("GET", async () =>
-			Response.json({ notes: await listNotes(params.db) }),
+	const { request, db, id } = params;
+	return match({ method: request.method, id })
+		.with({ method: "GET", id: undefined }, async () =>
+			Response.json({ notes: await listNotes(db) }),
 		)
-		.with("POST", () =>
+		.with({ method: "POST", id: undefined }, () =>
 			writeDraft(params, (draft) => createFrom({ ...params, draft })),
 		)
-		.otherwise(() => notAllowed("GET, POST"));
+		.with({ id: undefined }, () => notAllowed("GET, POST"))
+		.with({ method: "GET", id: P.string }, (route) =>
+			getNote({ db, id: route.id }),
+		)
+		.with({ method: "PATCH", id: P.string }, (route) =>
+			writeDraft(params, (draft) =>
+				updateFrom({ ...params, id: route.id, draft }),
+			),
+		)
+		.with({ method: "DELETE", id: P.string }, async (route) => {
+			const deleted = await deleteNote({ db, id: route.id });
+			if (!deleted) return errorResponse("not-found", 404);
+			return new Response(null, { status: 204 });
+		})
+		.with({ id: P.string }, () => notAllowed("GET, PATCH, DELETE"))
+		.exhaustive();
 }

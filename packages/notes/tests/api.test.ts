@@ -35,10 +35,11 @@ function send(method: string, path: string, body: unknown) {
 	});
 }
 
-function handle(db: D1Database, req: Request) {
+function handle(db: D1Database, req: Request, id?: string) {
 	return handleNotesRequest({
 		request: req,
 		db,
+		id,
 		settings: SETTINGS,
 		now: () => NOW,
 	});
@@ -126,6 +127,7 @@ describe("POST /api/notes", () => {
 		const response = await handleNotesRequest({
 			request: send("POST", "", DRAFT),
 			db,
+			id: undefined,
 			settings: { languages: null, fields: null },
 			now: () => NOW,
 		});
@@ -136,11 +138,77 @@ describe("POST /api/notes", () => {
 	});
 });
 
-describe("other methods", () => {
-	it("answers 405 to a method that the endpoint does not have", async () => {
+describe("/api/notes/<id>", () => {
+	it("gives one note with its body", async () => {
 		const { db } = createFakeD1();
-		const response = await handle(db, request("", { method: "PUT" }));
+		const id = await created(db);
+		const response = await handle(db, request(`/${id}`), id);
+		await expect(response.json()).resolves.toEqual({
+			note: expect.objectContaining({ id, body: DRAFT.body }),
+		});
+	});
+
+	it("changes a note, and keeps its own slug", async () => {
+		const { db } = createFakeD1();
+		const id = await created(db);
+		const draft = { ...DRAFT, title: "More Jotai recipes" };
+		const response = await handle(db, send("PATCH", `/${id}`, draft), id);
+		expect(response.status).toBe(200);
+		await expect(response.json()).resolves.toEqual({
+			note: expect.objectContaining({ id, title: "More Jotai recipes" }),
+		});
+	});
+
+	it("refuses a change to the slug of another note", async () => {
+		const { db } = createFakeD1();
+		await created(db);
+		const other = await created(db, { ...DRAFT, slug: "jotai-state" });
+		const response = await handle(db, send("PATCH", `/${other}`, DRAFT), other);
+		expect(response.status).toBe(409);
+	});
+
+	it("refuses a change with a draft that is not valid", async () => {
+		const { db } = createFakeD1();
+		const id = await created(db);
+		const response = await handle(
+			db,
+			send("PATCH", `/${id}`, { ...DRAFT, title: "" }),
+			id,
+		);
+		expect(response.status).toBe(422);
+	});
+
+	it("deletes a note, then answers 404 for it", async () => {
+		const { db } = createFakeD1();
+		const id = await created(db);
+		const deleted = await handle(
+			db,
+			request(`/${id}`, { method: "DELETE" }),
+			id,
+		);
+		expect(deleted.status).toBe(204);
+		expect((await handle(db, request(`/${id}`), id)).status).toBe(404);
+		expect((await handle(db, send("PATCH", `/${id}`, DRAFT), id)).status).toBe(
+			404,
+		);
+		expect(
+			(await handle(db, request(`/${id}`, { method: "DELETE" }), id)).status,
+		).toBe(404);
+	});
+});
+
+describe("other methods", () => {
+	it.each([
+		["PUT", undefined, "GET, POST"],
+		["POST", "n1", "GET, PATCH, DELETE"],
+	])("answers 405 to %s", async (method, id, allow) => {
+		const { db } = createFakeD1();
+		const response = await handle(
+			db,
+			request(id ? `/${id}` : "", { method }),
+			id,
+		);
 		expect(response.status).toBe(405);
-		expect(response.headers.get("Allow")).toBe("GET, POST");
+		expect(response.headers.get("Allow")).toBe(allow);
 	});
 });

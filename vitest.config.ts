@@ -54,6 +54,7 @@ export default defineConfig({
 				// tests.
 				"apps/cms/src/lib/notes/env.ts",
 				"apps/cms/src/pages/api/notes.ts",
+				"apps/cms/src/pages/api/notes/\\[id\\].ts",
 				// The security layer of the CMS app is wiring. The middleware needs
 				// `astro:middleware` to load, and the integration is one call of the setup hook.
 				// They give each response to `withSecurityHeaders`, which has tests.

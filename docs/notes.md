@@ -51,13 +51,17 @@ It gets the languages setting and the field definitions as `DraftRules`.
 ## The endpoint
 
 - `GET /api/notes` gives the summary of each note. `POST /api/notes` adds a draft and
-  answers 201 with the note. `handleNotesRequest` of `src/api.ts` answers, and the route
-  file is `apps/cms/src/pages/api/notes.ts`.
+  answers 201 with the note.
+- `GET /api/notes/<id>` gives one note with its body. `PATCH /api/notes/<id>` writes a
+  draft over it and gives the changed note. `DELETE /api/notes/<id>` deletes it and
+  answers 204. An ID that no note has answers 404.
+- `handleNotesRequest` of `src/api.ts` answers. The route files are
+  `apps/cms/src/pages/api/notes.ts` and `apps/cms/src/pages/api/notes/[id].ts`.
 - The route file reads the stored settings with `readSettings` of the settings package,
   and gives them to the handler. The settings package imports the notes package, so the
   notes package cannot import the settings.
 - A draft that `noteDraftSchema` refuses answers 422, with the path and the message of
-  each issue. A slug that a note has in the same language answers 409 (`slug-taken`).
+  each issue. A slug that another note has in the same language answers 409 (`slug-taken`).
 - Before the onboarding saves the languages, a write answers 409 (`settings-needed`).
 - A body of another type answers 415, a body that is not JSON 400, and a body above
   `NOTE_BODY_MAX_BYTES` and 64 KB of metadata 413.
