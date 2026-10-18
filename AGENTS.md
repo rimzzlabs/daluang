@@ -24,6 +24,14 @@ The first site that reads the notes is rimzzlabs.com. Its source is in
   "note" until a rename of the domain.
 - **Markdown is the one content format.** The CMS does not keep HTML, MDX, or rich text.
   Comark ([comark.dev](https://comark.dev)) parses and renders the Markdown.
+- **A note can hold components in the syntax of Comark**, for example
+  `::callout{type="note"}`. The CMS keeps the text. Comark parses the text into a
+  document of plain data: a node is a string, or `[tag, props, ...children]`.
+- **Each site renders the document with its own components.** The content API gives the
+  text and the parsed document of a note. A site maps each tag to a component of its own,
+  for example an Astro component or a React island. The CMS does not decide how a
+  component looks on a site. The preview of the CMS renders each component with a simple
+  default, so the preview and a site can look different.
 - **A note is text only, for now.** Images and videos in a note come in a later step.
 - **A note has core metadata and extra fields.** The core fields are the same for each
   site: title, slug, language, description, keywords, status, publishedAt, and
