@@ -32,6 +32,9 @@ The first site that reads the notes is rimzzlabs.com. Its source is in
   for example an Astro component or a React island. The CMS does not decide how a
   component looks on a site. The preview of the CMS renders each component with a simple
   default, so the preview and a site can look different.
+- **D1 keeps the Markdown of a note**, in the row of the note, with its metadata and its
+  extra fields. One write saves all of them. A row of D1 can hold 2 MB, and the largest
+  post of rimzzlabs.com has 30 KB.
 - **A note is text only, for now.** Images and videos in a note come in a later step.
 - **A note has core metadata and extra fields.** The core fields are the same for each
   site: title, slug, language, description, keywords, status, publishedAt, and
@@ -47,12 +50,11 @@ The first site that reads the notes is rimzzlabs.com. Its source is in
 
 Do not decide these in code. Ask the person you work for.
 
-| Question                                        | Current direction                                                                                                                                                                                                                                |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| How does a static site get a changed note?      | The site stays static. A publish in the CMS starts a rebuild of the site. The site reads the notes at build time through a content loader package. `experimental.incrementalBuild` of Astro 7.2 skips each page whose `cacheKey` did not change. |
-| Where do the bytes of an image or a video go?   | R2 keeps the bytes. A Durable Object can keep the state of an upload. A Durable Object does not keep the bytes: one stored value has a size limit of 2 MB.                                                                                       |
-| Where does the CMS keep the Markdown of a note? | D1 is the database of the CMS, and it holds the auth tables. Where the Markdown of a note lives is not decided.                                                                                                                                  |
-| How does a translation link to its note?        | Two notes with the same slug and different languages are translations of each other, as on rimzzlabs.com: `notes/en/<slug>` and `notes/id/<slug>`.                                                                                               |
+| Question                                      | Current direction                                                                                                                                                                                                                                                                                                                                     |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| How does a static site get a changed note?    | The site stays static. A publish in the CMS starts a rebuild of the site. The site reads the notes at build time through a content loader. The docs site gives the loader as a file to copy into the site. A package comes when a second site needs it. `experimental.incrementalBuild` of Astro 7.2 skips each page whose `cacheKey` did not change. |
+| Where do the bytes of an image or a video go? | R2 keeps the bytes. A Durable Object can keep the state of an upload. A Durable Object does not keep the bytes: one stored value has a size limit of 2 MB.                                                                                                                                                                                            |
+| How does a translation link to its note?      | Two notes with the same slug and different languages are translations of each other, as on rimzzlabs.com: `notes/en/<slug>` and `notes/id/<slug>`.                                                                                                                                                                                                    |
 
 ## Repository layout
 
