@@ -4,3 +4,63 @@
  * Tailwind CSS scans the app, and the theme adds the UI package. A domain package has no
  * components, so it needs no `@source` line.
  */
+
+/*
+ * The preview of a post. Each site styles its own posts, so the CMS keeps one plain style
+ * that shows the structure of the Markdown.
+ */
+.post-preview {
+	@apply font-serif text-base/7 text-foreground;
+}
+
+.post-preview :where(h1, h2, h3, h4) {
+	@apply mt-8 mb-3 font-semibold tracking-tight first:mt-0;
+}
+
+.post-preview :where(h1) {
+	@apply text-3xl;
+}
+
+.post-preview :where(h2) {
+	@apply text-2xl;
+}
+
+.post-preview :where(h3) {
+	@apply text-xl;
+}
+
+.post-preview :where(p, ul, ol, blockquote, pre) {
+	@apply my-4 first:mt-0;
+}
+
+.post-preview :where(ul) {
+	@apply list-disc pl-6;
+}
+
+.post-preview :where(ol) {
+	@apply list-decimal pl-6;
+}
+
+.post-preview :where(a) {
+	@apply underline underline-offset-2;
+}
+
+.post-preview :where(blockquote) {
+	@apply border-l-2 border-border pl-4 text-muted-foreground;
+}
+
+.post-preview :where(code) {
+	@apply rounded bg-muted px-1 py-0.5 font-mono text-sm;
+}
+
+.post-preview :where(pre) {
+	@apply overflow-x-auto rounded-xl bg-muted p-4;
+}
+
+.post-preview :where(pre code) {
+	@apply bg-transparent p-0;
+}
+
+.post-preview :where(hr) {
+	@apply my-8 border-border;
+}

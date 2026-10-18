@@ -17,6 +17,7 @@
 	"dependencies": {
 		"@astrojs/cloudflare": "catalog:",
 		"@astrojs/react": "catalog:",
+		"@comark/react": "catalog:",
 		"@codemirror/commands": "catalog:",
 		"@codemirror/lang-markdown": "catalog:",
 		"@codemirror/language": "catalog:",
@@ -36,6 +37,7 @@
 		"better-auth": "catalog:",
 		"cn": "catalog:",
 		"astro": "catalog:",
+		"comark": "catalog:",
 		"react": "catalog:",
 		"react-dom": "catalog:",
 		"tailwindcss": "catalog:",

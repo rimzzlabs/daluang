@@ -90,6 +90,15 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - `PostForm` loads the editor with `lazy`. CodeMirror and the grammars of Markdown are
   about 500 KB, so only the pages of the editor load them. A skeleton shows until the
   editor loads.
+- **Write** and **Preview** above the body switch the view. The editor stays in the page
+  during the preview, so it keeps its text and its undo history.
+- `PostPreview` of `apps/cms/src/components/notes/post-preview.tsx` parses the body with
+  `parseMarkdown` of `comark`, and renders the document with `MarkdownDocument` of
+  `@comark/react`. A component of Comark shows with its tag, because each site maps the
+  tag to its own component. The class `post-preview` of the global CSS gives one plain
+  style. `PostForm` loads the preview with `lazy`.
+- `PostPreview` does not use `MarkdownClient` of `@comark/react`. That component makes a
+  promise during the render, and a new preview can wait for its promise without end.
 - `FormField` puts a label, a control, and its help text or its error together. An
   optional value has "(optional)" after its label.
 

@@ -197,6 +197,9 @@ catalogs:
     '@codemirror/view':
       specifier: ^6.43.14
       version: 6.43.14
+    '@comark/react':
+      specifier: ^0.7.0
+      version: 0.7.0
     '@commitlint/cli':
       specifier: ^21.2.3
       version: 21.2.3
@@ -376,6 +379,9 @@ importers:
       '@codemirror/view':
         specifier: 'catalog:'
         version: 6.43.14
+      '@comark/react':
+        specifier: 'catalog:'
+        version: 0.7.0(react@19.3.1)(shiki@4.5.0)
       '@daluang/api-tokens':
         specifier: workspace:*
         version: link:../../packages/api-tokens
@@ -418,6 +424,9 @@ importers:
       cn:
         specifier: 'catalog:'
         version: 0.4.0
+      comark:
+        specifier: 'catalog:'
+        version: 0.7.0(shiki@4.5.0)
       react:
         specifier: 'catalog:'
         version: 19.3.1
@@ -1329,6 +1338,21 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18 || ^19
       react-dom: ^16.8.0 || ^17 || ^18 || ^19
+
+  '@comark/react@0.7.0':
+    resolution: {integrity: sha512-Pn0PtRWGSl7HmJjzsE+1WIna+jgHj1yIf0PvG6vjrfev7cBX+GSbUCWCCWSehPhnETRiYgV+yOYfOOSPGUvfxg==}
+    peerDependencies:
+      beautiful-mermaid: ^1.1.3
+      katex: ^0.17.0
+      react: ^19.0.0
+      shiki: ^4.3.1
+    peerDependenciesMeta:
+      beautiful-mermaid:
+        optional: true
+      katex:
+        optional: true
+      shiki:
+        optional: true
 
   '@commitlint/cli@21.2.3':
     resolution: {integrity: sha512-5yOX6IRjcrIReCxpyAd04hgI/yhUMpVBJ/ouwFV0wk9yx5+fYRDWZWJ5h55Tbedgfol+5m2mU5nqzbB8g3v0vQ==}
@@ -7225,6 +7249,15 @@ snapshots:
       react-devtools-inline: 4.4.0
       react-dom: 19.3.1(react@19.3.1)
       react-is: 17.0.2
+
+  '@comark/react@0.7.0(react@19.3.1)(shiki@4.5.0)':
+    dependencies:
+      comark: 0.7.0(shiki@4.5.0)
+      react: 19.3.1
+    optionalDependencies:
+      shiki: 4.5.0
+    transitivePeerDependencies:
+      - rangi
 
   '@commitlint/cli@21.2.3(@types/node@24.19.2)(conventional-commits-parser@7.1.3)(typescript@6.0.3)':
     dependencies:

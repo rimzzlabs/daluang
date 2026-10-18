@@ -20,7 +20,7 @@ import {
 	ToggleGroupItem,
 } from "@daluang/ui/components/toggle-group";
 import { A } from "@mobily/ts-belt";
-import { lazy, Suspense, useId } from "react";
+import { lazy, Suspense, useId, useState } from "react";
 import { ExtraFieldInput } from "./extra-field-input";
 import { FormField } from "./form-field";
 
@@ -39,6 +39,17 @@ const MarkdownEditor = lazy(() =>
 	})),
 );
 
+// The parser of Comark loads with the first preview.
+const PostPreview = lazy(() =>
+	import("./post-preview").then((module) => ({ default: module.PostPreview })),
+);
+
+type BodyView = "write" | "preview";
+
+function isBodyView(value: unknown): value is BodyView {
+	return value === "write" || value === "preview";
+}
+
 export interface PostFormProps {
 	value: NoteForm;
 	errors: NoteFormErrors;
@@ -56,6 +67,7 @@ export interface PostFormProps {
 export function PostForm(props: PostFormProps) {
 	const id = useId();
 	const { value, errors } = props;
+	const [view, setView] = useState<BodyView>("write");
 
 	function change(patch: Partial<NoteForm>) {
 		props.onChange({ ...value, ...patch });
@@ -169,19 +181,40 @@ export function PostForm(props: PostFormProps) {
 			<FormField
 				id={`${id}-body`}
 				label="Body"
-				help="Markdown. A preview comes in a later step."
+				help="Markdown, with the components of Comark."
 				error={errors.body}
 			>
-				<Suspense fallback={<Skeleton className="h-80 w-full rounded-xl" />}>
-					<MarkdownEditor
-						id={`${id}-body`}
-						label="Body"
-						defaultValue={value.body}
-						invalid={errors.body !== undefined}
-						describedBy={`${id}-body-help`}
-						onChange={(body) => change({ body })}
-					/>
-				</Suspense>
+				<ToggleGroup
+					variant="outline"
+					size="sm"
+					aria-label="View of the body"
+					value={[view]}
+					onValueChange={(values) => {
+						const [next] = values;
+						if (isBodyView(next)) setView(next);
+					}}
+				>
+					<ToggleGroupItem value="write">Write</ToggleGroupItem>
+					<ToggleGroupItem value="preview">Preview</ToggleGroupItem>
+				</ToggleGroup>
+				{/* The editor stays in the page during the preview, so it keeps its undo history. */}
+				<div hidden={view === "preview"}>
+					<Suspense fallback={<Skeleton className="h-80 w-full rounded-xl" />}>
+						<MarkdownEditor
+							id={`${id}-body`}
+							label="Body"
+							defaultValue={value.body}
+							invalid={errors.body !== undefined}
+							describedBy={`${id}-body-help`}
+							onChange={(body) => change({ body })}
+						/>
+					</Suspense>
+				</div>
+				{view === "preview" ? (
+					<Suspense fallback={<Skeleton className="h-80 w-full rounded-xl" />}>
+						<PostPreview body={value.body} />
+					</Suspense>
+				) : null}
 			</FormField>
 		</FieldGroup>
 	);

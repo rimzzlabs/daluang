@@ -118,4 +118,17 @@ describe("PostForm", () => {
 		expect(screen.queryByRole("group", { name: "Language" })).toBeNull();
 		expect(screen.queryByRole("button", { name: "English" })).toBeNull();
 	});
+
+	it("shows the preview of the body, and keeps the editor", async () => {
+		render(<Harness />);
+		await typeInEditor("Body", "# Resep");
+		await userEvent.click(screen.getByRole("button", { name: "Preview" }));
+		expect(
+			await screen.findByRole("heading", { level: 1, name: "Resep" }),
+		).toBeTruthy();
+		await userEvent.click(screen.getByRole("button", { name: "Write" }));
+		expect(screen.getByRole("textbox", { name: "Body" }).textContent).toBe(
+			"# Resep",
+		);
+	});
 });
