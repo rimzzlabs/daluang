@@ -5,6 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NewPost } from "@/components/notes/new-post";
 import { settingsStore } from "../../settings";
+import { typeInEditor } from "./editor";
 
 const client = vi.hoisted(() => ({
 	addNote: vi.fn(),
@@ -32,7 +33,7 @@ describe("NewPost", () => {
 			screen.getByRole("textbox", { name: "Title" }),
 			"Jotai recipes",
 		);
-		await userEvent.type(screen.getByRole("textbox", { name: "Body" }), "# Hi");
+		await typeInEditor("Body", "# Hi");
 		await userEvent.click(screen.getByRole("button", { name: "Save draft" }));
 		expect(client.addNote).toHaveBeenCalledWith({
 			title: "Jotai recipes",

@@ -81,6 +81,15 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - The language choice shows only in a CMS with more than one language.
 - `ExtraFieldInput` shows one extra field: a checkbox for yes or no, and a text box for a
   text, a number, or a list. A number asks for a decimal keyboard on a phone.
+- `MarkdownEditor` of `apps/cms/src/components/notes/markdown-editor.tsx` is the input of
+  the body: CodeMirror 6 with the syntax of Markdown, the undo history, and the default
+  keys. CodeMirror keeps its own text. The editor reads the first text one time, and it
+  gives each change to the form.
+- The highlight style of the editor uses the tokens of the theme, so it follows the dark
+  theme.
+- `PostForm` loads the editor with `lazy`. CodeMirror and the grammars of Markdown are
+  about 500 KB, so only the pages of the editor load them. A skeleton shows until the
+  editor loads.
 - `FormField` puts a label, a control, and its help text or its error together. An
   optional value has "(optional)" after its label.
 

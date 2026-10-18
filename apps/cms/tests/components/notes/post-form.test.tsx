@@ -10,6 +10,7 @@ import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { describe, expect, it } from "vitest";
 import { PostForm } from "@/components/notes/post-form";
+import { typeInEditor } from "./editor";
 
 const FIELDS: readonly FieldDefinition[] = [
 	{ name: "featured", label: "Featured", type: "boolean", required: false },
@@ -63,10 +64,7 @@ describe("PostForm", () => {
 			"react",
 		);
 		await userEvent.click(screen.getByRole("checkbox", { name: "Featured" }));
-		await userEvent.type(
-			screen.getByRole("textbox", { name: "Body" }),
-			"# Hai",
-		);
+		await typeInEditor("Body", "# Hai");
 		expect(last).toEqual({
 			...emptyNoteForm(RULES),
 			title: "Resep Jotai",
