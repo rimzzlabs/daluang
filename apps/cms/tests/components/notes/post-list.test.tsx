@@ -24,6 +24,7 @@ describe("PostList", () => {
 					{ note: summary("a", "draft"), change: "publish" },
 					{ note: summary("b", "published"), change: null },
 				]}
+				linkKind="anchor"
 				onAction={vi.fn()}
 			/>,
 		);
@@ -34,5 +35,8 @@ describe("PostList", () => {
 			/^Post apost-a · Changed Oct 1[789], 2026idDraftTo publish$/,
 		);
 		expect(second?.textContent).toMatch(/Published$/);
+		expect(
+			screen.getByRole("link", { name: "Post a" }).getAttribute("href"),
+		).toBe("/posts/a");
 	});
 });

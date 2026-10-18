@@ -198,7 +198,11 @@ export function Posts(props: PostsProps) {
 									</EmptyHeader>
 								</Empty>
 							) : (
-								<PostList posts={shown} onAction={act} />
+								<PostList
+									posts={shown}
+									linkKind={props.linkKind}
+									onAction={act}
+								/>
 							)}
 						</>
 					);

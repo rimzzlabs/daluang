@@ -211,6 +211,8 @@ It gets the languages setting and the field definitions as `DraftRules`.
 
 ## The page of a post
 
+- The title of each post in the list is a link to `/posts/<id>`. `PostLink` is a router
+  link in the island, and a plain link in the HTML of the server.
 - `EditPost` of `apps/cms/src/components/notes/edit-post.tsx` is the page of
   `/posts/<id>`. It reads the post with `readNote`, and shows its status and
   `EditPostForm`. A key of the ID resets the page for another post. A post that does not
