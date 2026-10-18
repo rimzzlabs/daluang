@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.3.0](https://github.com/rimzzlabs/daluang/compare/v0.2.0...v0.3.0) (2026-10-18)
+
+
+### Features
+
+* **auth:** let a site read the content api with a token and no session ([#27](https://github.com/rimzzlabs/daluang/issues/27)) ([050a2cc](https://github.com/rimzzlabs/daluang/commit/050a2cc1a00ecd21ad6b7a1c4825e357e37fce27))
+* **cms:** call the endpoint of the notes from the browser ([#32](https://github.com/rimzzlabs/daluang/issues/32)) ([cd73d9a](https://github.com/rimzzlabs/daluang/commit/cd73d9aed9756fc234b2ae4cdbdbf23726afd46f))
+* **notes:** add the table of the notes to d1 ([#20](https://github.com/rimzzlabs/daluang/issues/20)) ([5144610](https://github.com/rimzzlabs/daluang/commit/5144610787dffe7d6f2c2287c97f704b46096b1b))
+* **notes:** check a post against the languages and the fields of the site ([#22](https://github.com/rimzzlabs/daluang/issues/22)) ([0a5cdc3](https://github.com/rimzzlabs/daluang/commit/0a5cdc3efcd8002d8877b6f1806d016f3ea84c2c))
+* **notes:** give a site the published notes with their comark document ([#28](https://github.com/rimzzlabs/daluang/issues/28)) ([fb6dcf2](https://github.com/rimzzlabs/daluang/commit/fb6dcf224141ffc0797c8cb8eec5bf91d7388364))
+* **notes:** list the notes and add a draft at /api/notes ([#23](https://github.com/rimzzlabs/daluang/issues/23)) ([a3ea5cd](https://github.com/rimzzlabs/daluang/commit/a3ea5cd2a83918b2d478b145846a6d3459e85b03))
+* **notes:** publish and unpublish a note, and tell each site to rebuild ([#26](https://github.com/rimzzlabs/daluang/issues/26)) ([3b09312](https://github.com/rimzzlabs/daluang/commit/3b093125b130a0dc04476905ce02cf237202dcd6))
+* **notes:** read and write the notes in d1 ([#21](https://github.com/rimzzlabs/daluang/issues/21)) ([1510456](https://github.com/rimzzlabs/daluang/commit/15104561be0b09dc2fcc6459c2720daa4754d492))
+* **notes:** read, change, and delete one note at /api/notes/&lt;id&gt; ([#24](https://github.com/rimzzlabs/daluang/issues/24)) ([c354543](https://github.com/rimzzlabs/daluang/commit/c3545439d58c292b1bf044fae38f46ce79c90905))
+* **webhooks:** deliver a publish event to each webhook ([#25](https://github.com/rimzzlabs/daluang/issues/25)) ([4e89cab](https://github.com/rimzzlabs/daluang/commit/4e89cab5acc1b1d73e63db744adef6c3bba3f62a))
+
+
+### Documentation
+
+* **docs:** read the published posts in an astro site ([#30](https://github.com/rimzzlabs/daluang/issues/30)) ([1d263a7](https://github.com/rimzzlabs/daluang/commit/1d263a7bf2fcfa9bd83cdd1239134f65cf947792))
+* keep the commit of a move buildable ([#31](https://github.com/rimzzlabs/daluang/issues/31)) ([7f9b751](https://github.com/rimzzlabs/daluang/commit/7f9b751db799847ac6d7b33b253a761430c24a12))
+* record the decisions of the posts step ([#18](https://github.com/rimzzlabs/daluang/issues/18)) ([3628253](https://github.com/rimzzlabs/daluang/commit/36282538a0042a4449dcaef2be2b95976dff0a81))
+* stop the background preview before a new one ([#29](https://github.com/rimzzlabs/daluang/issues/29)) ([2d0ad38](https://github.com/rimzzlabs/daluang/commit/2d0ad383e83cc252855c4a4b9c3dbb2a232ea40f))
+
 ## [0.2.0](https://github.com/rimzzlabs/daluang/compare/v0.1.0...v0.2.0) (2026-10-17)
 
 
