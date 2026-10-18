@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { NoteSummary } from "../src/note";
-import { listedNotes } from "../src/note-list";
+import { inLanguage, listedNotes } from "../src/note-list";
 
-function summary(id: string): NoteSummary {
+function summary(id: string, language = "en"): NoteSummary {
 	return {
 		id,
 		title: `Post ${id}`,
 		slug: `post-${id}`,
-		language: "en",
+		language,
 		status: "draft",
 		publishedAt: null,
 		updatedAt: "2026-10-18T12:00:00.000Z",
@@ -37,5 +37,21 @@ describe("listedNotes", () => {
 		expect(
 			listedNotes({ notes, changes: [{ note: { id: "z" }, change: "edit" }] }),
 		).toEqual([{ note: notes[0], change: null }]);
+	});
+});
+
+describe("inLanguage", () => {
+	const listed = [
+		{ note: summary("a", "en"), change: null },
+		{ note: summary("b", "id"), change: null },
+		{ note: summary("c", "en"), change: null },
+	];
+
+	it("keeps the notes of one language, in their order", () => {
+		expect(inLanguage(listed, "en")).toEqual([listed[0], listed[2]]);
+	});
+
+	it("keeps each note when no language is chosen", () => {
+		expect(inLanguage(listed, null)).toBe(listed);
 	});
 });

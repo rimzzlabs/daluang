@@ -150,6 +150,9 @@ It gets the languages setting and the field definitions as `DraftRules`.
   language, the status, and the change. `CHANGE_LABELS` and `STATUS_LABELS` of
   `apps/cms/src/lib/notes/change-labels.ts` name them, also in the dialog of Publish
   changes.
+- In a CMS with more than one language, `LanguageFilter` shows All and each language of
+  the settings. `inLanguage` of `src/note-list.ts` keeps the posts of the chosen
+  language.
 - The page writes the number of changes of the server to the store of the navbar.
 - With no post, the page shows `NoPosts`: the steps to set up a site.
 

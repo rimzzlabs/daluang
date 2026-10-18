@@ -1,5 +1,12 @@
-import type { ListedNote } from "@daluang/notes/note-list";
+import { inLanguage, type ListedNote } from "@daluang/notes/note-list";
 import { Button } from "@daluang/ui/components/button";
+import {
+	Empty,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyMedia,
+	EmptyTitle,
+} from "@daluang/ui/components/empty";
 import {
 	Page,
 	PageDescription,
@@ -9,15 +16,19 @@ import {
 } from "@daluang/ui/components/page";
 import { Skeleton } from "@daluang/ui/components/skeleton";
 import { A, R } from "@mobily/ts-belt";
+import { TranslateIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { match } from "ts-pattern";
 import type { NavLinkKind } from "@/components/shell/nav-link";
+import { useSettings } from "@/hooks/settings/use-settings";
 import type { ChangesStore } from "@/lib/notes/changes-store";
 import {
 	listPostsOfCms,
 	NOTES_ERROR_MESSAGES,
 	type NotesError,
 } from "@/lib/notes/client";
+import type { SettingsStore } from "@/lib/settings/settings-store";
+import { LanguageFilter } from "./language-filter";
 import { NoPosts } from "./no-posts";
 import { PostList } from "./post-list";
 
@@ -39,17 +50,21 @@ async function readPosts(changes: ChangesStore): Promise<ListState> {
 }
 
 export interface PostsProps {
+	settings: SettingsStore;
 	changes: ChangesStore;
 	linkKind: NavLinkKind;
 }
 
 /**
  * The posts page: each post with its language, its status, and the change that waits for
- * Publish changes. With no post, it shows the steps to set up a site.
+ * Publish changes. A CMS with more than one language can show the posts of one language.
+ * With no post, the page shows the steps to set up a site.
  */
 export function Posts(props: PostsProps) {
 	const { changes } = props;
+	const { languages } = useSettings(props.settings).languages;
 	const [list, setList] = useState<ListState>({ status: "loading" });
+	const [language, setLanguage] = useState<string | null>(null);
 
 	// The posts are on the server, an external system. The page reads them when it opens.
 	useEffect(() => {
@@ -100,7 +115,35 @@ export function Posts(props: PostsProps) {
 						</Button>
 					</div>
 				))
-				.with({ status: "ready" }, (ready) => <PostList posts={ready.posts} />)
+				.with({ status: "ready" }, (ready) => {
+					const shown = inLanguage(ready.posts, language);
+					return (
+						<>
+							{A.length(languages) > 1 ? (
+								<LanguageFilter
+									languages={languages}
+									value={language}
+									onChange={setLanguage}
+								/>
+							) : null}
+							{A.isEmpty(shown) ? (
+								<Empty className="flex-none border border-border p-8">
+									<EmptyHeader>
+										<EmptyMedia variant="icon">
+											<TranslateIcon />
+										</EmptyMedia>
+										<EmptyTitle>No posts in this language</EmptyTitle>
+										<EmptyDescription>
+											Choose All to see the posts of each language.
+										</EmptyDescription>
+									</EmptyHeader>
+								</Empty>
+							) : (
+								<PostList posts={shown} />
+							)}
+						</>
+					);
+				})
 				.exhaustive()}
 		</Page>
 	);

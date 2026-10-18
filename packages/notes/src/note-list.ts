@@ -33,3 +33,12 @@ export function listedNotes(params: ListedNotesParams): readonly ListedNote[] {
 		),
 	}));
 }
+
+/** The notes in one language, or each note when `language` is `null`. The order stays. */
+export function inLanguage(
+	listed: readonly ListedNote[],
+	language: string | null,
+): readonly ListedNote[] {
+	if (language === null) return listed;
+	return A.filter(listed, (item) => item.note.language === language);
+}
