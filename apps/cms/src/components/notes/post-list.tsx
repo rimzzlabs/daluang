@@ -1,5 +1,5 @@
 import { dayLabel } from "@daluang/notes/date-label";
-import type { ListedNote, NoteMarkAction } from "@daluang/notes/note-list";
+import type { ListedNote, NoteAction } from "@daluang/notes/note-list";
 import { Badge } from "@daluang/ui/components/badge";
 import { A } from "@mobily/ts-belt";
 import { CHANGE_LABELS, STATUS_LABELS } from "@/lib/notes/change-labels";
@@ -7,7 +7,7 @@ import { PostMenu } from "./post-menu";
 
 export interface PostListProps {
 	posts: readonly ListedNote[];
-	onAction: (post: ListedNote, action: NoteMarkAction) => void;
+	onAction: (post: ListedNote, action: NoteAction) => void;
 }
 
 /**

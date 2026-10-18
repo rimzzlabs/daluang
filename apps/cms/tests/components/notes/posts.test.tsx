@@ -11,6 +11,7 @@ import { SETTINGS, settingsStore } from "../../settings";
 const client = vi.hoisted(() => ({
 	listPostsOfCms: vi.fn(),
 	markNoteOfCms: vi.fn(),
+	deleteNoteOfCms: vi.fn(),
 	NOTES_ERROR_MESSAGES: { offline: "Offline." },
 }));
 
@@ -33,6 +34,7 @@ const POST = {
 beforeEach(() => {
 	client.listPostsOfCms.mockReset();
 	client.markNoteOfCms.mockReset();
+	client.deleteNoteOfCms.mockReset();
 });
 
 describe("Posts", () => {
@@ -178,5 +180,32 @@ describe("Posts", () => {
 		expect((await screen.findByRole("alert")).textContent).toBe("Offline.");
 		expect(screen.getByText("Jotai recipes")).toBeTruthy();
 		expect(client.listPostsOfCms).toHaveBeenCalledOnce();
+	});
+
+	it("deletes a post after a confirmation, then reads the list again", async () => {
+		client.listPostsOfCms
+			.mockResolvedValueOnce(R.Ok({ posts: [POST], count: 1 }))
+			.mockResolvedValueOnce(R.Ok({ posts: [], count: 0 }));
+		client.deleteNoteOfCms.mockResolvedValue(R.Ok(true));
+		render(
+			<Posts
+				settings={settingsStore()}
+				changes={createChangesStore(0)}
+				linkKind="anchor"
+			/>,
+		);
+		await userEvent.click(
+			await screen.findByRole("button", { name: "Actions of Jotai recipes" }),
+		);
+		await userEvent.click(
+			await screen.findByRole("menuitem", { name: "Delete" }),
+		);
+		await userEvent.click(
+			await screen.findByRole("button", { name: "Delete the post" }),
+		);
+		expect(client.deleteNoteOfCms).toHaveBeenCalledWith("n1");
+		expect(
+			await screen.findByRole("heading", { name: "No posts yet" }),
+		).toBeTruthy();
 	});
 });

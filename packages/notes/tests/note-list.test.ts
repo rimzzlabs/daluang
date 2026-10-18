@@ -61,19 +61,28 @@ describe("noteActions", () => {
 	const published = { ...summary("b"), status: "published" as const };
 
 	it("lets a draft wait to publish, and a published note wait to unpublish", () => {
-		expect(noteActions({ note: draft, change: null })).toEqual(["publish"]);
+		expect(noteActions({ note: draft, change: null })).toEqual([
+			"publish",
+			"delete",
+		]);
 		expect(noteActions({ note: published, change: null })).toEqual([
 			"unpublish",
+			"delete",
 		]);
 		expect(noteActions({ note: published, change: "edit" })).toEqual([
 			"unpublish",
+			"delete",
 		]);
 	});
 
 	it("lets a note with a mark cancel it", () => {
-		expect(noteActions({ note: draft, change: "publish" })).toEqual(["cancel"]);
+		expect(noteActions({ note: draft, change: "publish" })).toEqual([
+			"cancel",
+			"delete",
+		]);
 		expect(noteActions({ note: published, change: "unpublish" })).toEqual([
 			"cancel",
+			"delete",
 		]);
 		expect(noteActions({ note: published, change: "delete" })).toEqual([
 			"cancel",
