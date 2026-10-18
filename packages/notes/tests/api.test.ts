@@ -2,7 +2,8 @@ import { A } from "@mobily/ts-belt";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import type { NoteEvent, NoteSettings } from "../src/api";
-import { handleNotesRequest, NOTES_API_PATH } from "../src/api";
+import { handleNotesRequest } from "../src/api";
+import { NOTES_API_PATH } from "../src/note";
 import { NOTE_BODY_MAX_BYTES } from "../src/note-draft";
 import { createFakeD1 } from "./fake-d1";
 

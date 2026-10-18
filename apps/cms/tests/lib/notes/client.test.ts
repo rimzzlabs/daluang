@@ -1,0 +1,139 @@
+import { R } from "@mobily/ts-belt";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+	addNote,
+	changeNoteStatus,
+	deleteNoteOfCms,
+	listNotesOfCms,
+	readNote,
+	saveNote,
+} from "@/lib/notes/client";
+
+const NOTE = {
+	id: "n1",
+	title: "Jotai recipes",
+	slug: "jotai-recipes",
+	language: "en",
+	description: "",
+	keywords: [],
+	status: "draft",
+	publishedAt: null,
+	updatedAt: "2026-10-18T00:00:00.000Z",
+	createdAt: "2026-10-18T00:00:00.000Z",
+	fields: {},
+	body: "# Jotai",
+};
+
+const SUMMARY = {
+	id: "n1",
+	title: "Jotai recipes",
+	slug: "jotai-recipes",
+	language: "en",
+	status: "draft",
+	publishedAt: null,
+	updatedAt: "2026-10-18T00:00:00.000Z",
+};
+
+const DRAFT = {
+	title: "Jotai recipes",
+	slug: "jotai-recipes",
+	language: "en",
+	description: "",
+	keywords: [],
+	fields: {},
+	body: "# Jotai",
+};
+
+function answer(response: Response | Error) {
+	const fetch = vi.fn(() =>
+		response instanceof Error
+			? Promise.reject(response)
+			: Promise.resolve(response),
+	);
+	vi.stubGlobal("fetch", fetch);
+	return fetch;
+}
+
+afterEach(() => {
+	vi.unstubAllGlobals();
+});
+
+describe("the notes client", () => {
+	it("lists the posts", async () => {
+		answer(Response.json({ notes: [SUMMARY] }));
+		await expect(listNotesOfCms()).resolves.toEqual(R.Ok([SUMMARY]));
+	});
+
+	it("reads one post", async () => {
+		const fetch = answer(Response.json({ note: NOTE }));
+		await expect(readNote("n 1")).resolves.toEqual(R.Ok(NOTE));
+		expect(fetch).toHaveBeenCalledWith("/api/notes/n%201", undefined);
+	});
+
+	it("adds a post with its draft as JSON", async () => {
+		const fetch = answer(Response.json({ note: NOTE }, { status: 201 }));
+		await expect(addNote(DRAFT)).resolves.toEqual(R.Ok(NOTE));
+		expect(fetch).toHaveBeenCalledWith("/api/notes", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(DRAFT),
+		});
+	});
+
+	it("saves a post with PATCH", async () => {
+		const fetch = answer(Response.json({ note: NOTE }));
+		await expect(saveNote({ id: "n1", draft: DRAFT })).resolves.toEqual(
+			R.Ok(NOTE),
+		);
+		expect(fetch).toHaveBeenCalledWith(
+			"/api/notes/n1",
+			expect.objectContaining({ method: "PATCH" }),
+		);
+	});
+
+	it("deletes a post", async () => {
+		const fetch = answer(new Response(null, { status: 204 }));
+		await expect(deleteNoteOfCms("n1")).resolves.toEqual(R.Ok(true));
+		expect(fetch).toHaveBeenCalledWith("/api/notes/n1", { method: "DELETE" });
+	});
+
+	it("publishes and unpublishes a post", async () => {
+		const fetch = answer(
+			Response.json({ note: { ...NOTE, status: "published" } }),
+		);
+		await expect(
+			changeNoteStatus({ id: "n1", action: "publish" }),
+		).resolves.toEqual(R.Ok({ ...NOTE, status: "published" }));
+		expect(fetch).toHaveBeenCalledWith("/api/notes/n1/publish", {
+			method: "POST",
+		});
+	});
+
+	it.each([
+		[Response.json({ error: "slug-taken" }, { status: 409 }), "slug-taken"],
+		[
+			Response.json({ error: "settings-needed" }, { status: 409 }),
+			"settings-needed",
+		],
+		[Response.json({ error: "invalid-note" }, { status: 422 }), "invalid"],
+		[Response.json({ error: "not-found" }, { status: 404 }), "not-found"],
+		[Response.json({ error: "x" }, { status: 401 }), "signed-out"],
+		[new Response("down", { status: 503 }), "server"],
+		[new Response(null, { status: 409 }), "server"],
+	])("gives the code of a refused answer", async (response, code) => {
+		answer(response);
+		await expect(addNote(DRAFT)).resolves.toEqual(R.Error(code));
+	});
+
+	it("gives offline for a request that does not reach the server", async () => {
+		answer(new Error("network"));
+		await expect(listNotesOfCms()).resolves.toEqual(R.Error("offline"));
+	});
+
+	it("gives server for an answer that the schema refuses", async () => {
+		answer(Response.json({ notes: [{ id: 1 }] }));
+		await expect(listNotesOfCms()).resolves.toEqual(R.Error("server"));
+		answer(new Response("not json"));
+		await expect(readNote("n1")).resolves.toEqual(R.Error("server"));
+	});
+});

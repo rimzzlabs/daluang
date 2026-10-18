@@ -66,6 +66,18 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - A body of another type answers 415, a body that is not JSON 400, and a body above
   `NOTE_BODY_MAX_BYTES` and 64 KB of metadata 413.
 
+## The browser client
+
+- `apps/cms/src/lib/notes/client.ts` calls the endpoint from the browser: `listNotesOfCms`,
+  `readNote`, `addNote`, `saveNote`, `deleteNoteOfCms`, and `changeNoteStatus` for a
+  publish or an unpublish. Each one gives an `R.Result`, and it does not throw.
+- An error is a code of `NotesError`, and `NOTES_ERROR_MESSAGES` has the message of each
+  code. A 409 gives `slug-taken` or `settings-needed` from the `error` of its body.
+- The client reads each answer with `noteSchema` or `noteSummarySchema` of `src/note.ts`.
+  An answer that the schema refuses gives `server`.
+- The editor checks a draft with `noteDraftSchema` before a save, so the writer sees the
+  message of each field. A 422 of the server gives `invalid`.
+
 ## Publish
 
 - `POST /api/notes/<id>/publish` checks the note again with `noteDraftSchema` and the
