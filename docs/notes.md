@@ -105,22 +105,31 @@ It gets the languages setting and the field definitions as `DraftRules`.
 
 ## Publish
 
+- **The sites change only at Publish changes.** Publish, unpublish, and delete only mark
+  a note, and they send no event.
 - `POST /api/notes/<id>/publish` checks the note again with `noteDraftSchema` and the
   current settings, because a field can be required since its last save. A note that the
-  check refuses answers 422. The route file is
-  `apps/cms/src/pages/api/notes/[id]/[action].ts`.
-- A publish sets the status `published` with `setNoteStatus` of the store, and copies the
-  working copy to the published copy. The first publish sets `publishedAt`, and a later
-  publish keeps it. A publish of a published note sends its saved changes to the sites.
-- `POST /api/notes/<id>/unpublish` sets the status `draft` and keeps `publishedAt`. A
-  draft stays a draft, with no event.
-- Each publish and each unpublish tells each site to rebuild: the handler calls `notify`
-  with `publish` or `unpublish`. A `DELETE` of a published note sends `unpublish`.
+  check refuses answers 422. Then it marks a note that the sites do not have `publish`. A
+  published note loses its mark, so an unpublish or a delete that waits stops. The route
+  file is `apps/cms/src/pages/api/notes/[id]/[action].ts`.
+- `POST /api/notes/<id>/unpublish` marks a published note `unpublish`. For a note that the
+  sites do not have, it clears the mark, so a publish that waits stops.
+- `POST /api/notes/<id>/cancel` clears the mark of a note.
+- A `DELETE` of a published note marks it `delete` and answers 200 with the note. A
+  `DELETE` of a note that the sites do not have deletes it at once and answers 204.
+- A save of a published note changes only its working copy. `noteChange` then gives
+  `edit`, so the change waits for Publish changes also.
+
+## Publish changes
+
+- `GET /api/changes` gives `count` and each change. `POST /api/changes` is Publish
+  changes: `applyChanges` applies each change, and the handler calls `notify` with
+  `publish` one time when it applied a change. Ten changes then cost one rebuild of each
+  site. `handleChangesRequest` of `src/changes.ts` answers, and the route file is
+  `apps/cms/src/pages/api/changes.ts`.
 - The handler gets `notify` as a parameter, so the notes package does not import the
-  webhooks package. `notifySites` of `apps/cms/src/lib/notes/notify.ts` gives each event
-  to `deliverEvent` of the webhooks package.
-- A save of a published note sends no event. The next publish or the next build of a site
-  takes the change.
+  webhooks package. `notifySites` of `apps/cms/src/lib/notes/notify.ts` gives the event to
+  `deliverEvent` of the webhooks package.
 
 ## The content API
 

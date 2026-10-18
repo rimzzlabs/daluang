@@ -1,10 +1,10 @@
-import { A } from "@mobily/ts-belt";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import type { NoteEvent, NoteSettings } from "../src/api";
+import type { NoteSettings } from "../src/api";
 import { handleNotesRequest } from "../src/api";
 import { NOTES_API_PATH } from "../src/note";
 import { NOTE_BODY_MAX_BYTES } from "../src/note-draft";
+import { setNoteStatus } from "../src/store";
 import { createFakeD1 } from "./fake-d1";
 
 const ORIGIN = "http://localhost:4321";
@@ -37,10 +37,6 @@ function send(method: string, path: string, body: unknown) {
 	});
 }
 
-function noEvent(): Promise<void> {
-	return Promise.reject(new Error("This request sends no event."));
-}
-
 function handle(db: D1Database, req: Request, id?: string) {
 	return handleNotesRequest({
 		request: req,
@@ -49,7 +45,6 @@ function handle(db: D1Database, req: Request, id?: string) {
 		action: undefined,
 		settings: SETTINGS,
 		now: () => NOW,
-		notify: noEvent,
 	});
 }
 
@@ -139,7 +134,6 @@ describe("POST /api/notes", () => {
 			action: undefined,
 			settings: { languages: null, fields: null },
 			now: () => NOW,
-			notify: noEvent,
 		});
 		expect(response.status).toBe(409);
 		await expect(response.json()).resolves.toEqual({
@@ -231,10 +225,9 @@ interface ActionCall {
 	settings?: NoteSettings;
 }
 
-/** A request to `/api/notes/<id>/<action>`, and the events that it sent. */
-async function act(call: ActionCall) {
-	const notify = vi.fn((_event: NoteEvent) => Promise.resolve());
-	const response = await handleNotesRequest({
+/** A request to `/api/notes/<id>/<action>`. */
+function act(call: ActionCall) {
+	return handleNotesRequest({
 		request: request(`/${call.id}/${call.action}`, {
 			method: call.method ?? "POST",
 		}),
@@ -243,27 +236,40 @@ async function act(call: ActionCall) {
 		action: call.action,
 		settings: call.settings ?? SETTINGS,
 		now: () => NOW,
-		notify,
 	});
-	return { response, events: A.map(notify.mock.calls, (args) => args[0]) };
 }
 
-describe("/api/notes/<id>/publish and /unpublish", () => {
-	it("publishes a note, sets publishedAt, and tells each site", async () => {
+const noteSchema = z.object({
+	note: z.object({
+		status: z.string(),
+		mark: z.string().nullable(),
+		published: z.unknown().nullable(),
+	}),
+});
+
+async function noteOf(response: Response) {
+	return noteSchema.parse(await response.json()).note;
+}
+
+/** Publishes a note at once, as Publish changes does. */
+async function publishNow(db: D1Database, id: string) {
+	await setNoteStatus({ db, id, status: "published", now: NOW });
+}
+
+describe("/api/notes/<id>/publish, /unpublish, and /cancel", () => {
+	it("marks a draft to publish, and the sites do not get it yet", async () => {
 		const { db } = createFakeD1();
 		const id = await created(db);
-		const { response, events } = await act({ db, id, action: "publish" });
+		const response = await act({ db, id, action: "publish" });
 		expect(response.status).toBe(200);
-		await expect(response.json()).resolves.toEqual({
-			note: expect.objectContaining({
-				status: "published",
-				publishedAt: NOW.toISOString(),
-			}),
+		expect(await noteOf(response)).toEqual({
+			status: "draft",
+			mark: "publish",
+			published: null,
 		});
-		expect(events).toEqual(["publish"]);
 	});
 
-	it("refuses to publish a note that the current settings refuse", async () => {
+	it("refuses to mark a note that the current settings refuse", async () => {
 		const { db } = createFakeD1();
 		const id = await created(db);
 		const settings: NoteSettings = {
@@ -272,76 +278,86 @@ describe("/api/notes/<id>/publish and /unpublish", () => {
 				{ name: "series", label: "Series", type: "text", required: true },
 			],
 		};
-		const { response, events } = await act({
-			db,
-			id,
-			action: "publish",
-			settings,
-		});
+		const response = await act({ db, id, action: "publish", settings });
 		expect(response.status).toBe(422);
 		await expect(response.json()).resolves.toEqual({
 			error: "invalid-note",
 			issues: [{ path: "fields.series", message: "Give Series a value." }],
 		});
-		expect(events).toEqual([]);
 	});
 
 	it("refuses to publish before the onboarding saves the languages", async () => {
 		const { db } = createFakeD1();
 		const id = await created(db);
 		const settings = { languages: null, fields: null };
-		const { response } = await act({ db, id, action: "publish", settings });
-		expect(response.status).toBe(409);
+		expect((await act({ db, id, action: "publish", settings })).status).toBe(
+			409,
+		);
 	});
 
-	it("takes a published note back to a draft, and tells each site", async () => {
+	it("marks a published note to unpublish", async () => {
+		const { db } = createFakeD1();
+		const id = await created(db);
+		await publishNow(db, id);
+		const note = await noteOf(await act({ db, id, action: "unpublish" }));
+		expect(note.status).toBe("published");
+		expect(note.mark).toBe("unpublish");
+	});
+
+	it("stops a publish that waits, with an unpublish of a draft", async () => {
 		const { db } = createFakeD1();
 		const id = await created(db);
 		await act({ db, id, action: "publish" });
-		const { response, events } = await act({ db, id, action: "unpublish" });
-		await expect(response.json()).resolves.toEqual({
-			note: expect.objectContaining({
-				status: "draft",
-				publishedAt: NOW.toISOString(),
-			}),
-		});
-		expect(events).toEqual(["unpublish"]);
+		const note = await noteOf(await act({ db, id, action: "unpublish" }));
+		expect(note.mark).toBeNull();
 	});
 
-	it("sends no event to unpublish a draft", async () => {
+	it("keeps a published note on the sites with a publish, and stops its unpublish", async () => {
 		const { db } = createFakeD1();
 		const id = await created(db);
-		const { response, events } = await act({ db, id, action: "unpublish" });
-		expect(response.status).toBe(200);
-		expect(events).toEqual([]);
+		await publishNow(db, id);
+		await act({ db, id, action: "unpublish" });
+		const note = await noteOf(await act({ db, id, action: "publish" }));
+		expect(note.mark).toBeNull();
+		expect(note.status).toBe("published");
 	});
 
-	it("tells each site when a published note is deleted", async () => {
+	it("clears a mark with cancel", async () => {
 		const { db } = createFakeD1();
 		const id = await created(db);
 		await act({ db, id, action: "publish" });
-		const notify = vi.fn((_event: NoteEvent) => Promise.resolve());
-		const response = await handleNotesRequest({
-			request: request(`/${id}`, { method: "DELETE" }),
+		const note = await noteOf(await act({ db, id, action: "cancel" }));
+		expect(note.mark).toBeNull();
+	});
+
+	it("marks a published note to delete, and deletes a draft at once", async () => {
+		const { db } = createFakeD1();
+		const live = await created(db);
+		await publishNow(db, live);
+		const draft = await created(db, { ...DRAFT, slug: "a-draft" });
+		const marked = await handle(
 			db,
-			id,
-			action: undefined,
-			settings: SETTINGS,
-			now: () => NOW,
-			notify,
-		});
-		expect(response.status).toBe(204);
-		expect(notify.mock.calls).toEqual([["unpublish"]]);
+			request(`/${live}`, { method: "DELETE" }),
+			live,
+		);
+		expect(marked.status).toBe(200);
+		expect((await noteOf(marked)).mark).toBe("delete");
+		const deleted = await handle(
+			db,
+			request(`/${draft}`, { method: "DELETE" }),
+			draft,
+		);
+		expect(deleted.status).toBe(204);
 	});
 
 	it.each([
 		["publish", "nope", "POST", 404],
 		["unpublish", "nope", "POST", 404],
+		["cancel", "nope", "POST", 404],
 		["publish", "n1", "GET", 405],
 		["archive", "n1", "POST", 404],
 	])("answers %s of %s with %s by %i", async (action, id, method, status) => {
 		const { db } = createFakeD1();
-		const { response } = await act({ db, id, action, method });
-		expect(response.status).toBe(status);
+		expect((await act({ db, id, action, method })).status).toBe(status);
 	});
 });

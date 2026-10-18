@@ -3,9 +3,9 @@
 A webhook is a URL that the CMS sends a POST to. Use the deploy hook of your site, so the
 site can rebuild with the new posts.
 
-The CMS sends a webhook when you select **Send a test**. It also sends one when a post
-goes to the sites (`publish`) and when it leaves them (`unpublish`). The page to write and
-publish a post comes in a later release.
+The CMS sends a webhook when you select **Send a test**. It also sends one when you select
+**Publish changes**: one delivery for all the changes, so a site rebuilds one time. The
+page to write and publish a post comes in a later release.
 
 ## Add the deploy hook of a site on Cloudflare Pages
 
@@ -24,7 +24,7 @@ The CMS sends a POST with this JSON body:
 { "event": "test", "sentAt": "2026-10-17T03:00:00.000Z" }
 ```
 
-The event is `test`, `publish`, or `unpublish`. A deploy hook can ignore the body: a
+The event is `test` or `publish`. A deploy hook can ignore the body: a
 POST starts the rebuild.
 
 A delivery is **Delivered** when the answer has a status of 2xx. Each other answer, a

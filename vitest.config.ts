@@ -56,7 +56,9 @@ export default defineConfig({
 				"apps/cms/src/pages/api/notes.ts",
 				"apps/cms/src/pages/api/notes/\\[id\\].ts",
 				"apps/cms/src/pages/api/notes/\\[id\\]/\\[action\\].ts",
-				// It builds the `notify` of the route files from `deliverEvent`, which has tests.
+				"apps/cms/src/pages/api/changes.ts",
+				// It builds the `notify` of the route file of the changes from `deliverEvent`, which
+				// has tests.
 				"apps/cms/src/lib/notes/notify.ts",
 				// The content API: its route file, and the `authorize` that it builds from
 				// `verifyApiToken`. Both functions have tests.

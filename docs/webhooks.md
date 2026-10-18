@@ -9,8 +9,8 @@ They give each request to `handleWebhooksRequest`, with the `DB` binding of
 
 - A webhook is a URL that gets a POST with `{ "event", "sentAt" }`, for example the
   deploy hook of a site on Cloudflare Pages. The events are `test`, from the button "Send
-  a test", and `publish` and `unpublish`, for a post that goes to a site or leaves it.
-  The endpoint of the notes sends these two (`docs/notes.md`, "Publish").
+  a test", and `publish`, which Publish changes sends one time for all its changes
+  (`docs/notes.md`, "Publish changes"). The CMS does not send `unpublish` now.
 - `deliverEvent` of `src/deliver-event.ts` sends one event to each webhook at the same
   time, and records each delivery. A failed delivery does not stop the others.
   `listWebhookTargets` of the store gives it the ID and the full URL of each webhook.
