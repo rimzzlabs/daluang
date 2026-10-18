@@ -94,7 +94,7 @@ export function NewPost(props: NewPostProps) {
 				<div className="flex justify-end gap-2">
 					<NavLink
 						kind={props.linkKind}
-						href="/"
+						href="/posts"
 						className={buttonVariants({ variant: "outline" })}
 					>
 						Cancel

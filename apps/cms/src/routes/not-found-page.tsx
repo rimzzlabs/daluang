@@ -11,7 +11,7 @@ export function NotFoundPage() {
 				No page of Daluang has this address.
 			</p>
 			<Link
-				to="/"
+				to="/posts"
 				className={buttonVariants({ variant: "outline", className: "mt-6" })}
 			>
 				Go to the posts

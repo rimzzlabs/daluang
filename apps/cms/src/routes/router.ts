@@ -28,10 +28,16 @@ const rootRoute = createRootRouteWithContext<AppRouterContext>()({
 	notFoundComponent: NotFoundPage,
 });
 
-const notesRoute = createRoute({
+const dashboardRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/",
 	component: routePage("/"),
+});
+
+const postsRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/posts",
+	component: routePage("/posts"),
 });
 
 const newPostRoute = createRoute({
@@ -83,7 +89,8 @@ const fieldsRoute = createRoute({
 });
 
 export const routeTree = rootRoute.addChildren([
-	notesRoute,
+	dashboardRoute,
+	postsRoute,
 	newPostRoute,
 	postRoute,
 	mediaRoute,

@@ -23,6 +23,11 @@ export function canonicalSiteUrl(value: string): O.Option<string> {
 	);
 }
 
+/** The address of a site as a reader types it, with no scheme: `rimzzlabs.com`. */
+export function siteHost(url: string): string {
+	return pipe(url, S.replaceByRe(/^https?:\/\//, ""), S.replaceByRe(/\/$/, ""));
+}
+
 const siteUrlSchema = z
 	.string()
 	.trim()

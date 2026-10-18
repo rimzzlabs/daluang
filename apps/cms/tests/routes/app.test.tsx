@@ -27,11 +27,13 @@ describe("App", () => {
 	it("shows the page of the address in the frame of the app", async () => {
 		openAt("/");
 		expect(
-			await screen.findByRole("heading", { name: "No posts yet" }),
+			await screen.findByRole("heading", { name: "Set up your site" }),
 		).toBeTruthy();
 		expect(screen.getByRole("navigation", { name: "Main" })).toBeTruthy();
 		expect(
-			screen.getByRole("link", { name: "Posts" }).hasAttribute("data-active"),
+			screen
+				.getByRole("link", { name: "Dashboard" })
+				.hasAttribute("data-active"),
 		).toBe(true);
 	});
 
@@ -41,13 +43,13 @@ describe("App", () => {
 			"<div data-static-shell></div>",
 		);
 		openAt("/");
-		await screen.findByRole("heading", { name: "No posts yet" });
+		await screen.findByRole("heading", { name: "Set up your site" });
 		expect(document.querySelector("[data-static-shell]")).toBeNull();
 	});
 
 	it("changes only the page on a menu click, with the title of the new page", async () => {
 		openAt("/");
-		await screen.findByRole("heading", { name: "No posts yet" });
+		await screen.findByRole("heading", { name: "Set up your site" });
 		const sidebar = screen.getByRole("navigation", { name: "Main" });
 		await userEvent.click(screen.getByRole("link", { name: "Webhooks" }));
 		expect(
@@ -80,7 +82,7 @@ describe("App", () => {
 		localStorage.setItem("daluang:sidebar-state", "collapsed");
 		localStorage.setItem("daluang:sidebar-width", "20");
 		openAt("/");
-		await screen.findByRole("heading", { name: "No posts yet" });
+		await screen.findByRole("heading", { name: "Set up your site" });
 		expect(
 			document.querySelector("[data-slot=sidebar]")?.getAttribute("data-state"),
 		).toBe("collapsed");

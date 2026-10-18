@@ -232,8 +232,8 @@ It gets the languages setting and the field definitions as `DraftRules`.
   the number of the navbar change. A failed mark shows its message above the list.
 - The page writes the number of changes of the server to the store of the navbar.
 - The header of the page has **New post**, a link to `/posts/new`.
-- With no post, the page shows `NoPosts`: a link to a new post, and the steps to set up a
-  site.
+- The posts page is at `/posts`. With no post, it shows `NoPosts`: a link to a new post.
+  The steps to set up a site are on the dashboard (`docs/app-shell.md`).
 
 ## The New post page
 

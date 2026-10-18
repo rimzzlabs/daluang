@@ -21,9 +21,12 @@ function renderAt(pathname: string, store = settingsStore()) {
 describe("AppSidebar", () => {
 	it("marks the item of the current page", () => {
 		renderAt("/");
-		const notes = screen.getByRole("link", { name: "Posts" });
-		expect(notes.getAttribute("href")).toBe("/");
-		expect(notes.hasAttribute("data-active")).toBe(true);
+		const dashboard = screen.getByRole("link", { name: "Dashboard" });
+		expect(dashboard.getAttribute("href")).toBe("/");
+		expect(dashboard.hasAttribute("data-active")).toBe(true);
+		expect(
+			screen.getByRole("link", { name: "Posts" }).hasAttribute("data-active"),
+		).toBe(false);
 	});
 
 	it("marks no item on another page", () => {
