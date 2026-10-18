@@ -11,6 +11,7 @@ export const ALL: APIRoute = async (context) => {
 	return handleNotesRequest({
 		request: context.request,
 		db,
+		id: undefined,
 		settings: await readSettings(db),
 		now: () => new Date(),
 	});
