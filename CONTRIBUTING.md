@@ -92,7 +92,8 @@ chore/bump-astro
 - Make one change of behavior in each commit, with its test and its docs. Each commit
   must pass the checks.
 - If you move a file and change it, make two commits: the move, then the change. Git then
-  shows the change as a diff.
+  shows the change as a diff. The commit of the move also changes each import of the file,
+  so that the commit passes the checks.
 - Do not add a trailer, a session link, or a "generated with" line to a commit.
 
 lefthook runs the Git hooks. `pnpm install` installs them.
