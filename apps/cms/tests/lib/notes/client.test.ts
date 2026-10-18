@@ -2,11 +2,11 @@ import { R } from "@mobily/ts-belt";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
 	addNote,
-	changeNoteStatus,
 	deleteNoteOfCms,
 	listChangesOfCms,
 	listNotesOfCms,
 	listPostsOfCms,
+	markNoteOfCms,
 	publishChanges,
 	readNote,
 	saveNote,
@@ -103,16 +103,18 @@ describe("the notes client", () => {
 		expect(fetch).toHaveBeenCalledWith("/api/notes/n1", { method: "DELETE" });
 	});
 
-	it("publishes and unpublishes a post", async () => {
-		const fetch = answer(
-			Response.json({ note: { ...NOTE, status: "published" } }),
-		);
+	it("marks a post, or clears its mark", async () => {
+		const fetch = answer(Response.json({ note: { ...NOTE, mark: "publish" } }));
 		await expect(
-			changeNoteStatus({ id: "n1", action: "publish" }),
-		).resolves.toEqual(R.Ok({ ...NOTE, status: "published" }));
+			markNoteOfCms({ id: "n1", action: "publish" }),
+		).resolves.toEqual(R.Ok({ ...NOTE, mark: "publish" }));
 		expect(fetch).toHaveBeenCalledWith("/api/notes/n1/publish", {
 			method: "POST",
 		});
+		answer(Response.json({ note: NOTE }));
+		await expect(
+			markNoteOfCms({ id: "n1", action: "cancel" }),
+		).resolves.toEqual(R.Ok(NOTE));
 	});
 
 	it.each([

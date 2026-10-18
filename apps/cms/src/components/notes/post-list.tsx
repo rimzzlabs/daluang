@@ -1,16 +1,18 @@
 import { dayLabel } from "@daluang/notes/date-label";
-import type { ListedNote } from "@daluang/notes/note-list";
+import type { ListedNote, NoteMarkAction } from "@daluang/notes/note-list";
 import { Badge } from "@daluang/ui/components/badge";
 import { A } from "@mobily/ts-belt";
 import { CHANGE_LABELS, STATUS_LABELS } from "@/lib/notes/change-labels";
+import { PostMenu } from "./post-menu";
 
 export interface PostListProps {
 	posts: readonly ListedNote[];
+	onAction: (post: ListedNote, action: NoteMarkAction) => void;
 }
 
 /**
  * The posts: the title, the slug, and the day of the last change, then the language, the
- * status, and the change that waits for Publish changes.
+ * status, the change that waits for Publish changes, and the menu of the post.
  */
 export function PostList(props: PostListProps) {
 	return (
@@ -46,6 +48,10 @@ export function PostList(props: PostListProps) {
 								{CHANGE_LABELS[post.change]}
 							</Badge>
 						)}
+						<PostMenu
+							post={post}
+							onAction={(action) => props.onAction(post, action)}
+						/>
 					</div>
 				</li>
 			))}

@@ -94,8 +94,8 @@ It gets the languages setting and the field definitions as `DraftRules`.
 ## The browser client
 
 - `apps/cms/src/lib/notes/client.ts` calls the endpoint from the browser: `listNotesOfCms`,
-  `readNote`, `addNote`, `saveNote`, `deleteNoteOfCms`, and `changeNoteStatus` for a
-  publish or an unpublish. Each one gives an `R.Result`, and it does not throw.
+  `readNote`, `addNote`, `saveNote`, `deleteNoteOfCms`, and `markNoteOfCms` for a
+  publish, an unpublish, or a cancel. Each one gives an `R.Result`, and it does not throw.
 - An error is a code of `NotesError`, and `NOTES_ERROR_MESSAGES` has the message of each
   code. A 409 gives `slug-taken` or `settings-needed` from the `error` of its body.
 - The client reads each answer with `noteSchema` or `noteSummarySchema` of `src/note.ts`.
@@ -153,6 +153,11 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - In a CMS with more than one language, `LanguageFilter` shows All and each language of
   the settings. `inLanguage` of `src/note-list.ts` keeps the posts of the chosen
   language.
+- `PostMenu` is the menu of each post. `noteActions` of `src/note-list.ts` gives its
+  items: Publish for a draft, Unpublish for a published post, and Cancel the change for a
+  post with a mark. An edit has no mark, so its menu shows Unpublish.
+- An item calls `markNoteOfCms`. Then the page reads the list again, so the badges and
+  the number of the navbar change. A failed mark shows its message above the list.
 - The page writes the number of changes of the server to the store of the navbar.
 - With no post, the page shows `NoPosts`: the steps to set up a site.
 

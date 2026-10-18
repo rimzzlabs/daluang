@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { NoteSummary } from "../src/note";
-import { inLanguage, listedNotes } from "../src/note-list";
+import { inLanguage, listedNotes, noteActions } from "../src/note-list";
 
 function summary(id: string, language = "en"): NoteSummary {
 	return {
@@ -53,5 +53,30 @@ describe("inLanguage", () => {
 
 	it("keeps each note when no language is chosen", () => {
 		expect(inLanguage(listed, null)).toBe(listed);
+	});
+});
+
+describe("noteActions", () => {
+	const draft = summary("a");
+	const published = { ...summary("b"), status: "published" as const };
+
+	it("lets a draft wait to publish, and a published note wait to unpublish", () => {
+		expect(noteActions({ note: draft, change: null })).toEqual(["publish"]);
+		expect(noteActions({ note: published, change: null })).toEqual([
+			"unpublish",
+		]);
+		expect(noteActions({ note: published, change: "edit" })).toEqual([
+			"unpublish",
+		]);
+	});
+
+	it("lets a note with a mark cancel it", () => {
+		expect(noteActions({ note: draft, change: "publish" })).toEqual(["cancel"]);
+		expect(noteActions({ note: published, change: "unpublish" })).toEqual([
+			"cancel",
+		]);
+		expect(noteActions({ note: published, change: "delete" })).toEqual([
+			"cancel",
+		]);
 	});
 });

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { PostList } from "@/components/notes/post-list";
 
 function summary(id: string, status: "draft" | "published") {
@@ -24,6 +24,7 @@ describe("PostList", () => {
 					{ note: summary("a", "draft"), change: "publish" },
 					{ note: summary("b", "published"), change: null },
 				]}
+				onAction={vi.fn()}
 			/>,
 		);
 		const [first, second] = within(
