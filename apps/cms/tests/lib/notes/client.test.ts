@@ -4,7 +4,9 @@ import {
 	addNote,
 	changeNoteStatus,
 	deleteNoteOfCms,
+	listChangesOfCms,
 	listNotesOfCms,
+	publishChanges,
 	readNote,
 	saveNote,
 } from "@/lib/notes/client";
@@ -138,5 +140,30 @@ describe("the notes client", () => {
 		await expect(listNotesOfCms()).resolves.toEqual(R.Error("server"));
 		answer(new Response("not json"));
 		await expect(readNote("n1")).resolves.toEqual(R.Error("server"));
+	});
+});
+
+describe("the changes client", () => {
+	it("lists the changes and their number", async () => {
+		const fetch = answer(
+			Response.json({ count: 1, changes: [{ note: SUMMARY, change: "edit" }] }),
+		);
+		await expect(listChangesOfCms()).resolves.toEqual(
+			R.Ok({ count: 1, changes: [{ note: SUMMARY, change: "edit" }] }),
+		);
+		expect(fetch).toHaveBeenCalledWith("/api/changes", undefined);
+	});
+
+	it("publishes the changes, and gives their number", async () => {
+		const fetch = answer(Response.json({ applied: [{}, {}] }));
+		await expect(publishChanges()).resolves.toEqual(R.Ok(2));
+		expect(fetch).toHaveBeenCalledWith("/api/changes", { method: "POST" });
+	});
+
+	it("refuses a change of an unknown kind", async () => {
+		answer(
+			Response.json({ count: 1, changes: [{ note: SUMMARY, change: "x" }] }),
+		);
+		await expect(listChangesOfCms()).resolves.toEqual(R.Error("server"));
 	});
 });

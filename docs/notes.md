@@ -102,6 +102,11 @@ It gets the languages setting and the field definitions as `DraftRules`.
   An answer that the schema refuses gives `server`.
 - The editor checks a draft with `noteDraftSchema` before a save, so the writer sees the
   message of each field. A 422 of the server gives `invalid`.
+- `listChangesOfCms` gives the changes and their number, and `publishChanges` is Publish
+  changes: it gives the number of applied changes.
+- `createChangesStore` of `apps/cms/src/lib/notes/changes-store.ts` keeps the number of
+  changes in the browser, and `useChangeCount` of `apps/cms/src/hooks/notes/` renders a
+  component again after each write.
 
 ## Publish
 
