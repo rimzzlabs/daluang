@@ -1,9 +1,16 @@
 // @vitest-environment jsdom
+import { R } from "@mobily/ts-belt";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { App } from "@/routes/app";
 import { SETTINGS } from "../settings";
+
+// The posts page reads the posts from the server. Here the CMS has no post.
+vi.mock("@/lib/notes/client", async (importOriginal) => ({
+	...(await importOriginal<object>()),
+	listPostsOfCms: () => Promise.resolve(R.Ok({ posts: [], count: 0 })),
+}));
 
 const props = {
 	user: { name: "Rizki Citra", githubLogin: "rimzzlabs", image: null },

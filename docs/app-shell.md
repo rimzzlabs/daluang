@@ -22,7 +22,8 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
 - A menu link is `<Link>` of the router in the island, and `<a>` in the HTML of the server
   (`navLinkElement`).
 - `routes/` holds the router, the root of the island, and a component for each page.
-- **Each page gets `AppPageProps`**: `settings`, a `SettingsStore`, and `linkKind`.
+- **Each page gets `AppPageProps`**: `settings`, a `SettingsStore`, `changes`, a
+  `ChangesStore`, and `linkKind`.
   `PageContent` of the server gives `anchor`, and `routePage` of the router gives
   `router`. A route component is `routePage(path)`. A link in a page is `NavLink`.
 - The island makes one `SettingsStore` from the settings of the server, and puts it in the
@@ -30,7 +31,7 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
   renders each reader again. The sidebar shows the new site name at once.
 - The island also puts a `ChangesStore` in the router context, with the number of
   changes from the server. The Publish changes button of the navbar reads it and writes
-  it (`docs/notes.md`).
+  it, and the posts page writes it (`docs/notes.md`).
 
 ## Menus
 

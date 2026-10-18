@@ -143,6 +143,15 @@ It gets the languages setting and the field definitions as `DraftRules`.
   stays.
 - `dayLabel` of `src/date-label.ts` gives the day of an ISO time for a list, in English,
   in the time zone of the browser: `Oct 18, 2026`.
+- `Posts` of `apps/cms/src/components/notes/posts.tsx` is the posts page. It reads the
+  list with `listPostsOfCms` of the browser client, which calls `GET /api/notes` and
+  `GET /api/changes` together and joins them with `listedNotes`.
+- `PostList` shows each post: the title, the slug, the day of the last change, the
+  language, the status, and the change. `CHANGE_LABELS` and `STATUS_LABELS` of
+  `apps/cms/src/lib/notes/change-labels.ts` name them, also in the dialog of Publish
+  changes.
+- The page writes the number of changes of the server to the store of the navbar.
+- With no post, the page shows `NoPosts`: the steps to set up a site.
 
 ## The Publish changes button
 

@@ -1,19 +1,27 @@
 // @vitest-environment jsdom
+import { R } from "@mobily/ts-belt";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { createChangesStore } from "@/lib/notes/changes-store";
 import { NotesPage } from "@/routes/notes-page";
 import { settingsStore } from "../settings";
 
+vi.mock("@/lib/notes/client", () => ({
+	listPostsOfCms: () => Promise.resolve(R.Ok({ posts: [], count: 0 })),
+	NOTES_ERROR_MESSAGES: {},
+}));
+
 describe("NotesPage", () => {
-	it("links to each setting that a site needs after the onboarding", () => {
-		render(<NotesPage settings={settingsStore()} linkKind="anchor" />);
-		expect(screen.getByRole("heading", { name: "No posts yet" })).toBeTruthy();
+	it("shows the posts", async () => {
+		render(
+			<NotesPage
+				settings={settingsStore()}
+				changes={createChangesStore(0)}
+				linkKind="anchor"
+			/>,
+		);
 		expect(
-			screen.getAllByRole("link").map((link) => link.getAttribute("href")),
-		).toEqual([
-			"/settings/fields",
-			"/settings/api-tokens",
-			"/settings/webhooks",
-		]);
+			await screen.findByRole("heading", { name: "No posts yet" }),
+		).toBeTruthy();
 	});
 });

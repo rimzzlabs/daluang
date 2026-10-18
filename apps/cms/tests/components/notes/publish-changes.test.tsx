@@ -60,8 +60,8 @@ describe("PublishChanges", () => {
 			await screen.findByRole("heading", { name: "Publish 2 changes?" }),
 		).toBeTruthy();
 		expect(screen.getByText("Jotai recipes")).toBeTruthy();
-		expect(screen.getByText("New")).toBeTruthy();
-		expect(screen.getByText("Delete")).toBeTruthy();
+		expect(screen.getByText("To publish")).toBeTruthy();
+		expect(screen.getByText("To delete")).toBeTruthy();
 		await userEvent.click(
 			within(screen.getByRole("dialog")).getByRole("button", {
 				name: "Publish changes",
