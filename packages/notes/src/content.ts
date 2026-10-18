@@ -1,17 +1,36 @@
-import { A } from "@mobily/ts-belt";
+import { A, O, pipe } from "@mobily/ts-belt";
 import { type MarkdownDocument, parseMarkdown } from "comark";
-import type { Note } from "./note";
+import type { Note, PublishedCopy } from "./note";
 import { listPublishedNotes } from "./store";
 
 /** The path of the content API of the notes. A site reads it with an API token. */
 export const CONTENT_NOTES_API_PATH = "/api/content/notes";
 
 /**
- * A published note for a site: its metadata, its extra fields, its Markdown, and the
- * Comark document of the Markdown. A site renders the document with its own components.
+ * A published note for a site: its published copy (the metadata, the extra fields, and the
+ * Markdown), and the Comark document of the Markdown. A site renders the document with its
+ * own components. A site never gets the working copy or the mark.
  */
-export interface ContentNote extends Note {
+export interface ContentNote extends PublishedCopy {
+	id: string;
+	status: "published";
+	publishedAt: string | null;
+	createdAt: string;
 	document: MarkdownDocument;
+}
+
+type ContentCopy = Omit<ContentNote, "document">;
+
+/** The published copy of a note for a site, or `None` when the sites do not have it. */
+function contentCopy(note: Note): O.Option<ContentCopy> {
+	if (note.published === null) return O.None;
+	return O.Some({
+		...note.published,
+		id: note.id,
+		status: "published",
+		publishedAt: note.publishedAt,
+		createdAt: note.createdAt,
+	});
 }
 
 export interface ContentRequest {
@@ -24,8 +43,8 @@ export interface ContentRequest {
 	authorize: (authorization: string | null) => Promise<boolean>;
 }
 
-async function toContentNote(note: Note): Promise<ContentNote> {
-	return { ...note, document: await parseMarkdown(note.body) };
+async function withDocument(copy: ContentCopy): Promise<ContentNote> {
+	return { ...copy, document: await parseMarkdown(copy.body) };
 }
 
 /**
@@ -48,8 +67,11 @@ export async function handleContentRequest(
 			{ error: "unauthorized" },
 			{ status: 401, headers: { "WWW-Authenticate": "Bearer" } },
 		);
-	const notes = await listPublishedNotes(params.db);
+	const copies = pipe(
+		await listPublishedNotes(params.db),
+		A.filterMap(contentCopy),
+	);
 	return Response.json({
-		notes: await Promise.all(A.map(notes, toContentNote)),
+		notes: await Promise.all(A.map(copies, withDocument)),
 	});
 }

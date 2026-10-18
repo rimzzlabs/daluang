@@ -114,11 +114,14 @@ It gets the languages setting and the field definitions as `DraftRules`.
 
 ## The content API
 
-- `GET /api/content/notes` gives each published note to a site, the last published first.
-  A draft is not in the list. `handleContentRequest` of `src/content.ts` answers, and the
-  route file is `apps/cms/src/pages/api/content/notes.ts`.
-- Each note has its metadata, its extra fields, its Markdown as `body`, and its Comark
-  document as `document`. `parseMarkdown` of `comark` makes the document: a node is a
+- `GET /api/content/notes` gives the published copy of each note to a site, the last
+  published first. A note with no published copy is not in the list.
+  `handleContentRequest` of `src/content.ts` answers, and the route file is
+  `apps/cms/src/pages/api/content/notes.ts`.
+- **A site never gets the working copy or the mark.** An edit of a published note stays
+  in the working copy until the published copy changes.
+- Each note has its published metadata, its extra fields, its Markdown as `body`, its ID,
+  `status`, `publishedAt`, `createdAt`, and its Comark document as `document`. `parseMarkdown` of `comark` makes the document: a node is a
   string, or `[tag, props, ...children]`. A site maps each tag to a component of its own.
 - The CMS does not highlight code. A `pre` node keeps the language, and the rest of the
   first line of the fence stays as `meta`, so each site highlights with its own Shiki.
