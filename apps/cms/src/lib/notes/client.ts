@@ -1,4 +1,9 @@
 import {
+	CHANGES_API_PATH,
+	NOTE_CHANGES,
+	type NoteChange,
+} from "@daluang/notes/change";
+import {
 	NOTES_API_PATH,
 	type Note,
 	type NoteDraft,
@@ -152,4 +157,41 @@ export async function changeNoteStatus(
 		oneSchema,
 	);
 	return R.map(body, (one) => one.note);
+}
+
+/** A post with a change that waits for Publish changes. */
+export interface ChangeItem {
+	note: NoteSummary;
+	change: NoteChange;
+}
+
+/** The changes that wait for Publish changes, and their number. */
+export interface ChangeList {
+	count: number;
+	changes: readonly ChangeItem[];
+}
+
+const changeListSchema: z.ZodType<ChangeList> = z.object({
+	count: z.number(),
+	changes: z.array(
+		z.object({ note: noteSummarySchema, change: z.enum(NOTE_CHANGES) }),
+	),
+});
+
+const appliedSchema = z.object({ applied: z.array(z.unknown()) });
+
+/** The changes that wait for Publish changes. */
+export async function listChangesOfCms(): Promise<
+	R.Result<ChangeList, NotesError>
+> {
+	return readBody(await send(CHANGES_API_PATH), changeListSchema);
+}
+
+/** Publish changes: the CMS applies each change, and each site rebuilds one time. */
+export async function publishChanges(): Promise<R.Result<number, NotesError>> {
+	const body = await readBody(
+		await send(CHANGES_API_PATH, { method: "POST" }),
+		appliedSchema,
+	);
+	return R.map(body, (result) => result.applied.length);
 }

@@ -2,9 +2,6 @@ import { A } from "@mobily/ts-belt";
 import { match } from "ts-pattern";
 import { applyChanges, listChanges } from "./store";
 
-/** The path of the endpoint of the changes. */
-export const CHANGES_API_PATH = "/api/changes";
-
 /** The event that tells each site to rebuild after Publish changes. */
 export type ChangesEvent = "publish";
 

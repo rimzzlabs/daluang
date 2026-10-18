@@ -2,6 +2,9 @@ import { A, D, O, pipe } from "@mobily/ts-belt";
 import { match } from "ts-pattern";
 import type { Note, PublishedCopy } from "./note";
 
+/** The path of the endpoint of the changes. */
+export const CHANGES_API_PATH = "/api/changes";
+
 /** The changes that wait for Publish changes. */
 export const NOTE_CHANGES = ["publish", "edit", "unpublish", "delete"] as const;
 

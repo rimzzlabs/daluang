@@ -1,7 +1,8 @@
 import { O } from "@mobily/ts-belt";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import { CHANGES_API_PATH, handleChangesRequest } from "../src/changes";
+import { CHANGES_API_PATH } from "../src/change";
+import { handleChangesRequest } from "../src/changes";
 import type { NoteDraft } from "../src/note";
 import { createNote, findNote, markNote } from "../src/store";
 import { createFakeD1 } from "./fake-d1";
