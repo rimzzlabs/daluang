@@ -12,6 +12,21 @@ in `packages/notes`.
   keywords, the extra fields, and the body. The CMS sets the ID, the status, and the
   dates. A new note is a draft.
 
+## The draft
+
+`noteDraftSchema` of `src/note-draft.ts` checks a draft against the settings of the CMS.
+It gets the languages setting and the field definitions as `DraftRules`.
+
+- The title, the slug, the description, and the keywords have the rules of the core
+  metadata. A missing description is `""`, and missing keywords are `[]`.
+- The language must be on the languages setting of the CMS.
+- Each defined field must have the value type of its definition. A required field must
+  have a value, and a required text or list must not be empty.
+- An extra field that the settings do not define stays as it is, so a value from another
+  source is not lost.
+- The body has a limit of 1 MB (`NOTE_BODY_MAX_BYTES`): half of the size limit of a row of
+  D1.
+
 ## The store
 
 - **D1 keeps each note in one row of the table `note`**
