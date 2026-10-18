@@ -1,4 +1,4 @@
-import { A, O, pipe, S } from "@mobily/ts-belt";
+import { A, D, O, pipe, S } from "@mobily/ts-belt";
 
 /**
  * The pages of the app island. The router, the menus, and the Astro page read this list. A
@@ -43,6 +43,27 @@ export function matchesPage(pagePath: string, path: string): boolean {
 				? !S.isEmpty(segment)
 				: pageSegment === segment,
 		),
+	);
+}
+
+/**
+ * The value of each parameter of a page in a path: `{ id: "n1" }` for `/posts/$id` and
+ * `/posts/n1`. A path that does not match the page gives no value.
+ */
+export function pageParams(
+	pagePath: string,
+	path: string,
+): Record<string, string> {
+	const normalized = normalizePath(path);
+	if (!matchesPage(pagePath, normalized)) return {};
+	return pipe(
+		A.zip(S.split(pagePath, "/"), S.split(normalized, "/")),
+		A.filter(([pageSegment]) => S.startsWith(pageSegment, "$")),
+		A.map(
+			([pageSegment, segment]) =>
+				[S.sliceToEnd(pageSegment, 1), segment] as const,
+		),
+		D.fromPairs,
 	);
 }
 

@@ -12,6 +12,7 @@ describe("settings pages", () => {
 				settings={settingsStore()}
 				changes={createChangesStore(0)}
 				linkKind="anchor"
+				pathname="/settings/site"
 			/>,
 		);
 		expect(screen.getByRole("heading", { name: "Site" })).toBeTruthy();
@@ -27,6 +28,7 @@ describe("settings pages", () => {
 				settings={settingsStore()}
 				changes={createChangesStore(0)}
 				linkKind="anchor"
+				pathname="/settings/languages"
 			/>,
 		);
 		expect(screen.getByRole("heading", { name: "Languages" })).toBeTruthy();
@@ -43,6 +45,7 @@ describe("settings pages", () => {
 				settings={settingsStore()}
 				changes={createChangesStore(0)}
 				linkKind="anchor"
+				pathname="/settings/fields"
 			/>,
 		);
 		expect(screen.getByRole("heading", { name: "Fields" })).toBeTruthy();
