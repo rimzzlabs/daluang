@@ -2,6 +2,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { AppShell } from "@/components/shell/app-shell";
+import { createChangesStore } from "@/lib/notes/changes-store";
 import { settingsStore } from "../../settings";
 
 const user = { name: "Rizki Citra", githubLogin: "rimzzlabs", image: null };
@@ -17,6 +18,7 @@ describe("AppShell", () => {
 				defaultWidth={18}
 				linkKind="anchor"
 				settings={settingsStore()}
+				changes={createChangesStore(0)}
 			>
 				<p>No posts yet</p>
 			</AppShell>,
@@ -42,6 +44,7 @@ describe("AppShell", () => {
 				defaultWidth={16}
 				linkKind="anchor"
 				settings={settingsStore()}
+				changes={createChangesStore(0)}
 			/>,
 		);
 		expect(

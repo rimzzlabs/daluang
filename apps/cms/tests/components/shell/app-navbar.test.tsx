@@ -3,6 +3,7 @@ import { SidebarProvider } from "@daluang/ui/components/sidebar";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { AppNavbar } from "@/components/shell/app-navbar";
+import { createChangesStore } from "@/lib/notes/changes-store";
 
 describe("AppNavbar", () => {
 	it("shows the title of the page, the sidebar trigger, the theme, and the account", () => {
@@ -11,6 +12,7 @@ describe("AppNavbar", () => {
 				<AppNavbar
 					title="Posts"
 					user={{ name: "Rizki Citra", githubLogin: "rimzzlabs", image: null }}
+					changes={createChangesStore(0)}
 				/>
 			</SidebarProvider>,
 		);

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { createMemoryHistory } from "@tanstack/react-router";
 import { describe, expect, it } from "vitest";
+import { createChangesStore } from "@/lib/notes/changes-store";
 import { createAppRouter } from "@/routes/router";
 import { settingsStore } from "../settings";
 
@@ -8,6 +9,7 @@ const context = {
 	user: { name: "Rizki Citra", githubLogin: "rimzzlabs", image: null },
 	sidebar: { open: true, width: 16 },
 	settings: settingsStore(),
+	changes: createChangesStore(0),
 };
 
 describe("createAppRouter", () => {

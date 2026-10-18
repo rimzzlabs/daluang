@@ -2,6 +2,7 @@ import { SidebarInset, SidebarProvider } from "@daluang/ui/components/sidebar";
 import { TooltipProvider } from "@daluang/ui/components/tooltip";
 import type { ReactNode } from "react";
 import type { UserMenuProps } from "@/components/auth/user-menu";
+import type { ChangesStore } from "@/lib/notes/changes-store";
 import type { SettingsStore } from "@/lib/settings/settings-store";
 import { AppNavbar } from "./app-navbar";
 import { AppSidebar } from "./app-sidebar";
@@ -18,6 +19,7 @@ export interface AppShellProps {
 	/** `router` inside the app island, `anchor` in the HTML of the server. */
 	linkKind: NavLinkKind;
 	settings: SettingsStore;
+	changes: ChangesStore;
 	children?: ReactNode;
 }
 
@@ -39,7 +41,11 @@ export function AppShell(props: AppShellProps) {
 					settings={props.settings}
 				/>
 				<SidebarInset>
-					<AppNavbar title={props.title} user={props.user} />
+					<AppNavbar
+						title={props.title}
+						user={props.user}
+						changes={props.changes}
+					/>
 					<div className="flex flex-1 flex-col">{props.children}</div>
 				</SidebarInset>
 			</SidebarProvider>
