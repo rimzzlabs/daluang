@@ -2,11 +2,14 @@ import { dayLabel } from "@daluang/notes/date-label";
 import type { ListedNote, NoteAction } from "@daluang/notes/note-list";
 import { Badge } from "@daluang/ui/components/badge";
 import { A } from "@mobily/ts-belt";
+import type { NavLinkKind } from "@/components/shell/nav-link";
 import { CHANGE_LABELS, STATUS_LABELS } from "@/lib/notes/change-labels";
+import { PostLink } from "./post-link";
 import { PostMenu } from "./post-menu";
 
 export interface PostListProps {
 	posts: readonly ListedNote[];
+	linkKind: NavLinkKind;
 	onAction: (post: ListedNote, action: NoteAction) => void;
 }
 
@@ -26,7 +29,13 @@ export function PostList(props: PostListProps) {
 					className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:gap-4"
 				>
 					<div className="min-w-0 flex-1">
-						<p className="truncate text-sm font-medium">{post.note.title}</p>
+						<PostLink
+							kind={props.linkKind}
+							id={post.note.id}
+							className="block truncate text-sm font-medium hover:underline"
+						>
+							{post.note.title}
+						</PostLink>
 						<p className="truncate text-sm text-muted-foreground">
 							<code className="font-mono text-xs">{post.note.slug}</code> ·
 							Changed {dayLabel(post.note.updatedAt)}
