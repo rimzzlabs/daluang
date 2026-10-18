@@ -191,7 +191,19 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - An item calls `markNoteOfCms`. Then the page reads the list again, so the badges and
   the number of the navbar change. A failed mark shows its message above the list.
 - The page writes the number of changes of the server to the store of the navbar.
-- With no post, the page shows `NoPosts`: the steps to set up a site.
+- The header of the page has **New post**, a link to `/posts/new`.
+- With no post, the page shows `NoPosts`: a link to a new post, and the steps to set up a
+  site.
+
+## The New post page
+
+- `NewPost` of `apps/cms/src/components/notes/new-post.tsx` is the page of `/posts/new`.
+  It starts with `emptyNoteForm` and shows `PostForm`.
+- **Save draft** checks the form with `parseNoteForm`. An error shows at its input, and the
+  page sends nothing. A valid draft goes to `addNote`. Then the page opens the list of
+  posts.
+- A refused save, for example a slug that another post has, shows its message above the
+  buttons. **Cancel** goes back to the list.
 
 ## The Publish changes button
 

@@ -5,8 +5,9 @@ import type { ChangesStore } from "@/lib/notes/changes-store";
 import type { SettingsStore } from "@/lib/settings/settings-store";
 import { type AppPagePath, findAppPage } from "@/lib/shell/app-pages";
 import { ApiTokensPage } from "./api-tokens-page";
-import { EditPostPage, MediaPage, NewPostPage } from "./later-pages";
+import { MediaPage } from "./later-pages";
 import { NotesPage } from "./notes-page";
+import { EditPostPage, NewPostPage } from "./post-pages";
 import { FieldsPage, LanguagesPage, SitePage } from "./settings-pages";
 import { WebhooksPage } from "./webhooks-page";
 
