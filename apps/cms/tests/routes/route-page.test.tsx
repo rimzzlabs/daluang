@@ -2,6 +2,7 @@
 import { createMemoryHistory, RouterProvider } from "@tanstack/react-router";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { createChangesStore } from "@/lib/notes/changes-store";
 import { routePage } from "@/routes/route-page";
 import { createAppRouter } from "@/routes/router";
 import { settingsStore } from "../settings";
@@ -13,6 +14,7 @@ describe("routePage", () => {
 				user: { name: "Rizki Citra", githubLogin: "rimzzlabs", image: null },
 				sidebar: { open: true, width: 16 },
 				settings: settingsStore(),
+				changes: createChangesStore(0),
 			},
 			history: createMemoryHistory({ initialEntries: ["/settings/site"] }),
 		});

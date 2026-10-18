@@ -1,9 +1,12 @@
 ---
 import { SIGN_IN_PATH } from "@daluang/auth/paths";
+import { listChanges } from "@daluang/notes/store";
 import { ONBOARDING_PATH } from "@daluang/settings/onboarding";
 import { SIDEBAR_WIDTH_REM } from "@daluang/ui/lib/sidebar-preferences";
 import { AppShell } from "@/components/shell/app-shell";
 import BaseLayout from "@/layouts/base-layout.astro";
+import { createChangesStore } from "@/lib/notes/changes-store";
+import { readNotesEnv } from "@/lib/notes/env";
 import { createSettingsStore } from "@/lib/settings/settings-store";
 import { documentTitle, findAppPage, pageTitle } from "@/lib/shell/app-pages";
 import { App } from "@/routes/app";
@@ -27,6 +30,9 @@ const title = pageTitle(pathname);
 const menuUser = { name: user.name, githubLogin: user.githubLogin, image: user.image ?? null };
 // The HTML of the server reads the settings from a store, as the island does.
 const store = createSettingsStore(settings.settings);
+// The navbar shows the number of changes. The server gives it, so the button does not jump.
+const changeCount = (await listChanges(readNotesEnv().DB)).length;
+const changes = createChangesStore(changeCount);
 ---
 
 <BaseLayout title={documentTitle(title)}>
@@ -39,10 +45,16 @@ const store = createSettingsStore(settings.settings);
 			defaultWidth={SIDEBAR_WIDTH_REM.default}
 			linkKind="anchor"
 			settings={store}
+			changes={changes}
 		>
 			<PageContent pathname={pathname} settings={store} />
 		</AppShell>
 	</div>
 	<!-- `client:only`: the client router reads the browser history when it starts. -->
-	<App client:only="react" user={menuUser} settings={settings.settings} />
+	<App
+		client:only="react"
+		user={menuUser}
+		settings={settings.settings}
+		changeCount={changeCount}
+	/>
 </BaseLayout>

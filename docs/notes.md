@@ -136,6 +136,18 @@ It gets the languages setting and the field definitions as `DraftRules`.
   webhooks package. `notifySites` of `apps/cms/src/lib/notes/notify.ts` gives the event to
   `deliverEvent` of the webhooks package.
 
+## The Publish changes button
+
+- `PublishChanges` of `apps/cms/src/components/notes/publish-changes.tsx` is in the
+  navbar of each page. It shows the number of changes. With no change, it shows nothing.
+- `[...path].astro` counts the changes with `listChanges` before the render. The server
+  HTML and the island then show the same number, with no request from the browser.
+- A click opens a dialog with the list of `listChangesOfCms`: the title, the language, and
+  the change of each note. The list also writes the new number to the store.
+- **Publish changes** in the dialog calls `publishChanges`. If it succeeds, the store gets
+  0, so the button goes away. If it fails, the dialog stays open with the message, and
+  the number stays.
+
 ## The content API
 
 - `GET /api/content/notes` gives the published copy of each note to a site, the last

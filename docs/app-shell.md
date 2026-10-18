@@ -28,6 +28,9 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
 - The island makes one `SettingsStore` from the settings of the server, and puts it in the
   router context. A settings page writes the saved settings to it, and `useSettings`
   renders each reader again. The sidebar shows the new site name at once.
+- The island also puts a `ChangesStore` in the router context, with the number of
+  changes from the server. The Publish changes button of the navbar reads it and writes
+  it (`docs/notes.md`).
 
 ## Menus
 

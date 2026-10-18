@@ -8,6 +8,7 @@ import { SETTINGS } from "../settings";
 const props = {
 	user: { name: "Rizki Citra", githubLogin: "rimzzlabs", image: null },
 	settings: SETTINGS,
+	changeCount: 0,
 };
 
 function openAt(path: string) {

@@ -5,6 +5,7 @@ import {
 	type RouterHistory,
 } from "@tanstack/react-router";
 import type { UserMenuProps } from "@/components/auth/user-menu";
+import type { ChangesStore } from "@/lib/notes/changes-store";
 import type { SettingsStore } from "@/lib/settings/settings-store";
 import { AppRoot } from "./app-root";
 import { NotFoundPage } from "./not-found-page";
@@ -17,6 +18,8 @@ export interface AppRouterContext {
 	sidebar: { open: boolean; width: number };
 	/** The settings of the CMS. A settings page writes to it after a save. */
 	settings: SettingsStore;
+	/** The number of changes that wait for Publish changes. */
+	changes: ChangesStore;
 }
 
 // The root route is the frame: the sidebar and the navbar stay while the page changes.
