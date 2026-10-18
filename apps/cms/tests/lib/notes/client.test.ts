@@ -6,6 +6,7 @@ import {
 	deleteNoteOfCms,
 	listChangesOfCms,
 	listNotesOfCms,
+	listPostsOfCms,
 	publishChanges,
 	readNote,
 	saveNote,
@@ -165,5 +166,31 @@ describe("the changes client", () => {
 			Response.json({ count: 1, changes: [{ note: SUMMARY, change: "x" }] }),
 		);
 		await expect(listChangesOfCms()).resolves.toEqual(R.Error("server"));
+	});
+});
+
+describe("the posts client", () => {
+	it("lists the posts, each with its change", async () => {
+		vi.stubGlobal(
+			"fetch",
+			vi.fn((path: string) =>
+				Promise.resolve(
+					path === "/api/changes"
+						? Response.json({
+								count: 1,
+								changes: [{ note: SUMMARY, change: "edit" }],
+							})
+						: Response.json({ notes: [SUMMARY] }),
+				),
+			),
+		);
+		await expect(listPostsOfCms()).resolves.toEqual(
+			R.Ok({ posts: [{ note: SUMMARY, change: "edit" }], count: 1 }),
+		);
+	});
+
+	it("fails when a list fails", async () => {
+		answer(new Response(null, { status: 401 }));
+		await expect(listPostsOfCms()).resolves.toEqual(R.Error("signed-out"));
 	});
 });

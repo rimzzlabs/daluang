@@ -11,6 +11,7 @@ import {
 	noteSchema,
 	noteSummarySchema,
 } from "@daluang/notes/note";
+import { type ListedNote, listedNotes } from "@daluang/notes/note-list";
 import { R } from "@mobily/ts-belt";
 import { match, P } from "ts-pattern";
 import { z } from "zod";
@@ -194,4 +195,26 @@ export async function publishChanges(): Promise<R.Result<number, NotesError>> {
 		appliedSchema,
 	);
 	return R.map(body, (result) => result.applied.length);
+}
+
+/** The posts of the list, each with its change, and the number of changes. */
+export interface ListedPosts {
+	posts: readonly ListedNote[];
+	count: number;
+}
+
+/** The posts, the last changed first, each with the change that waits for Publish changes. */
+export async function listPostsOfCms(): Promise<
+	R.Result<ListedPosts, NotesError>
+> {
+	const [notes, waiting] = await Promise.all([
+		listNotesOfCms(),
+		listChangesOfCms(),
+	]);
+	return R.flatMap(notes, (list) =>
+		R.map(waiting, (changes) => ({
+			posts: listedNotes({ notes: list, changes: changes.changes }),
+			count: changes.count,
+		})),
+	);
 }

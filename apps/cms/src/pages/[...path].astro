@@ -47,7 +47,7 @@ const changes = createChangesStore(changeCount);
 			settings={store}
 			changes={changes}
 		>
-			<PageContent pathname={pathname} settings={store} />
+			<PageContent pathname={pathname} settings={store} changes={changes} />
 		</AppShell>
 	</div>
 	<!-- `client:only`: the client router reads the browser history when it starts. -->

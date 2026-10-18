@@ -1,4 +1,3 @@
-import type { NoteChange } from "@daluang/notes/change";
 import { Badge } from "@daluang/ui/components/badge";
 import { Button } from "@daluang/ui/components/button";
 import {
@@ -17,6 +16,7 @@ import { UploadSimpleIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { useChangeCount } from "@/hooks/notes/use-change-count";
+import { CHANGE_LABELS } from "@/lib/notes/change-labels";
 import type { ChangesStore } from "@/lib/notes/changes-store";
 import {
 	type ChangeItem,
@@ -28,13 +28,6 @@ import {
 export interface PublishChangesProps {
 	changes: ChangesStore;
 }
-
-const CHANGE_LABELS: Record<NoteChange, string> = {
-	publish: "New",
-	edit: "Edited",
-	unpublish: "Unpublish",
-	delete: "Delete",
-};
 
 type DialogState =
 	| { status: "loading" }

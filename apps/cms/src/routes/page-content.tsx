@@ -1,6 +1,7 @@
 import { O } from "@mobily/ts-belt";
 import type { ReactElement } from "react";
 import type { NavLinkKind } from "@/components/shell/nav-link";
+import type { ChangesStore } from "@/lib/notes/changes-store";
 import type { SettingsStore } from "@/lib/settings/settings-store";
 import { type AppPagePath, findAppPage } from "@/lib/shell/app-pages";
 import { ApiTokensPage } from "./api-tokens-page";
@@ -12,6 +13,8 @@ import { WebhooksPage } from "./webhooks-page";
 /** What each page gets: the server and the router give the same values. */
 export interface AppPageProps {
 	settings: SettingsStore;
+	/** The number of changes that wait for Publish changes. */
+	changes: ChangesStore;
 	/** `anchor` in the HTML of the server, `router` in the app island. */
 	linkKind: NavLinkKind;
 }
@@ -30,7 +33,8 @@ export const PAGE_COMPONENTS: Record<
 	"/settings/fields": FieldsPage,
 };
 
-export interface PageContentProps extends Pick<AppPageProps, "settings"> {
+export interface PageContentProps
+	extends Pick<AppPageProps, "settings" | "changes"> {
 	pathname: string;
 }
 
@@ -42,5 +46,7 @@ export function PageContent(props: PageContentProps) {
 	const page = findAppPage(props.pathname);
 	if (O.isNone(page)) return null;
 	const Page = PAGE_COMPONENTS[page.path];
-	return <Page settings={props.settings} linkKind="anchor" />;
+	return (
+		<Page settings={props.settings} changes={props.changes} linkKind="anchor" />
+	);
 }
