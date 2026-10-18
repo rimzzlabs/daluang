@@ -44,6 +44,17 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
 - A page with no feature yet uses `LaterPage`, which says what the page will do.
 - An item is active on its page and on each page below its path. `/` is active only on
   `/`.
+- An item can have a `section`: each page below that path also makes the item active.
+  Posts has the section `/posts`, so it is active in the editor.
+
+## Pages with a parameter
+
+- A path of `APP_PAGES` can have a parameter, as in TanStack Router: `/posts/$id`.
+  `matchesPage` matches a parameter with one segment that is not empty.
+- `findAppPage` takes the first match. A page with no parameter comes first, so
+  `/posts/new` is not a post with the ID `new`.
+- `/posts/new` and `/posts/$id` are the pages of the editor. They use `LaterPage` until
+  the editor comes.
 
 ## Preferences
 

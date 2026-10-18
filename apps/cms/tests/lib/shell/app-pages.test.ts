@@ -3,6 +3,7 @@ import {
 	APP_PAGES,
 	documentTitle,
 	findAppPage,
+	matchesPage,
 	NOT_FOUND_TITLE,
 	normalizePath,
 	pageTitle,
@@ -23,6 +24,23 @@ describe("findAppPage", () => {
 
 	it("gives None for a path with no page", () => {
 		expect(findAppPage("/nope")).toBeUndefined();
+	});
+
+	it("finds the page of a post by its ID, and the page of a new post", () => {
+		expect(findAppPage("/posts/n1")?.path).toBe("/posts/$id");
+		expect(findAppPage("/posts/new")?.path).toBe("/posts/new");
+		expect(findAppPage("/posts")).toBeUndefined();
+		expect(findAppPage("/posts/n1/more")).toBeUndefined();
+	});
+});
+
+describe("matchesPage", () => {
+	it("matches each segment, and a parameter with one segment that is not empty", () => {
+		expect(matchesPage("/", "/")).toBe(true);
+		expect(matchesPage("/", "/media")).toBe(false);
+		expect(matchesPage("/posts/$id", "/posts/n1")).toBe(true);
+		expect(matchesPage("/posts/$id", "/posts/")).toBe(false);
+		expect(matchesPage("/posts/$id", "/drafts/n1")).toBe(false);
 	});
 });
 

@@ -45,6 +45,13 @@ describe("AppSidebar", () => {
 		).toBe(false);
 	});
 
+	it("marks Posts on the pages of the editor", () => {
+		renderAt("/posts/new");
+		expect(
+			screen.getByRole("link", { name: "Posts" }).hasAttribute("data-active"),
+		).toBe(true);
+	});
+
 	it("shows each menu group with a link for each item", () => {
 		renderAt("/");
 		for (const group of NAV_GROUPS) {

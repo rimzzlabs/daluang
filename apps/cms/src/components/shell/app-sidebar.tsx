@@ -31,6 +31,8 @@ interface NavItem {
 	label: string;
 	href: AppPagePath;
 	icon: ComponentType;
+	/** A path whose pages also make the item active, for example `/posts` for Posts. */
+	section?: string;
 }
 
 interface NavGroup {
@@ -43,7 +45,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 	{
 		label: "Write",
 		items: [
-			{ label: "Posts", href: "/", icon: NotePencilIcon },
+			{ label: "Posts", href: "/", icon: NotePencilIcon, section: "/posts" },
 			{ label: "Media", href: "/media", icon: ImagesIcon },
 		],
 	},
@@ -68,6 +70,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 export function isActivePath(pathname: string, href: string): boolean {
 	if (href === "/") return pathname === "/";
 	return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+/** True when `pathname` is the page of an item, a page below it, or a page of its section. */
+export function isActiveItem(pathname: string, item: NavItem): boolean {
+	if (isActivePath(pathname, item.href)) return true;
+	return item.section !== undefined && isActivePath(pathname, item.section);
 }
 
 export interface AppSidebarProps {
@@ -115,7 +123,7 @@ export function AppSidebar(props: AppSidebarProps) {
 													kind: props.linkKind,
 													href: item.href,
 												})}
-												isActive={isActivePath(props.pathname, item.href)}
+												isActive={isActiveItem(props.pathname, item)}
 												tooltip={item.label}
 											>
 												<item.icon />
