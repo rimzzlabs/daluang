@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { R } from "@mobily/ts-belt";
 import { createMemoryHistory, RouterProvider } from "@tanstack/react-router";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { createChangesStore } from "@/lib/notes/changes-store";
@@ -12,7 +12,8 @@ import { settingsStore } from "../settings";
 
 vi.mock("@/lib/notes/client", async (importOriginal) => ({
 	...(await importOriginal<object>()),
-	addNote: () => Promise.resolve(R.Ok({})),
+	addNote: () => Promise.resolve(R.Ok({ id: "n9" })),
+	listNotesOfCms: () => Promise.resolve(R.Ok([])),
 	listPostsOfCms: () => Promise.resolve(R.Ok({ posts: [], count: 0 })),
 	readNote: vi.fn((id: string) =>
 		Promise.resolve(
@@ -92,5 +93,29 @@ describe("post pages", () => {
 		);
 		await screen.findByDisplayValue("Jotai recipes");
 		expect(readNote).toHaveBeenLastCalledWith("");
+	});
+
+	it("opens the page of a new translation", async () => {
+		const router = createAppRouter({
+			context: {
+				user: { name: "Rizki Citra", githubLogin: "rimzzlabs", image: null },
+				sidebar: { open: true, width: 16 },
+				settings: settingsStore(),
+				changes: createChangesStore(0),
+			},
+			history: createMemoryHistory({ initialEntries: ["/posts/n1"] }),
+		});
+		render(<RouterProvider router={router} />);
+		await userEvent.click(
+			await screen.findByRole("button", { name: "Translate" }),
+		);
+		await userEvent.click(
+			await within(await screen.findByRole("dialog")).findByRole("button", {
+				name: "Indonesia",
+			}),
+		);
+		await waitFor(() =>
+			expect(router.state.location.pathname).toBe("/posts/n9"),
+		);
 	});
 });

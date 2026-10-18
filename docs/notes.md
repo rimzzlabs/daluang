@@ -110,6 +110,11 @@ It gets the languages setting and the field definitions as `DraftRules`.
   yet, in the order of the setting.
 - `translationDraft` copies a note into another language, with the same slug. The writer
   then translates its text.
+- **Translate** on the page of a post opens `TranslatePost` of
+  `apps/cms/src/components/notes/translate-post.tsx`. It lists the posts, and shows each
+  language from `missingLanguages`. A click adds the copy of the saved post with
+  `addNote`, and the page of the new draft opens. A CMS with one language shows no
+  Translate.
 
 ## The store
 

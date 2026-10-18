@@ -3,6 +3,7 @@ import { Badge } from "@daluang/ui/components/badge";
 import { buttonVariants } from "@daluang/ui/components/button";
 import {
 	Page,
+	PageActions,
 	PageDescription,
 	PageHeader,
 	PageHeading,
@@ -13,6 +14,7 @@ import { R } from "@mobily/ts-belt";
 import { useEffect, useState } from "react";
 import { match } from "ts-pattern";
 import { NavLink, type NavLinkKind } from "@/components/shell/nav-link";
+import { useSettings } from "@/hooks/settings/use-settings";
 import { STATUS_LABELS } from "@/lib/notes/change-labels";
 import type { ChangesStore } from "@/lib/notes/changes-store";
 import {
@@ -22,6 +24,7 @@ import {
 } from "@/lib/notes/client";
 import type { SettingsStore } from "@/lib/settings/settings-store";
 import { EditPostForm } from "./edit-post-form";
+import { TranslatePost } from "./translate-post";
 
 type LoadState =
 	| { status: "loading" }
@@ -34,12 +37,15 @@ export interface EditPostProps {
 	settings: SettingsStore;
 	changes: ChangesStore;
 	linkKind: NavLinkKind;
+	/** Opens the page of another post, for example a new translation. */
+	onOpenPost: (id: string) => void;
 }
 
 /** The page of a stored post: it reads the post, then shows its form. */
 export function EditPost(props: EditPostProps) {
 	const { id } = props;
 	const [load, setLoad] = useState<LoadState>({ status: "loading" });
+	const { languages } = useSettings(props.settings).languages;
 
 	// The post is on the server, an external system. The page reads it when it opens.
 	useEffect(() => {
@@ -80,6 +86,15 @@ export function EditPost(props: EditPostProps) {
 						at Publish changes.
 					</PageDescription>
 				</PageHeading>
+				{load.status === "ready" ? (
+					<PageActions>
+						<TranslatePost
+							note={load.note}
+							languages={languages}
+							onTranslated={props.onOpenPost}
+						/>
+					</PageActions>
+				) : null}
 			</PageHeader>
 			{match(load)
 				.with({ status: "loading" }, () => (
