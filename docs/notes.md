@@ -52,6 +52,23 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - The body has a limit of 1 MB (`NOTE_BODY_MAX_BYTES`): half of the size limit of a row of
   D1.
 
+## The form of the editor
+
+`src/note-form.ts` holds the form of the editor as pure functions. The editor keeps a
+`NoteForm`, and it sends the draft of `parseNoteForm`.
+
+- `NoteForm` keeps each value as its input gives it: text, or yes or no for a boolean
+  field. The keywords are one text, with a comma between two keywords.
+- `emptyNoteForm` starts a new post in the default language, with an empty input for each
+  defined field.
+- `withTitle` makes the slug from the title with `slugify`, until the writer types a slug.
+  `withSlug` keeps the typed slug. An empty slug follows the title again.
+- `parseNoteForm` turns each input into the value of its type, then checks the draft with
+  `noteDraftSchema`. An empty input is no value, so a required field asks for one.
+- A number field with a text that is not a number keeps the text. The schema then tells
+  the writer that the field needs a number.
+- An error is a message for each path: `title`, or `fields.<name>` for an extra field.
+
 ## The store
 
 - **D1 keeps each note in one row of the table `note`**
