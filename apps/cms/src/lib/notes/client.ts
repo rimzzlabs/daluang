@@ -19,6 +19,7 @@ import {
 import { R } from "@mobily/ts-belt";
 import { match, P } from "ts-pattern";
 import { z } from "zod";
+import type { ChangesStore } from "./changes-store";
 
 /** Why a request of the posts failed. The UI shows one message for each code. */
 export type NotesError =
@@ -221,4 +222,10 @@ export async function listPostsOfCms(): Promise<
 			count: changes.count,
 		})),
 	);
+}
+
+/** Reads the number of changes again, and gives it to the store of the navbar. */
+export async function refreshChangeCount(changes: ChangesStore): Promise<void> {
+	const list = await listChangesOfCms();
+	if (R.isOk(list)) changes.write(R.getExn(list).count);
 }

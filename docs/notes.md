@@ -209,6 +209,13 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - A refused save, for example a slug that another post has, shows its message above the
   buttons. **Cancel** goes back to the list.
 
+## The page of a post
+
+- `EditPostForm` of `apps/cms/src/components/notes/edit-post-form.tsx` is the form of a
+  stored post. It starts with `noteFormOf`, and **Save** sends the draft to `saveNote`.
+- A save of a published post changes only its working copy. After a save,
+  `refreshChangeCount` reads the number of changes again for the navbar.
+
 ## The Publish changes button
 
 - `PublishChanges` of `apps/cms/src/components/notes/publish-changes.tsx` is in the
