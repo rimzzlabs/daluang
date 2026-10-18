@@ -1,10 +1,10 @@
-import type { NoteEvent } from "@daluang/notes/api";
+import type { ChangesEvent } from "@daluang/notes/changes";
 import { deliverEvent } from "@daluang/webhooks/deliver-event";
 
-/** The `notify` of the endpoint of the notes: it sends the event to each webhook. */
+/** The `notify` of the endpoint of the changes: it sends the event to each webhook. */
 export function notifySites(
 	db: D1Database,
-): (event: NoteEvent) => Promise<void> {
+): (event: ChangesEvent) => Promise<void> {
 	return async (event) => {
 		await deliverEvent({
 			db,

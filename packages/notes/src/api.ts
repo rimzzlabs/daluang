@@ -10,8 +10,8 @@ import {
 	deleteNote,
 	findNote,
 	listNotes,
+	markNote,
 	type NoteRef,
-	setNoteStatus,
 	updateNote,
 } from "./store";
 import { isSlugTaken } from "./translation";
@@ -28,9 +28,6 @@ export type NotesApiError =
 	| "invalid-note"
 	| "slug-taken"
 	| "settings-needed";
-
-/** The events of a note that tell each site to rebuild. */
-export type NoteEvent = "publish" | "unpublish";
 
 /** A refused value of a draft: the path of the field, and the message for the writer. */
 export interface NoteIssue {
@@ -57,8 +54,6 @@ export interface NotesRequest {
 	settings: NoteSettings;
 	/** The clock. The route file gives `() => new Date()`, and a test gives a fixed time. */
 	now: () => Date;
-	/** Tells each site to rebuild. The route file sends the event to each webhook. */
-	notify: (event: NoteEvent) => Promise<void>;
 }
 
 interface NoteAction extends NotesRequest {
@@ -173,11 +168,11 @@ async function writeDraft(
 }
 
 /**
- * Side effect: writes the status `published` to D1, and tells each site to rebuild. A
- * published note must reach each site.
+ * Side effect: writes the mark of a note to D1, so that Publish changes finds it.
  *
- * Checks the note again first: a field can be required since its last save. A publish of
- * a published note sends its saved changes to the sites.
+ * Checks the note again first: a field can be required since its last save. A note that
+ * the sites do not have gets the mark `publish`. A published note loses its mark, so an
+ * unpublish or a delete that waits stops. An edit of it is a change with no mark.
  */
 async function publishFrom(action: NoteAction): Promise<Response> {
 	const found = await findNote({ db: action.db, id: action.id });
@@ -193,45 +188,44 @@ async function publishFrom(action: NoteAction): Promise<Response> {
 			{ error: "invalid-note", issues: toIssues(checked.error) },
 			{ status: 422 },
 		);
-	await setNoteStatus({
-		db: action.db,
-		id: action.id,
-		status: "published",
-		now: action.now(),
-	});
-	await action.notify("publish");
+	const mark = found.published === null ? "publish" : null;
+	await markNote({ db: action.db, id: action.id, mark });
 	return getNote({ db: action.db, id: action.id });
 }
 
 /**
- * Side effect: writes the status `draft` to D1, and tells each site to rebuild. A note that
- * leaves the sites must leave at their next build.
+ * Side effect: writes the mark of a note to D1, so that Publish changes finds it.
  *
- * A draft stays a draft, with no event.
+ * Marks a published note to unpublish. For a note that the sites do not have, it clears
+ * the mark: a publish that waits stops.
  */
 async function unpublishFrom(action: NoteAction): Promise<Response> {
 	const found = await findNote({ db: action.db, id: action.id });
 	if (O.isNone(found)) return errorResponse("not-found", 404);
-	if (found.status === "draft") return Response.json({ note: found });
-	await setNoteStatus({
-		db: action.db,
-		id: action.id,
-		status: "draft",
-		now: action.now(),
-	});
-	await action.notify("unpublish");
+	const mark = found.published === null ? null : "unpublish";
+	await markNote({ db: action.db, id: action.id, mark });
+	return getNote({ db: action.db, id: action.id });
+}
+
+/** Side effect: clears the mark of a note in D1, so that its change stops waiting. */
+async function cancelFrom(action: NoteAction): Promise<Response> {
+	const cleared = await markNote({ db: action.db, id: action.id, mark: null });
+	if (!cleared) return errorResponse("not-found", 404);
 	return getNote({ db: action.db, id: action.id });
 }
 
 /**
- * Side effect: deletes a note from D1, and tells each site to rebuild when the note was
- * published. A deleted note must leave the sites.
+ * Side effect: deletes a draft from D1 at once, or marks a published note to delete. The
+ * sites keep a published note until the next Publish changes.
  */
 async function deleteFrom(action: NoteAction): Promise<Response> {
 	const found = await findNote({ db: action.db, id: action.id });
 	if (O.isNone(found)) return errorResponse("not-found", 404);
+	if (found.published !== null) {
+		await markNote({ db: action.db, id: action.id, mark: "delete" });
+		return getNote({ db: action.db, id: action.id });
+	}
 	await deleteNote({ db: action.db, id: action.id });
-	if (found.status === "published") await action.notify("unpublish");
 	return new Response(null, { status: 204 });
 }
 
@@ -249,10 +243,10 @@ function notAllowed(allow: string): Promise<Response> {
  * CMS.
  *
  * The endpoint of the notes. `GET /api/notes` lists them, and `POST /api/notes` adds a
- * draft. `GET`, `PATCH`, and `DELETE /api/notes/<id>` read, change, and delete one note.
- * `POST /api/notes/<id>/publish` and `/unpublish` change its status, and tell each site
- * to rebuild. The sign-in guard checks the session and the origin before this handler
- * runs.
+ * draft. `GET`, `PATCH`, and `DELETE /api/notes/<id>` read, change, and delete one note:
+ * a delete of a published note only marks it. `POST /api/notes/<id>/publish`, `/unpublish`,
+ * and `/cancel` mark a note, or clear its mark, for Publish changes. The sign-in guard
+ * checks the session and the origin before this handler runs.
  */
 export function handleNotesRequest(params: NotesRequest): Promise<Response> {
 	const { request, db, id } = params;
@@ -263,7 +257,12 @@ export function handleNotesRequest(params: NotesRequest): Promise<Response> {
 		.with({ method: "POST", id: P.string, action: "unpublish" }, (route) =>
 			unpublishFrom({ ...params, id: route.id }),
 		)
-		.with({ action: P.union("publish", "unpublish") }, () => notAllowed("POST"))
+		.with({ method: "POST", id: P.string, action: "cancel" }, (route) =>
+			cancelFrom({ ...params, id: route.id }),
+		)
+		.with({ action: P.union("publish", "unpublish", "cancel") }, () =>
+			notAllowed("POST"),
+		)
 		.with({ action: P.string }, () =>
 			Promise.resolve(errorResponse("not-found", 404)),
 		)

@@ -205,7 +205,11 @@ const { post } = Astro.props;
 </article>
 ```
 
-## Rebuild the site at each publish
+## Rebuild the site at Publish changes
 
-Add the deploy hook of the site as a webhook. The CMS sends `publish` when a post goes
-to the site, and `unpublish` when it leaves. See [Webhooks](/guide/webhooks).
+The content API gives the published copy of each post. An edit, a publish, an unpublish,
+or a delete waits until the writer selects **Publish changes**. Then the CMS sends one
+`publish` event for all the changes.
+
+Add the deploy hook of the site as a webhook, so that the site rebuilds at each Publish
+changes. See [Webhooks](/guide/webhooks).

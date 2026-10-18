@@ -2,7 +2,6 @@ import { handleNotesRequest } from "@daluang/notes/api";
 import { readSettings } from "@daluang/settings/store";
 import type { APIRoute } from "astro";
 import { readNotesEnv } from "@/lib/notes/env";
-import { notifySites } from "@/lib/notes/notify";
 
 export const prerender = false;
 
@@ -16,6 +15,5 @@ export const ALL: APIRoute = async (context) => {
 		action: undefined,
 		settings: await readSettings(db),
 		now: () => new Date(),
-		notify: notifySites(db),
 	});
 };
