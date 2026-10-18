@@ -69,6 +69,13 @@ It gets the languages setting and the field definitions as `DraftRules`.
   the writer that the field needs a number.
 - An error is a message for each path: `title`, or `fields.<name>` for an extra field.
 
+## The inputs of the editor
+
+- `ExtraFieldInput` shows one extra field: a checkbox for yes or no, and a text box for a
+  text, a number, or a list. A number asks for a decimal keyboard on a phone.
+- `FormField` puts a label, a control, and its help text or its error together. An
+  optional value has "(optional)" after its label.
+
 ## The store
 
 - **D1 keeps each note in one row of the table `note`**
