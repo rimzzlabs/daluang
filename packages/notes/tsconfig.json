@@ -1,7 +1,7 @@
 {
 	"extends": "@daluang/tsconfig/base.json",
 	"compilerOptions": {
-		"types": ["node"]
+		"types": ["@cloudflare/workers-types", "node"]
 	},
 	"include": ["src", "tests", "vitest.config.ts"]
 }
