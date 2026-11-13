@@ -16,7 +16,10 @@ import { useIsWide } from "@daluang/ui/hooks/use-wide";
 import { A, D, pipe, R } from "@mobily/ts-belt";
 import { useEffect, useEffectEvent, useState } from "react";
 import { NavLink, type NavLinkKind } from "@/components/shell/nav-link";
-import { AUTOSAVE_RETRY_MS, useAutosave } from "@/hooks/notes/use-autosave";
+import {
+	AUTOSAVE_RETRY_SECONDS,
+	useAutosave,
+} from "@/hooks/notes/use-autosave";
 import { useSettings } from "@/hooks/settings/use-settings";
 import type { ChangesStore } from "@/lib/notes/changes-store";
 import {
@@ -41,8 +44,6 @@ export interface EditPostFormProps {
 	onSaved: (note: Note) => void;
 }
 
-const RETRY_SECONDS = AUTOSAVE_RETRY_MS / 1000;
-
 /**
  * The message of a save error. After a refused save, the writer must change a value. After
  * a failed save, the text is not saved, and the autosave tries again.
@@ -50,7 +51,7 @@ const RETRY_SECONDS = AUTOSAVE_RETRY_MS / 1000;
 function saveErrorMessage(error: NotesError): string {
 	if (SAVE_ERROR_OUTCOMES[error] === "refused")
 		return NOTES_ERROR_MESSAGES[error];
-	const retry = `Daluang tries again in ${RETRY_SECONDS} seconds.`;
+	const retry = `Daluang tries again in ${AUTOSAVE_RETRY_SECONDS} seconds.`;
 	if (error === "signed-out")
 		return `Not saved: your session ended. Sign in again in another tab. The text stays on this page, and ${retry}`;
 	if (error === "offline")
@@ -69,7 +70,7 @@ function afterSave(next: SaveState): (current: SaveState) => SaveState {
  * (`useAutosave`). The sites change only at Publish changes, so a save is safe. A value
  * that is not valid shows its error, and the save waits for a valid post. A save of a
  * published post changes only its working copy, so the navbar reads the number of changes
- * again.
+ * again. Publish changes saves the form first, with no wait.
  */
 export function EditPostForm(props: EditPostFormProps) {
 	const { languages, fields } = useSettings(props.settings);
@@ -123,6 +124,15 @@ export function EditPostForm(props: EditPostFormProps) {
 		window.addEventListener("keydown", saveNow, true);
 		return () => window.removeEventListener("keydown", saveNow, true);
 	}, []);
+
+	const saveBeforePublish = useEffectEvent(() => autosave.settle());
+
+	// The store of the changes is shared with the navbar. Publish changes saves this post
+	// first, so the sites get its last text.
+	useEffect(
+		() => props.changes.registerOpenPost(() => saveBeforePublish()),
+		[props.changes],
+	);
 
 	const fieldProps = {
 		value: form,

@@ -7,6 +7,15 @@ export const AUTOSAVE_DELAY_MS = 1000;
 /** The wait after a failed save before the hook tries again, in milliseconds. */
 export const AUTOSAVE_RETRY_MS = 5000;
 
+/** `AUTOSAVE_RETRY_MS` in seconds, for a message. */
+export const AUTOSAVE_RETRY_SECONDS = AUTOSAVE_RETRY_MS / 1000;
+
+/** The save that runs now: the value that it sent, and its outcome. */
+interface RunningSave<T> {
+	sent: { value: T };
+	saving: Promise<AutosaveOutcome>;
+}
+
 export interface Autosave<T> {
 	/** Saves the value after the wait. A new value starts the wait again. */
 	schedule: (value: T) => void;
@@ -14,6 +23,11 @@ export interface Autosave<T> {
 	flush: () => void;
 	/** True while the server does not have the last value, also during its save. */
 	hasUnsaved: () => boolean;
+	/**
+	 * Saves the value that is not saved now, with no wait, and waits for each save. Gives
+	 * `saved` when the server has the last value, else the outcome of its last save.
+	 */
+	settle: () => Promise<AutosaveOutcome>;
 }
 
 /**
@@ -31,7 +45,8 @@ export function useAutosave<T>(
 	// The last value that the server does not have. A new object for each change, so a save
 	// knows if a newer change came during it.
 	const unsaved = useRef<{ value: T } | null>(null);
-	const running = useRef(false);
+	const running = useRef<RunningSave<T> | null>(null);
+	const lastOutcome = useRef<AutosaveOutcome>("saved");
 	const gone = useRef(false);
 	const latestSave = useRef(save);
 
@@ -55,10 +70,12 @@ export function useAutosave<T>(
 
 	async function run() {
 		const sent = unsaved.current;
-		if (running.current || sent === null) return;
-		running.current = true;
-		const outcome = await latestSave.current(sent.value);
-		running.current = false;
+		if (running.current !== null || sent === null) return;
+		const saving = latestSave.current(sent.value);
+		running.current = { sent, saving };
+		const outcome = await saving;
+		running.current = null;
+		lastOutcome.current = outcome;
 		if (unsaved.current === sent) {
 			if (outcome === "saved") unsaved.current = null;
 			// A page that went away does not try again in the background.
@@ -83,6 +100,24 @@ export function useAutosave<T>(
 		return unsaved.current !== null;
 	}
 
+	async function settle(): Promise<AutosaveOutcome> {
+		const before = unsaved.current;
+		if (before === null) return "saved";
+		const active = running.current;
+		if (active === null) {
+			stopTimer();
+			await run();
+		} else {
+			await active.saving;
+		}
+		if (unsaved.current === null) return "saved";
+		const sentLast = active === null || active.sent === before;
+		// The server did not save the last value. A failed save tries again after its wait.
+		if (sentLast && unsaved.current === before) return lastOutcome.current;
+		// A newer value came during the save, or waited behind it.
+		return settle();
+	}
+
 	const leave = useEffectEvent(() => {
 		gone.current = true;
 		flush();
@@ -102,5 +137,5 @@ export function useAutosave<T>(
 		};
 	}, []);
 
-	return { schedule, flush, hasUnsaved };
+	return { schedule, flush, hasUnsaved, settle };
 }

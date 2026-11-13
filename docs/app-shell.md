@@ -32,7 +32,8 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
 - The island also puts a `ChangesStore` in the router context, with the number of
   changes from the server. The Publish changes button of the navbar reads it and writes
   it, and the posts page writes it. After each Publish changes, each page that shows
-  posts reads them again (`docs/notes.md`).
+  posts reads them again. The page of a post registers the save of its form in the
+  store, so Publish changes saves the open post first (`docs/notes.md`).
 
 ## Menus
 
