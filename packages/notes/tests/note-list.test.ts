@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { NoteSummary } from "../src/note";
 import {
+	explorerNotes,
 	inLanguage,
 	listedNotes,
 	noteActions,
@@ -58,6 +59,42 @@ describe("inLanguage", () => {
 
 	it("keeps each note when no language is chosen", () => {
 		expect(inLanguage(listed, null)).toBe(listed);
+	});
+});
+
+describe("explorerNotes", () => {
+	const listed = [
+		{ note: { ...summary("a"), title: "Jotai Recipes" }, change: null },
+		{
+			note: { ...summary("b"), slug: "lefthook", status: "published" as const },
+			change: null,
+		},
+		{ note: summary("c"), change: null },
+	];
+
+	it("finds a note by its title or its slug, with any capitals", () => {
+		expect(explorerNotes(listed, { search: " jotai ", filter: "all" })).toEqual(
+			[listed[0]],
+		);
+		expect(explorerNotes(listed, { search: "LEFT", filter: "all" })).toEqual([
+			listed[1],
+		]);
+	});
+
+	it("keeps the notes of one status, in their order", () => {
+		expect(explorerNotes(listed, { search: "", filter: "draft" })).toEqual([
+			listed[0],
+			listed[2],
+		]);
+		expect(explorerNotes(listed, { search: "", filter: "published" })).toEqual([
+			listed[1],
+		]);
+	});
+
+	it("gives each note for an empty search and the filter all", () => {
+		expect(explorerNotes(listed, { search: "", filter: "all" })).toEqual(
+			listed,
+		);
 	});
 });
 

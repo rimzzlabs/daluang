@@ -1,6 +1,7 @@
-import { A, O, pipe } from "@mobily/ts-belt";
+import { A, O, pipe, S } from "@mobily/ts-belt";
 import { match, P } from "ts-pattern";
 import type { NoteChange } from "./change";
+import type { NoteStatus } from "./metadata";
 import type { NoteSummary } from "./note";
 
 /** A note of the list of the CMS, with the change that waits for Publish changes. */
@@ -42,6 +43,34 @@ export function inLanguage(
 ): readonly ListedNote[] {
 	if (language === null) return listed;
 	return A.filter(listed, (item) => item.note.language === language);
+}
+
+/** The status filter of the explorer of the editor: each note, or the notes of one status. */
+export type ExplorerFilter = NoteStatus | "all";
+
+export interface ExplorerQuery {
+	/** The text of the search. An empty text finds each note. */
+	search: string;
+	filter: ExplorerFilter;
+}
+
+/**
+ * The notes of the explorer: the notes of the filter whose title or slug holds the search
+ * text, with no difference between capitals and small letters. The order stays.
+ */
+export function explorerNotes(
+	listed: readonly ListedNote[],
+	query: ExplorerQuery,
+): readonly ListedNote[] {
+	const search = pipe(query.search, S.trim, S.toLowerCase);
+	return A.filter(listed, (item) => {
+		const { note } = item;
+		if (query.filter !== "all" && note.status !== query.filter) return false;
+		return (
+			S.includes(S.toLowerCase(note.title), search) ||
+			S.includes(note.slug, search)
+		);
+	});
 }
 
 /**

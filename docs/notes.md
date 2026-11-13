@@ -240,6 +240,20 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - The posts page is at `/posts`. With no post, it shows `NoPosts`: a link to a new post.
   The steps to set up a site are on the dashboard (`docs/app-shell.md`).
 
+## The explorer of the editor
+
+- The pages of the editor show `PostExplorer` of
+  `apps/cms/src/components/notes/post-explorer.tsx` at the left of the post. It shows from
+  64rem (`lg`), where the editor has the room for it.
+- The explorer has a search, the filter All / Drafts / Published, the number of the posts
+  that match, and a link to each post. The link of the open post has
+  `aria-current="page"`.
+- `explorerNotes` of `src/note-list.ts` gives the posts of the search and the filter. The
+  search finds the text in the title or the slug, with no difference between capitals and
+  small letters.
+- The page reads the list with `usePostList`, and reads it again after a save and after a
+  new translation. The explorer then shows the new title.
+
 ## The New post page
 
 - `NewPost` of `apps/cms/src/components/notes/new-post.tsx` is the page of `/posts/new`.
