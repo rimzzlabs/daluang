@@ -34,7 +34,8 @@ Each post has the core fields: `title`, `slug`, `language`, `description`, `keyw
 3. Type the label. The CMS makes the frontmatter name from it, for example
    `relatedPosts` for "Related posts". You can change the name.
 4. Select the type: text, number, yes or no, or a list of text.
-5. Select **Required** if each post must have a value.
+5. Select **Required** if each post must have a value. A draft can stay empty. Publish
+   asks for the value.
 6. Select **Save**.
 
 The questions of the first sign-in do not ask for the fields. A site with no extra fields

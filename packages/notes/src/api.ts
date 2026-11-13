@@ -4,7 +4,11 @@ import type { z } from "zod";
 import type { FieldDefinition } from "./field-definitions";
 import type { LanguagesSetting } from "./languages-setting";
 import type { NoteDraft } from "./note";
-import { NOTE_BODY_MAX_BYTES, noteDraftSchema } from "./note-draft";
+import {
+	NOTE_BODY_MAX_BYTES,
+	noteDraftSchema,
+	publishedDraftSchema,
+} from "./note-draft";
 import {
 	createNote,
 	deleteNote,
@@ -170,16 +174,17 @@ async function writeDraft(
 /**
  * Side effect: writes the mark of a note to D1, so that Publish changes finds it.
  *
- * Checks the note again first: a field can be required since its last save. A note that
- * the sites do not have gets the mark `publish`. A published note loses its mark, so an
- * unpublish or a delete that waits stops. An edit of it is a change with no mark.
+ * Checks the note first: each required field must have a value. A saved draft can leave
+ * one empty. A note that the sites do not have gets the mark `publish`. A published note
+ * loses its mark, so an unpublish or a delete that waits stops. An edit of it is a change
+ * with no mark.
  */
 async function publishFrom(action: NoteAction): Promise<Response> {
 	const found = await findNote({ db: action.db, id: action.id });
 	if (O.isNone(found)) return errorResponse("not-found", 404);
 	const { languages } = action.settings;
 	if (languages === null) return errorResponse("settings-needed", 409);
-	const checked = noteDraftSchema({
+	const checked = publishedDraftSchema({
 		languages,
 		fields: action.settings.fields ?? [],
 	}).safeParse(found);

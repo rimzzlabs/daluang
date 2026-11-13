@@ -49,7 +49,9 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - The title, the slug, the description, and the keywords have the rules of the core
   metadata. A missing description is `""`, and missing keywords are `[]`.
 - The language must be on the languages setting of the CMS.
-- Each defined field must have the value type of its definition. A required field must
+- Each defined field must have the value type of its definition.
+- A saved draft can have an empty required field, so the writer does not lose text.
+  `publishedDraftSchema` adds the required check for Publish: a required field must
   have a value, and a required text or list must not be empty.
 - An extra field that the settings do not define stays as it is, so a value from another
   source is not lost.
@@ -72,7 +74,8 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - `withTitle` makes the slug from the title with `slugify`, until the writer types a slug.
   `withSlug` keeps the typed slug. An empty slug follows the title again.
 - `parseNoteForm` turns each input into the value of its type, then checks the draft with
-  `noteDraftSchema`. An empty input is no value, so a required field asks for one.
+  `noteDraftSchema`. An empty input is no value. Publish asks for the value of a
+  required field.
 - A number field with a text that is not a number keeps the text. The schema then tells
   the writer that the field needs a number.
 - An error is a message for each path: `title`, or `fields.<name>` for an extra field.
@@ -180,8 +183,8 @@ It gets the languages setting and the field definitions as `DraftRules`.
 
 - **The sites change only at Publish changes.** Publish, unpublish, and delete only mark
   a note, and they send no event.
-- `POST /api/notes/<id>/publish` checks the note again with `noteDraftSchema` and the
-  current settings, because a field can be required since its last save. A note that the
+- `POST /api/notes/<id>/publish` checks the note with `publishedDraftSchema` and the
+  current settings: each required field must have a value. A note that the
   check refuses answers 422. Then it marks a note that the sites do not have `publish`. A
   published note loses its mark, so an unpublish or a delete that waits stops. The route
   file is `apps/cms/src/pages/api/notes/[id]/[action].ts`.

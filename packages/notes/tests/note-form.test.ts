@@ -129,7 +129,6 @@ describe("parseNoteForm", () => {
 			title: "Give the post a title.",
 			language: "Choose a language of this CMS.",
 			"fields.readingTime": "Reading time needs a number.",
-			"fields.series": "Give Series a value.",
 		});
 	});
 });

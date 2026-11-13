@@ -81,10 +81,7 @@ describe("POST /api/notes", () => {
 		expect(response.status).toBe(422);
 		await expect(response.json()).resolves.toEqual({
 			error: "invalid-note",
-			issues: [
-				{ path: "language", message: "Choose a language of this CMS." },
-				{ path: "fields.featured", message: "Give Featured a value." },
-			],
+			issues: [{ path: "language", message: "Choose a language of this CMS." }],
 		});
 	});
 
