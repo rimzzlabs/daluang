@@ -15,12 +15,27 @@ export interface ChangesRequest {
 }
 
 /**
+ * Side effect: calls `notify`, and writes its error to the log of the Worker. The changes
+ * are already applied, so an error of the event does not fail Publish changes.
+ */
+async function notifyAfterPublish(params: ChangesRequest): Promise<void> {
+	try {
+		await params.notify("publish");
+	} catch (error) {
+		console.error(
+			"Publish changes applied each change, but the publish event failed.",
+			error,
+		);
+	}
+}
+
+/**
  * Side effect: applies each change in D1, and tells each site to rebuild one time. The
  * sites change only at Publish changes.
  */
 async function publishChanges(params: ChangesRequest): Promise<Response> {
 	const applied = await applyChanges({ db: params.db, now: params.now() });
-	if (A.isNotEmpty(applied)) await params.notify("publish");
+	if (A.isNotEmpty(applied)) await notifyAfterPublish(params);
 	return Response.json({ applied });
 }
 

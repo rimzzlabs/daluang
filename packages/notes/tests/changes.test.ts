@@ -69,6 +69,31 @@ describe("handleChangesRequest", () => {
 		expect((await call(db, "GET").response).status).toBe(200);
 	});
 
+	it("answers 200 and logs the error when the event fails after the publish", async () => {
+		const { db } = createFakeD1();
+		const note = await createNote({ db, draft: DRAFT, now: NOW });
+		await markNote({ db, id: note.id, mark: "publish" });
+		const failure = new Error("D1 is not available");
+		const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
+		const answer = await handleChangesRequest({
+			request: new Request(`http://localhost:4321${CHANGES_API_PATH}`, {
+				method: "POST",
+			}),
+			db,
+			now: () => NOW,
+			notify: () => Promise.reject(failure),
+		});
+		expect(answer.status).toBe(200);
+		const body = z
+			.object({ applied: z.array(z.unknown()) })
+			.parse(await answer.json());
+		expect(body.applied).toHaveLength(1);
+		expect(log).toHaveBeenCalledExactlyOnceWith(expect.any(String), failure);
+		log.mockRestore();
+		const published = O.getExn(await findNote({ db, id: note.id }));
+		expect(published.status).toBe("published");
+	});
+
 	it("sends no event when no change waits", async () => {
 		const { db } = createFakeD1();
 		const { notify, response } = call(db, "POST");
