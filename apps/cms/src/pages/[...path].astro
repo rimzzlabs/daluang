@@ -7,6 +7,7 @@ import { AppShell } from "@/components/shell/app-shell";
 import BaseLayout from "@/layouts/base-layout.astro";
 import { createChangesStore } from "@/lib/notes/changes-store";
 import { readNotesEnv } from "@/lib/notes/env";
+import { makeStyleNonce, nonceSource } from "@/lib/security/style-nonce";
 import { createSettingsStore } from "@/lib/settings/settings-store";
 import { documentTitle, findAppPage, pageTitle } from "@/lib/shell/app-pages";
 import { App } from "@/routes/app";
@@ -33,9 +34,14 @@ const store = createSettingsStore(settings.settings);
 // The navbar shows the number of changes. The server gives it, so the button does not jump.
 const changeCount = (await listChanges(readNotesEnv().DB)).length;
 const changes = createChangesStore(changeCount);
+// The editor puts its styles in a `<style>` element. The nonce of this response allows it.
+// `astro dev` sends no header, so the nonce has no effect there. `Astro.csp` is undefined
+// only in a config with no policy.
+const styleNonce = makeStyleNonce();
+Astro.csp?.insertStyleResource(nonceSource(styleNonce));
 ---
 
-<BaseLayout title={documentTitle(title)}>
+<BaseLayout title={documentTitle(title)} styleNonce={styleNonce}>
 	<div data-static-shell class="contents">
 		<AppShell
 			title={title}

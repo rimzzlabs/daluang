@@ -27,8 +27,9 @@ describe("CMS_CSP", () => {
 		);
 	});
 
-	it("allows an inline style only as an attribute", () => {
+	it("allows the own stylesheets, and an inline style only as an attribute", () => {
 		expect(CMS_CSP.styleDirective.resources).toEqual([
+			"'self'",
 			{ resource: "'unsafe-inline'", kind: "attribute" },
 		]);
 	});
