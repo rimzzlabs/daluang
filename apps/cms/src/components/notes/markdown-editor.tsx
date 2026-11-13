@@ -1,11 +1,19 @@
-import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import {
+	defaultKeymap,
+	history,
+	historyKeymap,
+	redo,
+	undo,
+} from "@codemirror/commands";
 import { markdown } from "@codemirror/lang-markdown";
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
+import { type MarkdownEdit, markdownEdit } from "@daluang/notes/markdown-edit";
 import { tags } from "@lezer/highlight";
 import { cn } from "cn";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { EditorToolbar, type ToolbarAction } from "./editor-toolbar";
 
 // The colors come from the tokens of the theme, so the editor follows the dark theme.
 const MARKDOWN_STYLE = HighlightStyle.define([
@@ -37,6 +45,32 @@ const EDITOR_THEME = EditorView.theme({
 	".cm-cursor": { borderLeftColor: "var(--foreground)" },
 });
 
+/**
+ * Applies one text action of the toolbar to the editor, as one transaction. One undo then
+ * removes it. True, so that a key of the keymap stops there.
+ */
+function applyEdit(editor: EditorView, edit: MarkdownEdit): boolean {
+	const { main } = editor.state.selection;
+	const change = markdownEdit(edit, {
+		text: editor.state.doc.toString(),
+		selection: { from: main.from, to: main.to },
+	});
+	editor.dispatch({
+		changes: { from: change.from, to: change.to, insert: change.insert },
+		selection: { anchor: change.selection.from, head: change.selection.to },
+		scrollIntoView: true,
+		userEvent: "input",
+	});
+	return true;
+}
+
+// The keys of the common text actions. The keys of CodeMirror come after these.
+const EDIT_KEYS = keymap.of([
+	{ key: "Mod-b", run: (editor) => applyEdit(editor, "bold") },
+	{ key: "Mod-i", run: (editor) => applyEdit(editor, "italic") },
+	{ key: "Mod-k", run: (editor) => applyEdit(editor, "link") },
+]);
+
 export interface MarkdownEditorProps {
 	/** The ID of the editable element. */
 	id: string;
@@ -51,8 +85,9 @@ export interface MarkdownEditorProps {
 }
 
 /**
- * The editor of the Markdown body: CodeMirror 6 with the syntax of Markdown, the undo
- * history, and the default keys. It keeps the text as the writer types it.
+ * The editor of the Markdown body: the toolbar, then CodeMirror 6 with the syntax of
+ * Markdown, the undo history, and the default keys. It keeps the text as the writer types
+ * it.
  */
 export function MarkdownEditor(props: MarkdownEditorProps) {
 	const host = useRef<HTMLDivElement>(null);
@@ -73,6 +108,7 @@ export function MarkdownEditor(props: MarkdownEditorProps) {
 				doc: initial,
 				extensions: [
 					history(),
+					EDIT_KEYS,
 					keymap.of([...defaultKeymap, ...historyKeymap]),
 					markdown(),
 					syntaxHighlighting(MARKDOWN_STYLE),
@@ -101,14 +137,25 @@ export function MarkdownEditor(props: MarkdownEditorProps) {
 		content?.setAttribute("aria-describedby", describedBy);
 	}, [invalid, describedBy]);
 
+	function act(action: ToolbarAction) {
+		const editor = view.current;
+		if (editor === null) return;
+		if (action === "undo") undo(editor);
+		else if (action === "redo") redo(editor);
+		else applyEdit(editor, action);
+		editor.focus();
+	}
+
 	return (
 		<div
-			ref={host}
 			className={cn(
 				"w-full overflow-hidden rounded-xl border border-input bg-input/30 text-base transition-colors focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 md:text-sm",
 				props.invalid &&
 					"border-destructive ring-[3px] ring-destructive/20 dark:border-destructive/50 dark:ring-destructive/40",
 			)}
-		/>
+		>
+			<EditorToolbar onAction={act} />
+			<div ref={host} />
+		</div>
 	);
 }

@@ -16,6 +16,10 @@ you select **Publish changes**.
 The editor of the body is CodeMirror. It keeps the Markdown as you type it, also the
 components of Comark, for example `::callout`. Your site gives each component its look.
 
+The toolbar above the body adds the Markdown of a heading, a mark, a list, a link, a code
+block, a table, a rule, or a callout. Select the text first to change it. Ctrl+B (⌘B on a
+Mac) makes the text bold, Ctrl+I makes it italic, and Ctrl+K makes a link.
+
 ## Change a post
 
 1. Select the title of the post in the list.
