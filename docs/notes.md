@@ -110,6 +110,21 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - `FormField` puts a label, a control, and its help text or its error together. An
   optional value has "(optional)" after its label.
 
+## The text actions of the toolbar
+
+- `markdownEdit` of `src/markdown-edit.ts` gives the change of the body for one action of
+  the toolbar (`MARKDOWN_EDITS`). It gets the text and the selection, and gives one
+  `TextEdit`: the range, the new text, and the new selection. The editor applies it as one
+  transaction, so one undo removes it.
+- Bold, italic, strikethrough, and inline code put their marks around the selection, or
+  remove the marks when they are there. With no selection, the cursor goes between them.
+- Heading, quote, bullet list, and numbered list give a prefix to each line of the
+  selection, or remove it when each line has it. Heading puts `## ` in place of another
+  level.
+- Link makes `[text](https://)`, and selects the URL. Code block and callout
+  (`::callout{type="note"}`) put the selected lines in a block, or select a placeholder.
+  Table and rule go after the line of the cursor.
+
 ## Translations
 
 - Two notes with the same slug and different languages are translations of each other.
