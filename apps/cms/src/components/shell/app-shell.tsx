@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import type { UserMenuProps } from "@/components/auth/user-menu";
 import type { ChangesStore } from "@/lib/notes/changes-store";
 import type { SettingsStore } from "@/lib/settings/settings-store";
+import { isEditorPage } from "@/lib/shell/app-pages";
 import { AppNavbar } from "./app-navbar";
 import { AppSidebar } from "./app-sidebar";
 import type { NavLinkKind } from "./nav-link";
@@ -26,7 +27,8 @@ export interface AppShellProps {
 /**
  * The frame of each signed-in page: the sidebar, the navbar, and the page in between. The
  * root route of the app island renders it. The server also renders it, as the HTML that
- * shows before the island starts, and the two give the same HTML.
+ * shows before the island starts, and the two give the same HTML. On a page of the editor,
+ * the sidebar folds to its icons.
  */
 export function AppShell(props: AppShellProps) {
 	return (
@@ -34,6 +36,7 @@ export function AppShell(props: AppShellProps) {
 			<SidebarProvider
 				defaultOpen={props.defaultOpen}
 				defaultWidth={props.defaultWidth}
+				folded={isEditorPage(props.pathname)}
 			>
 				<AppSidebar
 					pathname={props.pathname}

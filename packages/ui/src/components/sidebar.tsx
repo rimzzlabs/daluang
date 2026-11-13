@@ -69,16 +69,28 @@ export interface SidebarProviderProps extends ComponentProps<"div"> {
 	defaultOpen?: boolean;
 	/** The stored width, in rem. */
 	defaultWidth?: number;
+	/**
+	 * True on a page that needs the full width, for example the editor. The sidebar shows
+	 * its icons, and a toggle opens it for this page only. The stored state does not change.
+	 */
+	folded?: boolean;
 }
 
 export function SidebarProvider(props: SidebarProviderProps) {
-	const {
-		defaultOpen = true,
-		defaultWidth = SIDEBAR_WIDTH_REM.default,
-		...rest
-	} = props;
+	const { defaultOpen = true, defaultWidth = SIDEBAR_WIDTH_REM.default } =
+		props;
+	const rest = D.deleteKeys(props, ["defaultOpen", "defaultWidth", "folded"]);
+	const folded = props.folded ?? false;
 	const isMobile = useIsMobile();
-	const [open, setOpenState] = useState(defaultOpen);
+	const [storedOpen, setStoredOpen] = useState(defaultOpen);
+	// The open state on a folded page. A new fold starts with the icons again.
+	const [unfolded, setUnfolded] = useState(false);
+	const [lastFolded, setLastFolded] = useState(folded);
+	if (lastFolded !== folded) {
+		setLastFolded(folded);
+		setUnfolded(false);
+	}
+	const open = folded ? unfolded : storedOpen;
 	const [openMobile, setOpenMobile] = useState(false);
 	const [width, setWidthState] = useState(() =>
 		clampSidebarWidth(defaultWidth),
@@ -86,7 +98,8 @@ export function SidebarProvider(props: SidebarProviderProps) {
 	const [resizing, setResizing] = useState(false);
 
 	function setOpen(value: boolean) {
-		setOpenState(value);
+		if (folded) return setUnfolded(value);
+		setStoredOpen(value);
 		writeSidebarPreference({
 			key: SIDEBAR_STATE_KEY,
 			value: value ? "expanded" : "collapsed",

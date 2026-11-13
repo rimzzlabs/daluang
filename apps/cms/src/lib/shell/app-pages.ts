@@ -85,6 +85,17 @@ export function pageTitle(pathname: string): string {
 	);
 }
 
+/** The pages of the editor. The sidebar folds to its icons on them, for the room to write. */
+const EDITOR_PAGES: readonly AppPagePath[] = ["/posts/new", "/posts/$id"];
+
+/** True when a path is a page of the editor. */
+export function isEditorPage(pathname: string): boolean {
+	return pipe(
+		findAppPage(pathname),
+		O.mapWithDefault(false, (page) => A.includes(EDITOR_PAGES, page.path)),
+	);
+}
+
 /** The text of `<title>` for a page. */
 export function documentTitle(title: string): string {
 	return `${title} · Daluang`;
