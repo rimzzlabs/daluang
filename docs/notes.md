@@ -219,6 +219,8 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - `SAVE_ERROR_OUTCOMES` tells the autosave what to do after each code. `invalid`,
   `slug-taken`, `settings-needed`, and `not-found` give `refused`. `signed-out`,
   `offline`, and `server` give `failed`, so the autosave tries again.
+- Each request has a timeout of 30 s (`NOTES_REQUEST_TIMEOUT_MS`). A request with no
+  answer gives `offline`, so a save that hangs does not stop the later saves.
 - The client reads each answer with `noteSchema` or `noteSummarySchema` of `src/note.ts`.
   An answer that the schema refuses gives `server`.
 - The editor checks a draft with `noteDraftSchema` before a save, so the writer sees the

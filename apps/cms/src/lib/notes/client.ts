@@ -68,6 +68,12 @@ export const SAVE_ERROR_OUTCOMES: Record<
 	server: "failed",
 };
 
+/**
+ * The longest wait for an answer, in milliseconds. A request with no answer gives `offline`,
+ * so a save that hangs does not stop each later save.
+ */
+export const NOTES_REQUEST_TIMEOUT_MS = 30_000;
+
 const listSchema = z.object({ notes: z.array(noteSummarySchema) });
 const oneSchema = z.object({ note: noteSchema });
 const errorSchema = z.object({ error: z.string() });
@@ -92,7 +98,13 @@ async function send(
 	path: string,
 	init?: RequestInit,
 ): Promise<R.Result<Response, NotesError>> {
-	const response = await R.fromPromise(fetch(path, init));
+	// A rejection of `fetch`, also the `TimeoutError` of the signal, gives `offline`.
+	const response = await R.fromPromise(
+		fetch(path, {
+			...init,
+			signal: AbortSignal.timeout(NOTES_REQUEST_TIMEOUT_MS),
+		}),
+	);
 	if (R.isError(response)) return R.Error("offline");
 	const answer = R.getExn(response);
 	if (!answer.ok) return R.Error(await refusal(answer));
