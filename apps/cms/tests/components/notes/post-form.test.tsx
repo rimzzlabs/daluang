@@ -9,7 +9,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { describe, expect, it } from "vitest";
-import { PostForm } from "@/components/notes/post-form";
+import { PostBodyField, PostDetailsFields } from "@/components/notes/post-form";
 import { typeInEditor } from "./editor";
 
 const FIELDS: readonly FieldDefinition[] = [
@@ -33,18 +33,22 @@ function Harness(props: {
 }) {
 	const [form, setForm] = useState(emptyNoteForm(RULES));
 	last = form;
+	const fieldProps = {
+		value: form,
+		errors: props.errors ?? {},
+		languages: props.languages ?? ["en", "id"],
+		definitions: FIELDS,
+		onChange: setForm,
+	};
 	return (
-		<PostForm
-			value={form}
-			errors={props.errors ?? {}}
-			languages={props.languages ?? ["en", "id"]}
-			definitions={FIELDS}
-			onChange={setForm}
-		/>
+		<>
+			<PostDetailsFields {...fieldProps} />
+			<PostBodyField {...fieldProps} />
+		</>
 	);
 }
 
-describe("PostForm", () => {
+describe("PostDetailsFields and PostBodyField", () => {
 	it("makes the slug from the title, and keeps each value", async () => {
 		render(<Harness />);
 		await userEvent.type(
