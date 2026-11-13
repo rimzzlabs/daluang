@@ -44,6 +44,30 @@ export const NOTES_ERROR_MESSAGES: Record<NotesError, string> = {
 	server: "The server could not do the request. Try again.",
 };
 
+/**
+ * The result of one save of the autosave. `saved`: the server stored the value. `refused`:
+ * the value cannot be stored as it is, and a retry cannot help. `failed`: a retry can help.
+ */
+export type AutosaveOutcome = "saved" | "refused" | "failed";
+
+/**
+ * What the autosave does after an error of a save. `refused`: the value cannot be stored as
+ * it is, so the autosave waits for a change of the writer. `failed`: a retry can help, for
+ * example after a sign-in in another tab, so the autosave tries again.
+ */
+export const SAVE_ERROR_OUTCOMES: Record<
+	NotesError,
+	Exclude<AutosaveOutcome, "saved">
+> = {
+	invalid: "refused",
+	"slug-taken": "refused",
+	"settings-needed": "refused",
+	"not-found": "refused",
+	"signed-out": "failed",
+	offline: "failed",
+	server: "failed",
+};
+
 const listSchema = z.object({ notes: z.array(noteSummarySchema) });
 const oneSchema = z.object({ note: noteSchema });
 const errorSchema = z.object({ error: z.string() });

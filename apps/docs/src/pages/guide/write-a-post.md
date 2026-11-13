@@ -17,6 +17,20 @@ The CMS saves the post about 1 second after you stop typing. The bar below the p
 "Saving", then "Saved". Press Ctrl+S (⌘S on a Mac) to save at once. Your site does not
 change until you select **Publish changes**.
 
+If a save fails, the bar shows the reason. The text stays on the page:
+
+- If the CMS cannot reach the server, it tries again every 5 seconds.
+- If your session ends, sign in again in another tab. The CMS then saves the text at
+  the next try.
+- If the CMS refuses a value, for example a slug that another post has, correct the
+  value. The CMS then saves the post.
+
+If you close the tab before the CMS saves the text, the browser asks you first.
+
+If you open another page of the CMS before the CMS saves the text, the CMS sends the
+text one last time. If that save fails, the text is lost. Look at the bar before you
+leave the post: it must show "Saved".
+
 The editor of the body is CodeMirror. It keeps the Markdown as you type it, also the
 components of Comark, for example `::callout`. Your site gives each component its look.
 

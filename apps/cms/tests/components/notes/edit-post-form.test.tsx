@@ -2,6 +2,7 @@
 import type { Note } from "@daluang/notes/note";
 import { R } from "@mobily/ts-belt";
 import {
+	act,
 	fireEvent,
 	render,
 	screen,
@@ -11,13 +12,23 @@ import {
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EditPostForm } from "@/components/notes/edit-post-form";
+import {
+	AUTOSAVE_DELAY_MS,
+	AUTOSAVE_RETRY_MS,
+} from "@/hooks/notes/use-autosave";
 import { createChangesStore } from "@/lib/notes/changes-store";
 import { settingsStore } from "../../settings";
 
 const client = vi.hoisted(() => ({
 	saveNote: vi.fn(),
 	refreshChangeCount: vi.fn(),
-	NOTES_ERROR_MESSAGES: { offline: "Offline." },
+	NOTES_ERROR_MESSAGES: { "slug-taken": "Slug taken." },
+	SAVE_ERROR_OUTCOMES: {
+		"slug-taken": "refused",
+		"signed-out": "failed",
+		offline: "failed",
+		server: "failed",
+	},
 }));
 
 vi.mock("@/lib/notes/client", () => client);
@@ -99,14 +110,40 @@ describe("EditPostForm", () => {
 	});
 
 	it("shows the message of a refused save", async () => {
-		client.saveNote.mockResolvedValue(R.Error("offline"));
+		client.saveNote.mockResolvedValue(R.Error("slug-taken"));
 		renderForm();
 		await userEvent.type(
 			screen.getByDisplayValue("Jotai recipes"),
 			"!{Control>}s{/Control}",
 		);
-		expect((await screen.findByRole("alert")).textContent).toBe("Offline.");
+		expect((await screen.findByRole("alert")).textContent).toBe("Slug taken.");
 	});
+
+	it.each([
+		[
+			"offline",
+			"Not saved: Daluang could not reach the server. Daluang tries again in 5 seconds.",
+		],
+		[
+			"server",
+			"Not saved: the server could not save the post. Daluang tries again in 5 seconds.",
+		],
+		[
+			"signed-out",
+			"Not saved: your session ended. Sign in again in another tab. The text stays on this page, and Daluang tries again in 5 seconds.",
+		],
+	])(
+		"tells the writer that Daluang tries again after %s",
+		async (error, message) => {
+			client.saveNote.mockResolvedValue(R.Error(error));
+			renderForm();
+			await userEvent.type(
+				screen.getByDisplayValue("Jotai recipes"),
+				"!{Control>}s{/Control}",
+			);
+			expect((await screen.findByRole("alert")).textContent).toBe(message);
+		},
+	);
 
 	it("shows the errors of the form, and saves nothing", async () => {
 		renderForm();
@@ -134,6 +171,64 @@ describe("EditPostForm", () => {
 		const panel = screen.getByRole("complementary", { name: "Details" });
 		expect(panel.querySelector("input")?.value).toBe("Jotai recipes");
 		expect(screen.queryByRole("button", { name: "Details" })).toBeNull();
+	});
+});
+
+describe("EditPostForm with fake timers", () => {
+	beforeEach(() => {
+		vi.useFakeTimers();
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	function status(): string | null {
+		return screen.getByRole("status").textContent;
+	}
+
+	function saveNow() {
+		fireEvent.keyDown(window, { key: "s", ctrlKey: true });
+	}
+
+	it("shows Saved only after the save of the last change", async () => {
+		const first = Promise.withResolvers<R.Result<Note, string>>();
+		client.saveNote
+			.mockReturnValueOnce(first.promise)
+			.mockResolvedValue(R.Ok(NOTE));
+		renderForm();
+		const title = screen.getByDisplayValue("Jotai recipes");
+		fireEvent.change(title, { target: { value: "Jotai" } });
+		saveNow();
+		expect(status()).toBe("Saving");
+		fireEvent.change(title, { target: { value: "Jotai!" } });
+		await act(async () => first.resolve(R.Ok(NOTE)));
+		expect(status()).toBe("Not saved yet");
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS));
+		expect(status()).toBe("Saved");
+		expect(client.saveNote).toHaveBeenCalledTimes(2);
+		expect(client.saveNote).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				draft: expect.objectContaining({ title: "Jotai!" }),
+			}),
+		);
+	});
+
+	it("shows Saved again after the retry of a failed save", async () => {
+		client.saveNote
+			.mockResolvedValueOnce(R.Error("offline"))
+			.mockResolvedValue(R.Ok(NOTE));
+		renderForm();
+		fireEvent.change(screen.getByDisplayValue("Jotai recipes"), {
+			target: { value: "Jotai" },
+		});
+		await act(async () => saveNow());
+		expect(screen.getByRole("alert").textContent).toBe(
+			"Not saved: Daluang could not reach the server. Daluang tries again in 5 seconds.",
+		);
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_RETRY_MS));
+		expect(client.saveNote).toHaveBeenCalledTimes(2);
+		expect(status()).toBe("Saved");
 	});
 });
 
