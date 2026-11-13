@@ -72,6 +72,10 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
   `/posts/new` is not a post with the ID `new`.
 - `/posts/new` and `/posts/$id` are the pages of the editor. `EditPostPage` reads the ID
   of the post with `pageParams`.
+- **The sidebar folds to its icons on the editor** (`isEditorPage`), for the room to
+  write. `AppShell` gives `folded` to `SidebarProvider`. A toggle opens the sidebar until
+  the person leaves the editor. The fold does not change the stored state of the sidebar.
+  The server renders the folded sidebar, so the first paint shows it folded also.
 - A page that navigates after an action, for example after Save, reads the router with
   `useRouter({ warn: false })`. The server renders the page with no router, and only an
   action in the island navigates.

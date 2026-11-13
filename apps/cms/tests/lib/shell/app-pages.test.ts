@@ -3,6 +3,7 @@ import {
 	APP_PAGES,
 	documentTitle,
 	findAppPage,
+	isEditorPage,
 	matchesPage,
 	NOT_FOUND_TITLE,
 	normalizePath,
@@ -69,5 +70,18 @@ describe("pageTitle", () => {
 describe("documentTitle", () => {
 	it("adds the name of the product", () => {
 		expect(documentTitle("Posts")).toBe("Posts · Daluang");
+	});
+});
+
+describe("isEditorPage", () => {
+	it.each([
+		["/posts/new", true],
+		["/posts/n1", true],
+		["/posts/n1/", true],
+		["/posts", false],
+		["/", false],
+		["/nowhere", false],
+	])("%s gives %s", (path, expected) => {
+		expect(isEditorPage(path)).toBe(expected);
 	});
 });
