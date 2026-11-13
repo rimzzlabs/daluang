@@ -15,5 +15,8 @@ export default defineProject({
 		pool: "vmThreads",
 		include: ["tests/**/*.test.{ts,tsx}"],
 		setupFiles: ["tests/setup.ts"],
+		// A test that loads CodeMirror in jsdom can take 5 s on a busy computer, and the
+		// pre-push hook runs each test at once. The default of 5 s then fails a good test.
+		testTimeout: 15_000,
 	},
 });
