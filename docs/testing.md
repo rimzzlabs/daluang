@@ -29,8 +29,10 @@ This page tells which code needs a test, where the test goes, and how coverage c
 
 ## Environment
 
-- The tests run in the `node` environment, in the `vmThreads` pool. A React component test
-  uses `@testing-library/react`, and its first line is `// @vitest-environment jsdom`.
+- The tests run in the `node` environment, in the `vmThreads` pool. The root
+  `vitest.config.ts` limits the workers to 50% of the CPU cores (`maxWorkers`). CI uses
+  the default of Vitest. A React component test uses `@testing-library/react`, and its
+  first line is `// @vitest-environment jsdom`.
 - A test of `apps/cms` has 15 s, not the 5 s of Vitest. A test that loads CodeMirror in
   jsdom can take 5 s on a busy computer, and the pre-push hook runs all tests together.
 - jsdom has no layout. `apps/cms/tests/setup.ts` gives a text range no box, because
