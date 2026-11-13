@@ -21,6 +21,10 @@ const RULES = {
 	fields: FIELDS,
 };
 
+// The preview loads the parser of Comark with a lazy import. On a busy computer, as in the
+// pre-push hook, the first load takes more than the 1 s of `findByRole`.
+const LAZY_PREVIEW = { timeout: 10_000 };
+
 let last: NoteForm = emptyNoteForm(RULES);
 
 function Harness(props: {
@@ -124,7 +128,11 @@ describe("PostForm", () => {
 		await typeInEditor("Body", "# Resep");
 		await userEvent.click(screen.getByRole("button", { name: "Preview" }));
 		expect(
-			await screen.findByRole("heading", { level: 1, name: "Resep" }),
+			await screen.findByRole(
+				"heading",
+				{ level: 1, name: "Resep" },
+				LAZY_PREVIEW,
+			),
 		).toBeTruthy();
 		await userEvent.click(screen.getByRole("button", { name: "Write" }));
 		expect(screen.getByRole("textbox", { name: "Body" }).textContent).toBe(
@@ -137,7 +145,11 @@ describe("PostForm", () => {
 		await typeInEditor("Body", "# Resep");
 		await userEvent.click(screen.getByRole("button", { name: "Split" }));
 		expect(
-			await screen.findByRole("heading", { level: 1, name: "Resep" }),
+			await screen.findByRole(
+				"heading",
+				{ level: 1, name: "Resep" },
+				LAZY_PREVIEW,
+			),
 		).toBeTruthy();
 		expect(screen.getByRole("textbox", { name: "Body" })).toBeTruthy();
 		await userEvent.click(screen.getByRole("button", { name: "Split" }));
