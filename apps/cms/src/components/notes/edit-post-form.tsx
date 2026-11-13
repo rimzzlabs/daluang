@@ -1,14 +1,15 @@
 import type { Note, NoteDraft } from "@daluang/notes/note";
 import {
+	type NoteForm,
 	type NoteFormErrors,
 	noteFormOf,
 	parseNoteForm,
 } from "@daluang/notes/note-form";
-import { Button, buttonVariants } from "@daluang/ui/components/button";
-import { Spinner } from "@daluang/ui/components/spinner";
+import { buttonVariants } from "@daluang/ui/components/button";
 import { R } from "@mobily/ts-belt";
-import { type SyntheticEvent, useState } from "react";
+import { type KeyboardEvent, useState } from "react";
 import { NavLink, type NavLinkKind } from "@/components/shell/nav-link";
+import { useAutosave } from "@/hooks/notes/use-autosave";
 import { useSettings } from "@/hooks/settings/use-settings";
 import type { ChangesStore } from "@/lib/notes/changes-store";
 import {
@@ -30,8 +31,11 @@ export interface EditPostFormProps {
 }
 
 /**
- * The form of a stored post, and Save. A save of a published post changes only its
- * working copy, so the navbar reads the number of changes again.
+ * The form of a stored post. It saves the working copy about 1 s after the writer stops
+ * (`useAutosave`). The sites change only at Publish changes, so a save is safe. A value
+ * that is not valid shows its error, and the save waits for a valid post. A save of a
+ * published post changes only its working copy, so the navbar reads the number of changes
+ * again.
  */
 export function EditPostForm(props: EditPostFormProps) {
 	const { languages, fields } = useSettings(props.settings);
@@ -39,15 +43,14 @@ export function EditPostForm(props: EditPostFormProps) {
 	const [form, setForm] = useState(() => noteFormOf(props.note, fields));
 	const [errors, setErrors] = useState<NoteFormErrors>({});
 	const [save, setSave] = useState<SaveState>({ status: "idle" });
-	const saving = save.status === "saving";
 
-	async function submit(event: SyntheticEvent<HTMLFormElement>) {
-		event.preventDefault();
+	async function saveForm(next: NoteForm) {
 		const draft = R.match(
-			parseNoteForm(form, rules),
+			parseNoteForm(next, rules),
 			(valid): NoteDraft | null => valid,
 			(found) => {
 				setErrors(found);
+				setSave({ status: "invalid" });
 				return null;
 			},
 		);
@@ -66,11 +69,22 @@ export function EditPostForm(props: EditPostFormProps) {
 		);
 	}
 
+	const autosave = useAutosave(saveForm);
+
+	// Mod-S saves at once, as in other editors. The key comes up from each input, also from
+	// the editor of the body.
+	function onKeyDown(event: KeyboardEvent<HTMLFormElement>) {
+		if (event.key !== "s" || !(event.metaKey || event.ctrlKey)) return;
+		event.preventDefault();
+		autosave.flush();
+	}
+
 	return (
 		<form
 			noValidate
 			className="flex w-full max-w-3xl flex-col gap-6"
-			onSubmit={submit}
+			onSubmit={(event) => event.preventDefault()}
+			onKeyDown={onKeyDown}
 		>
 			<PostForm
 				value={form}
@@ -79,7 +93,8 @@ export function EditPostForm(props: EditPostFormProps) {
 				definitions={fields}
 				onChange={(next) => {
 					setForm(next);
-					if (save.status === "saved") setSave({ status: "idle" });
+					setSave({ status: "pending" });
+					autosave.schedule(next);
 				}}
 			/>
 			<PostStatusBar body={form.body} save={save} />
@@ -91,10 +106,6 @@ export function EditPostForm(props: EditPostFormProps) {
 				>
 					Back to the posts
 				</NavLink>
-				<Button type="submit" disabled={saving}>
-					{saving ? <Spinner data-icon="inline-start" /> : null}
-					Save
-				</Button>
 			</div>
 		</form>
 	);

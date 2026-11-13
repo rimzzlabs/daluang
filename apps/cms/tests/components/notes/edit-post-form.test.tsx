@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import type { Note } from "@daluang/notes/note";
 import { R } from "@mobily/ts-belt";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { EditPostForm } from "@/components/notes/edit-post-form";
@@ -53,15 +53,16 @@ function renderForm(onSaved = vi.fn()) {
 }
 
 describe("EditPostForm", () => {
-	it("saves the post, then reads the number of changes again", async () => {
+	it("saves at Mod-S, then reads the number of changes again", async () => {
 		const saved = { ...NOTE, title: "Jotai" };
 		client.saveNote.mockResolvedValue(R.Ok(saved));
 		const { changes, onSaved } = renderForm();
 		const title = screen.getByDisplayValue("Jotai recipes");
 		await userEvent.clear(title);
 		await userEvent.type(title, "Jotai");
-		await userEvent.click(screen.getByRole("button", { name: "Save" }));
-		expect(client.saveNote).toHaveBeenCalledWith({
+		expect(screen.getByRole("status").textContent).toBe("Not saved yet");
+		await userEvent.type(title, "{Control>}s{/Control}");
+		expect(client.saveNote).toHaveBeenCalledExactlyOnceWith({
 			id: "n1",
 			draft: {
 				title: "Jotai",
@@ -73,25 +74,42 @@ describe("EditPostForm", () => {
 				body: "# Jotai",
 			},
 		});
-		expect((await screen.findByRole("status")).textContent).toBe("Saved");
+		await waitFor(() =>
+			expect(screen.getByRole("status").textContent).toBe("Saved"),
+		);
 		expect(onSaved).toHaveBeenCalledWith(saved);
 		expect(client.refreshChangeCount).toHaveBeenCalledWith(changes);
-		await userEvent.type(title, "!");
-		expect(screen.queryByRole("status")).toBeNull();
+	});
+
+	it("saves by itself after the writer stops", async () => {
+		client.saveNote.mockResolvedValue(R.Ok(NOTE));
+		renderForm();
+		await userEvent.type(screen.getByDisplayValue("Jotai recipes"), "!");
+		expect(client.saveNote).not.toHaveBeenCalled();
+		await waitFor(() => expect(client.saveNote).toHaveBeenCalledOnce(), {
+			timeout: 3000,
+		});
 	});
 
 	it("shows the message of a refused save", async () => {
 		client.saveNote.mockResolvedValue(R.Error("offline"));
 		renderForm();
-		await userEvent.click(screen.getByRole("button", { name: "Save" }));
+		await userEvent.type(
+			screen.getByDisplayValue("Jotai recipes"),
+			"!{Control>}s{/Control}",
+		);
 		expect((await screen.findByRole("alert")).textContent).toBe("Offline.");
 	});
 
-	it("shows the errors of the form, and sends nothing", async () => {
+	it("shows the errors of the form, and saves nothing", async () => {
 		renderForm();
-		await userEvent.clear(screen.getByDisplayValue("Jotai recipes"));
-		await userEvent.click(screen.getByRole("button", { name: "Save" }));
+		const title = screen.getByDisplayValue("Jotai recipes");
+		await userEvent.clear(title);
+		await userEvent.type(title, "{Control>}s{/Control}");
 		expect(screen.getByText("Give the post a title.")).toBeTruthy();
+		expect(screen.getByRole("status").textContent).toBe(
+			"Not saved: correct the marked values",
+		);
 		expect(client.saveNote).not.toHaveBeenCalled();
 	});
 

@@ -79,8 +79,8 @@ describe("EditPost", () => {
 		client.readNote.mockResolvedValue(R.Ok(NOTE));
 		client.saveNote.mockResolvedValue(R.Ok(NOTE));
 		const onSaved = renderEditPost();
-		await screen.findByDisplayValue("Jotai recipes");
-		await userEvent.click(screen.getByRole("button", { name: "Save" }));
+		const title = await screen.findByDisplayValue("Jotai recipes");
+		await userEvent.type(title, "!{Control>}s{/Control}");
 		await waitFor(() => expect(onSaved).toHaveBeenCalledOnce());
 	});
 });
