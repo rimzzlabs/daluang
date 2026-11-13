@@ -14,6 +14,7 @@ import { R } from "@mobily/ts-belt";
 import { useEffect, useState } from "react";
 import { match } from "ts-pattern";
 import { NavLink, type NavLinkKind } from "@/components/shell/nav-link";
+import { usePublishCount } from "@/hooks/notes/use-change-count";
 import { useSettings } from "@/hooks/settings/use-settings";
 import { STATUS_LABELS } from "@/lib/notes/change-labels";
 import type { ChangesStore } from "@/lib/notes/changes-store";
@@ -43,29 +44,83 @@ export interface EditPostProps {
 	onSaved: () => void;
 }
 
+interface NoteMerge {
+	/** The note that gives each field that the writer changes. */
+	saved: Note;
+	/** The note that gives each field that only Publish changes changes. */
+	published: Note;
+}
+
+/** One note from two: a save never changes the status, the published copy, or the mark. */
+function mergeNote(merge: NoteMerge): Note {
+	const { saved, published } = merge;
+	return {
+		...saved,
+		status: published.status,
+		publishedAt: published.publishedAt,
+		published: published.published,
+		mark: published.mark,
+	};
+}
+
+interface PostRead {
+	/** The state on the page before the read. */
+	shown: LoadState;
+	result: R.Result<Note, NotesError>;
+}
+
+/**
+ * The state after a read of the post. A read again after Publish changes takes only the
+ * fields of Publish changes, so an old answer does not replace a newer save. When it fails,
+ * the form stays, with the exception of a post that Publish changes deleted.
+ */
+function afterRead(read: PostRead): LoadState {
+	const { shown, result } = read;
+	return R.match(
+		result,
+		(note): LoadState => {
+			if (shown.status !== "ready") return { status: "ready", note };
+			const merged = mergeNote({ saved: shown.note, published: note });
+			return { status: "ready", note: merged };
+		},
+		(error): LoadState => {
+			if (shown.status === "ready" && error !== "not-found") return shown;
+			return { status: "failed", error };
+		},
+	);
+}
+
+/**
+ * The state after a save. The save takes the fields of the writer, and keeps the fields of
+ * Publish changes on the page, so an answer that comes after Publish changes keeps the status.
+ */
+function afterSave(saved: Note): (shown: LoadState) => LoadState {
+	return (shown) => {
+		if (shown.status !== "ready") return { status: "ready", note: saved };
+		const merged = mergeNote({ saved, published: shown.note });
+		return { status: "ready", note: merged };
+	};
+}
+
 /** The page of a stored post: it reads the post, then shows its form. */
 export function EditPost(props: EditPostProps) {
 	const { id } = props;
 	const [load, setLoad] = useState<LoadState>({ status: "loading" });
 	const { languages } = useSettings(props.settings).languages;
+	const published = usePublishCount(props.changes);
 
-	// The post is on the server, an external system. The page reads it when it opens.
+	// The post is on the server, an external system. The page reads it when it opens, and
+	// again after Publish changes, so the status shows the published post.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: a new `published` reads the post again.
 	useEffect(() => {
 		let current = true;
 		readNote(id).then((result) => {
-			if (!current) return;
-			setLoad(
-				R.match(
-					result,
-					(note): LoadState => ({ status: "ready", note }),
-					(error): LoadState => ({ status: "failed", error }),
-				),
-			);
+			if (current) setLoad((shown) => afterRead({ shown, result }));
 		});
 		return () => {
 			current = false;
 		};
-	}, [id]);
+	}, [id, published]);
 
 	return (
 		<Page>
@@ -128,7 +183,7 @@ export function EditPost(props: EditPostProps) {
 						changes={props.changes}
 						linkKind={props.linkKind}
 						onSaved={(note) => {
-							setLoad({ status: "ready", note });
+							setLoad(afterSave(note));
 							props.onSaved();
 						}}
 					/>

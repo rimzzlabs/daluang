@@ -31,7 +31,8 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
   renders each reader again. The sidebar shows the new site name at once.
 - The island also puts a `ChangesStore` in the router context, with the number of
   changes from the server. The Publish changes button of the navbar reads it and writes
-  it, and the posts page writes it (`docs/notes.md`).
+  it, and the posts page writes it. After each Publish changes, each page that shows
+  posts reads them again (`docs/notes.md`).
 
 ## Menus
 

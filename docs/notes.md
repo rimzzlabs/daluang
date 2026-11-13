@@ -228,6 +228,10 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - `createChangesStore` of `apps/cms/src/lib/notes/changes-store.ts` keeps the number of
   changes in the browser, and `useChangeCount` of `apps/cms/src/hooks/notes/` renders a
   component again after each write.
+- The store also counts each Publish changes that succeeds. `markPublished` sets the
+  number of changes to 0 and adds 1 to this count (`readPublished`). `usePublishCount`
+  renders a component again after each Publish changes, so the component reads its posts
+  again.
 
 ## Publish
 
@@ -293,6 +297,13 @@ It gets the languages setting and the field definitions as `DraftRules`.
   the read fails, or no field blocks the post, the page shows the generic message of the
   code. The alert state is one union: `code` or `blocked`.
 - The page writes the number of changes of the server to the store of the navbar.
+- After each Publish changes, `usePostList` reads the list again, so the badges and the
+  status of each post change, and a deleted post goes away. The list stays on the page
+  while the hook reads it. The dashboard uses the same hook.
+- If the read after Publish changes fails, the list on the page stays, and the next
+  action reads it again. A failed first read and a failed retry show the error.
+- Each read of `usePostList` gets a number, and only the answer of the last read changes
+  the list and the number of changes in the navbar.
 - The header of the page has **New post**, a link to `/posts/new`.
 - The posts page is at `/posts`. With no post, it shows `NoPosts`: a link to a new post.
   The steps to set up a site are on the dashboard (`docs/app-shell.md`).
@@ -308,8 +319,9 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - `explorerNotes` of `src/note-list.ts` gives the posts of the search and the filter. The
   search finds the text in the title or the slug, with no difference between capitals and
   small letters.
-- The page reads the list with `usePostList`, and reads it again after a save and after a
-  new translation. The explorer then shows the new title.
+- The page reads the list with `usePostList`, and reads it again after a save, after a
+  new translation, and after Publish changes. The explorer then shows the new title and
+  the new status.
 
 ## The New post page
 
@@ -332,6 +344,15 @@ It gets the languages setting and the field definitions as `DraftRules`.
   `/posts/<id>`. It reads the post with `readNote`, and shows its status and
   `EditPostForm`. A key of the ID resets the page for another post. A post that does not
   exist shows its message, with a link back to the list.
+- After each Publish changes, `EditPost` reads the post again, so the status of the page
+  changes. `EditPostForm` makes its form state from `note` only at its first render, so
+  the text that the writer types stays. If Publish changes deleted the post, the page
+  shows the message of a post that does not exist. Text that is not saved goes away with
+  the deleted post. Another error of this read keeps the form.
+- The read after Publish changes takes only the fields that Publish changes writes:
+  `status`, `publishedAt`, `published`, and `mark`. A save takes each other field of the
+  saved note, and keeps these four fields of the page, so an answer that comes late
+  does not show old data.
 - `EditPostForm` of `apps/cms/src/components/notes/edit-post-form.tsx` is the form of a
   stored post. It starts with `noteFormOf`, and it saves by itself: there is no Save
   button.
@@ -402,9 +423,10 @@ It gets the languages setting and the field definitions as `DraftRules`.
   HTML and the island then show the same number, with no request from the browser.
 - A click opens a dialog with the list of `listChangesOfCms`: the title, the language, and
   the change of each note. The list also writes the new number to the store.
-- **Publish changes** in the dialog calls `publishChanges`. If it succeeds, the store gets
-  0, so the button goes away. If it fails, the dialog stays open with the message, and
-  the number stays.
+- **Publish changes** in the dialog calls `publishChanges`. If it succeeds, the dialog
+  calls `markPublished` of the store, so the button goes away and each page reads its
+  posts again. If it fails, the dialog stays open with the message, and the number
+  stays.
 
 ## The content API
 

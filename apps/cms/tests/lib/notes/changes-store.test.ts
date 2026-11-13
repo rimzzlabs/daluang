@@ -21,4 +21,17 @@ describe("createChangesStore", () => {
 		expect(first).toHaveBeenCalledOnce();
 		expect(second).toHaveBeenCalledTimes(2);
 	});
+
+	it("counts each Publish changes, with no change after it", () => {
+		const store = createChangesStore(2);
+		const listener = vi.fn();
+		store.subscribe(listener);
+		expect(store.readPublished()).toBe(0);
+		store.markPublished();
+		expect(store.readPublished()).toBe(1);
+		expect(store.read()).toBe(0);
+		expect(listener).toHaveBeenCalledOnce();
+		store.write(1);
+		expect(store.readPublished()).toBe(1);
+	});
 });

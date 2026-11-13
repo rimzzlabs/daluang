@@ -75,7 +75,7 @@ export function PublishChanges(props: PublishChangesProps) {
 		R.match(
 			result,
 			() => {
-				props.changes.write(0);
+				props.changes.markPublished();
 				setOpen(false);
 			},
 			(error) =>
