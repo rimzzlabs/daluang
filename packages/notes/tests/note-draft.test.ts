@@ -1,7 +1,11 @@
 import { A } from "@mobily/ts-belt";
 import { describe, expect, it } from "vitest";
 import type { FieldDefinition } from "../src/field-definitions";
-import { NOTE_BODY_MAX_BYTES, noteDraftSchema } from "../src/note-draft";
+import {
+	NOTE_BODY_MAX_BYTES,
+	noteDraftSchema,
+	publishedDraftSchema,
+} from "../src/note-draft";
 
 const LANGUAGES = { languages: ["en", "id"], defaultLanguage: "en" };
 
@@ -55,10 +59,8 @@ describe("noteDraftSchema", () => {
 		]);
 	});
 
-	it("refuses a missing required field", () => {
-		expect(messages({ ...DRAFT, fields: {} })).toEqual([
-			"Give Featured a value.",
-		]);
+	it("accepts a missing required field: Publish asks for it", () => {
+		expect(messages({ ...DRAFT, fields: {} })).toEqual([]);
 	});
 
 	it("refuses a value of the wrong type", () => {
@@ -67,8 +69,40 @@ describe("noteDraftSchema", () => {
 		).toEqual(["Series needs a text."]);
 	});
 
+	it("accepts an empty value of a required text in a saved draft", () => {
+		const saved = noteDraftSchema({
+			languages: LANGUAGES,
+			fields: [
+				{ name: "series", label: "Series", type: "text", required: true },
+			],
+		});
+		expect(saved.safeParse({ ...DRAFT, fields: { series: "" } }).success).toBe(
+			true,
+		);
+	});
+
+	it("accepts a body at the size limit, and refuses one byte more", () => {
+		const body = "a".repeat(NOTE_BODY_MAX_BYTES);
+		expect(schema.safeParse({ ...DRAFT, body }).success).toBe(true);
+		expect(messages({ ...DRAFT, body: `${body}a` })).toEqual([
+			"Keep the post at 1 MB or less.",
+		]);
+	});
+});
+
+describe("publishedDraftSchema", () => {
+	it("refuses a missing required field", () => {
+		const published = publishedDraftSchema({
+			languages: LANGUAGES,
+			fields: FIELDS,
+		});
+		expect(published.safeParse({ ...DRAFT, fields: {} }).error?.issues).toEqual(
+			[expect.objectContaining({ message: "Give Featured a value." })],
+		);
+	});
+
 	it("refuses an empty value of a required text or list", () => {
-		const required = noteDraftSchema({
+		const required = publishedDraftSchema({
 			languages: LANGUAGES,
 			fields: [
 				{ name: "series", label: "Series", type: "text", required: true },
@@ -83,14 +117,6 @@ describe("noteDraftSchema", () => {
 		expect(A.map(parsed.error?.issues ?? [], (issue) => issue.path)).toEqual([
 			["fields", "series"],
 			["fields", "tags"],
-		]);
-	});
-
-	it("accepts a body at the size limit, and refuses one byte more", () => {
-		const body = "a".repeat(NOTE_BODY_MAX_BYTES);
-		expect(schema.safeParse({ ...DRAFT, body }).success).toBe(true);
-		expect(messages({ ...DRAFT, body: `${body}a` })).toEqual([
-			"Keep the post at 1 MB or less.",
 		]);
 	});
 });

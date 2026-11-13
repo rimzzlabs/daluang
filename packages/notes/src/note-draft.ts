@@ -43,31 +43,38 @@ interface FieldIssue {
 	message: string;
 }
 
+interface FieldCheck {
+	definition: FieldDefinition;
+	fields: ExtraFields;
+	/** True at Publish: a required field must then have a value. */
+	requireValues: boolean;
+}
+
 /** The problem of the value of one defined field, or `None` for a correct value. */
-function fieldIssue(
-	definition: FieldDefinition,
-	fields: ExtraFields,
-): O.Option<FieldIssue> {
+function fieldIssue(check: FieldCheck): O.Option<FieldIssue> {
+	const { definition, fields, requireValues } = check;
 	const value = fields[definition.name];
+	const required = requireValues && definition.required;
 	const missing = O.Some({
 		name: definition.name,
 		message: `Give ${definition.label} a value.`,
 	});
-	if (value === undefined) return definition.required ? missing : O.None;
+	if (value === undefined) return required ? missing : O.None;
 	if (!VALUE_SCHEMAS[definition.type].safeParse(value).success)
 		return O.Some({
 			name: definition.name,
 			message: `${definition.label} needs ${VALUE_WORDS[definition.type]}.`,
 		});
-	return definition.required && isEmptyValue(value) ? missing : O.None;
+	return required && isEmptyValue(value) ? missing : O.None;
 }
 
-/**
- * The schema of a draft for the settings of a CMS. The language must be a language of the
- * CMS, and each defined field must have its type and, if it is required, a value. An extra
- * field that the settings do not define stays as it is.
- */
-export function noteDraftSchema(rules: DraftRules): z.ZodType<NoteDraft> {
+interface DraftCheck {
+	rules: DraftRules;
+	requireValues: boolean;
+}
+
+function draftSchema(check: DraftCheck): z.ZodType<NoteDraft> {
+	const { rules, requireValues } = check;
 	const { shape } = noteMetadataSchema;
 	return z.object({
 		title: shape.title,
@@ -81,7 +88,9 @@ export function noteDraftSchema(rules: DraftRules): z.ZodType<NoteDraft> {
 		fields: extraFieldsSchema.superRefine((fields, context) => {
 			pipe(
 				rules.fields,
-				A.filterMap((definition) => fieldIssue(definition, fields)),
+				A.filterMap((definition) =>
+					fieldIssue({ definition, fields, requireValues }),
+				),
 				A.forEach((issue) => {
 					context.addIssue({
 						code: "custom",
@@ -98,4 +107,21 @@ export function noteDraftSchema(rules: DraftRules): z.ZodType<NoteDraft> {
 				"Keep the post at 1 MB or less.",
 			),
 	});
+}
+
+/**
+ * The schema of a draft that the writer saves. The language must be a language of the CMS,
+ * and each defined field must have its type. A required field can be empty: Publish asks
+ * for its value. An extra field that the settings do not define stays as it is.
+ */
+export function noteDraftSchema(rules: DraftRules): z.ZodType<NoteDraft> {
+	return draftSchema({ rules, requireValues: false });
+}
+
+/**
+ * The schema of a draft at Publish: the schema of a saved draft, and a value for each
+ * required field.
+ */
+export function publishedDraftSchema(rules: DraftRules): z.ZodType<NoteDraft> {
+	return draftSchema({ rules, requireValues: true });
 }
