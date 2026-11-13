@@ -465,8 +465,11 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - Each note has its published metadata, its extra fields, its Markdown as `body`, its ID,
   `status`, `publishedAt`, `createdAt`, and its Comark document as `document`. `parseMarkdown` of `comark` makes the document: a node is a
   string, or `[tag, props, ...children]`. A site maps each tag to a component of its own.
-- The CMS does not highlight code. A `pre` node keeps the language, and the rest of the
+- The CMS does not highlight code. A `pre` node keeps the props `language`, `filename`
+  (the text in `[ ]`), and `highlights` (the lines in `{ }`, as numbers). The rest of the
   first line of the fence stays as `meta`, so each site highlights with its own Shiki.
+- HTML in a note gives a node with the prop `$`, for example `{ "$": { "html": 1 } }`. The
+  prop is a marker of Comark, so a site must not put it on an element.
 - A site sends `Authorization: Bearer dlg_…`. The handler gets `authorize` as a parameter,
   and `authorizeSite` of `apps/cms/src/lib/notes/authorize.ts` checks the token with
   `verifyApiToken`. A request with no valid token answers 401, with

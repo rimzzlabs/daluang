@@ -24,9 +24,35 @@ for example `::callout{type="tip"}`, is a node with its own tag:
 ["callout", { "type": "tip" }, "Run ", ["strong", {}, "pnpm i"], " first."]
 ```
 
-A comment is `[null, {}, text]`. A code block is a `pre` node with `language` and `meta`:
-the rest of the first line of the fence, for example `title="app.ts" showLineNumbers`.
-The CMS does not highlight code, so your site highlights it with its own Shiki.
+A comment is `[null, {}, text]`. A code block is a `pre` node. Its props are:
+
+- `language`: the language of the fence, for example `ts`
+- `filename`: the text in `[ ]`, for example `app.ts`
+- `highlights`: the lines in `{ }`, as an array of numbers, for example `[1, 2]`
+- `meta`: the rest of the first line of the fence, for example
+  `title="x" showLineNumbers`
+
+For the fence ` ```ts [app.ts] {1,2} title="x" showLineNumbers `, the node is:
+
+```json
+[
+  "pre",
+  {
+    "language": "ts",
+    "filename": "app.ts",
+    "highlights": [1, 2],
+    "meta": "title=\"x\" showLineNumbers"
+  },
+  ["code", { "class": "language-ts" }, "const a = 1;"]
+]
+```
+
+A prop is not there when the fence does not have it. The CMS does not highlight code, so
+your site highlights it with its own Shiki.
+
+HTML that a writer types, for example `<details>`, gives a node with the prop `$`, for
+example `["details", { "$": { "html": 1, "block": 1 } }, …]`. The prop `$` is a marker of
+Comark. It is not an HTML attribute.
 
 ## Give the site a token
 
@@ -59,6 +85,10 @@ export function daluangLoader(options: DaluangLoaderOptions): Loader {
   return {
     name: "daluang",
     load: async (context) => {
+      if (!options.url || !options.token)
+        throw new Error(
+          "Set DALUANG_URL and DALUANG_TOKEN for the build. The Daluang loader needs them.",
+        );
       const response = await fetch(new URL("/api/content/notes", options.url), {
         headers: { Authorization: `Bearer ${options.token}` },
       });
@@ -85,12 +115,13 @@ export function daluangLoader(options: DaluangLoaderOptions): Loader {
 
 The ID of a post is `<language>/<slug>`, for example `en/jotai-recipes`. Two posts with
 the same slug in different languages are translations of each other. If the URL or the
-token is wrong, the build stops with the status of the answer.
+token is empty, the build stops with a message that names both variables. If the URL or
+the token is wrong, the build stops with the status of the answer.
 
 ## Define the collection
 
 Add the collection to `src/content.config.ts`. Add each extra field of your site to the
-schema of `fields`:
+schema of `fields`. Make each extra field `.optional()`, or give it a `.default(...)`:
 
 ```ts
 import { defineCollection } from "astro:content";
@@ -110,13 +141,17 @@ const posts = defineCollection({
     keywords: z.array(z.string()),
     publishedAt: z.string(),
     updatedAt: z.string(),
-    fields: z.object({ featured: z.boolean() }),
+    fields: z.object({ featured: z.boolean().optional() }),
     document: z.object({ nodes: z.array(z.any()) }),
   }),
 });
 
 export const collections = { posts };
 ```
+
+The CMS leaves out an extra field with an empty value. A post that the writer saved before
+you added the field has no key for it. A required field makes the build stop for such a
+post.
 
 ## Render the document
 
@@ -131,14 +166,16 @@ import Callout from "./callout.astro";
 import CodeBlock from "./code-block.astro";
 
 const { node } = Astro.props;
-const [Tag, props, ...children] = Array.isArray(node) ? node : [];
+const [Tag, props = {}, ...children] = Array.isArray(node) ? node : [];
+// `$` is a marker of Comark for HTML. Do not put it on an element.
+const { $: _marker, ...attributes } = props;
 const known = ["callout", "pre"];
 ---
 
 {typeof node === "string" && node}
 {
   Tag === "callout" && (
-    <Callout {...props}>
+    <Callout {...attributes}>
       {children.map((child) => <Astro.self node={child} />)}
     </Callout>
   )
@@ -148,36 +185,42 @@ const known = ["callout", "pre"];
     <CodeBlock
       code={children[0]?.[2] ?? ""}
       language={props.language}
+      filename={props.filename}
+      highlights={props.highlights}
       meta={props.meta}
     />
   )
 }
 {
   typeof Tag === "string" && !known.includes(Tag) && (
-    <Tag {...props}>{children.map((child) => <Astro.self node={child} />)}</Tag>
+    <Tag {...attributes}>{children.map((child) => <Astro.self node={child} />)}</Tag>
   )
 }
 ```
 
 - A comment has the tag `null`, so no branch renders it.
 - Map `pre` to your own code block. The first child of `pre` is the `code` node, and its
-  text is the code. With no branch, `language` and `meta` go on the `<pre>` element as
-  attributes.
+  text is the code. With no branch, `language`, `filename`, `highlights`, and `meta` go on
+  the `<pre>` element as attributes.
+- Tell the writers to use the `::component` syntax of Comark for a component. Comark
+  parses the Markdown inside a component. It does not parse the Markdown inside an HTML
+  block that has no blank line around the Markdown.
 - An island needs a branch of its own, with its import in the same file. Astro must see
   the import to hydrate it: `{Tag === "demo" && <Demo client:visible {...props} />}`.
 
 The code block can use the `Code` component of Astro, which highlights with Shiki. Your
-own transformer can read `meta`:
+own transformer can read `meta` and `highlights`:
 
 ```astro
 ---
 // src/components/code-block.astro
 import { Code } from "astro:components";
 
-const { code, language = "plaintext", meta } = Astro.props;
+const { code, language = "plaintext", filename, highlights = [], meta } = Astro.props;
 ---
 
-<figure data-meta={meta}>
+<figure data-meta={meta} data-highlights={highlights.join(",")}>
+  {filename && <figcaption>{filename}</figcaption>}
   <Code code={code} lang={language} />
 </figure>
 ```

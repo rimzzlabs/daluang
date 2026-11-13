@@ -27,6 +27,14 @@ The CMS sends a POST with this JSON body:
 The event is `test` or `publish`. A deploy hook can ignore the body: a
 POST starts the rebuild.
 
+The request has the headers `Content-Type: application/json` and
+`User-Agent: Daluang-Webhook/1`. It has no `Authorization` header and no signature. The
+CMS does not follow a redirect.
+
+A deploy hook works if it needs only a POST to a secret URL. Cloudflare Pages, Vercel, and
+Netlify give such a hook. A hook that needs an auth header or its own body does not work.
+For example, `repository_dispatch` of GitHub does not work.
+
 A delivery is **Delivered** when the answer has a status of 2xx. Each other answer, a
 redirect, or no answer in 10 seconds is **Failed**. The CMS keeps the 20 newest deliveries
 of each webhook.

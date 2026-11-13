@@ -61,7 +61,7 @@ the instance, the guard middleware, and the read of the environment.
   changes the schema (a plugin, a field), make the SQL with `getMigrations` of
   `better-auth/db/migration`, and add it as a new migration file. Do not edit an applied
   migration.
-- `apps/cms/.dev.vars.example` lists each variable. In production, set each one with
-  `wrangler secret put`.
+- `apps/cms/.dev.vars.example` lists each variable. In production, `deploy.yml` sets each
+  one at each deploy, with `--secrets-file`. A value that you set by hand is replaced.
 - `apps/cms/src/lib/auth/env.ts` reads the auth variables and the `DB` binding with the
   schema of `@daluang/auth/env`.
