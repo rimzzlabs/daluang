@@ -20,6 +20,7 @@ import {
 	ToggleGroupItem,
 } from "@daluang/ui/components/toggle-group";
 import { A } from "@mobily/ts-belt";
+import { cn } from "cn";
 import { lazy, Suspense, useId, useState } from "react";
 import { ExtraFieldInput } from "./extra-field-input";
 import { FormField } from "./form-field";
@@ -44,10 +45,12 @@ const PostPreview = lazy(() =>
 	import("./post-preview").then((module) => ({ default: module.PostPreview })),
 );
 
-type BodyView = "write" | "preview";
+const BODY_VIEWS = ["write", "split", "preview"] as const;
+
+type BodyView = (typeof BODY_VIEWS)[number];
 
 function isBodyView(value: unknown): value is BodyView {
-	return value === "write" || value === "preview";
+	return A.includes(BODY_VIEWS, value);
 }
 
 export interface PostFormProps {
@@ -195,26 +198,41 @@ export function PostForm(props: PostFormProps) {
 					}}
 				>
 					<ToggleGroupItem value="write">Write</ToggleGroupItem>
+					<ToggleGroupItem value="split">Split</ToggleGroupItem>
 					<ToggleGroupItem value="preview">Preview</ToggleGroupItem>
 				</ToggleGroup>
-				{/* The editor stays in the page during the preview, so it keeps its undo history. */}
-				<div hidden={view === "preview"}>
-					<Suspense fallback={<Skeleton className="h-80 w-full rounded-xl" />}>
-						<MarkdownEditor
-							id={`${id}-body`}
-							label="Body"
-							defaultValue={value.body}
-							invalid={errors.body !== undefined}
-							describedBy={`${id}-body-help`}
-							onChange={(body) => change({ body })}
-						/>
-					</Suspense>
+				{/* Split puts the preview beside the text from 64rem, and below it on a phone. */}
+				<div
+					className={cn(
+						"grid gap-3",
+						view === "split" && "lg:grid-cols-2 lg:items-start",
+					)}
+				>
+					{/* The editor stays in the page during the preview, so it keeps its undo history. */}
+					<div hidden={view === "preview"} className="min-w-0">
+						<Suspense
+							fallback={<Skeleton className="h-80 w-full rounded-xl" />}
+						>
+							<MarkdownEditor
+								id={`${id}-body`}
+								label="Body"
+								defaultValue={value.body}
+								invalid={errors.body !== undefined}
+								describedBy={`${id}-body-help`}
+								onChange={(body) => change({ body })}
+							/>
+						</Suspense>
+					</div>
+					{view === "write" ? null : (
+						<div className="min-w-0">
+							<Suspense
+								fallback={<Skeleton className="h-80 w-full rounded-xl" />}
+							>
+								<PostPreview body={value.body} />
+							</Suspense>
+						</div>
+					)}
 				</div>
-				{view === "preview" ? (
-					<Suspense fallback={<Skeleton className="h-80 w-full rounded-xl" />}>
-						<PostPreview body={value.body} />
-					</Suspense>
-				) : null}
 			</FormField>
 		</FieldGroup>
 	);
