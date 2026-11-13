@@ -24,6 +24,9 @@ apps/docs/src/pages.gen.ts
 /package-lock.json
 /yarn.lock
 
+# The coverage report of Vitest. A test run writes temporary files to it.
+coverage/
+
 # Logs
 *.log
 
