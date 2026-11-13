@@ -2,7 +2,7 @@ import { handleTokensRequest } from "@daluang/api-tokens/api";
 import { handleNotesRequest } from "@daluang/notes/api";
 import { handleChangesRequest } from "@daluang/notes/changes";
 import { handleContentRequest } from "@daluang/notes/content";
-import type { Note } from "@daluang/notes/note";
+import { type Note, noteSchema, noteSummarySchema } from "@daluang/notes/note";
 import { untitledDraft } from "@daluang/notes/note-draft";
 import { noteFormOf, parseNoteForm, withTitle } from "@daluang/notes/note-form";
 import { handleSettingsRequest } from "@daluang/settings/api";
@@ -10,6 +10,7 @@ import { readSettings } from "@daluang/settings/store";
 import { handleWebhooksRequest } from "@daluang/webhooks/api";
 import { R } from "@mobily/ts-belt";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { z } from "zod";
 import { authorizeSite } from "@/lib/notes/authorize";
 import { notifySites } from "@/lib/notes/notify";
 import { createFakeD1 } from "../fake-d1";
@@ -32,6 +33,29 @@ function request(method: string, path: string, body?: unknown): Request {
 		headers: { "content-type": "application/json" },
 		body: JSON.stringify(body),
 	});
+}
+
+// Each answer is JSON from outside the test, so the test reads it with a schema.
+const noteAnswer = z.object({ note: noteSchema });
+const listAnswer = z.object({ notes: z.array(noteSummarySchema) });
+const tokenAnswer = z.object({ secret: z.string() });
+const changesAnswer = z.object({
+	count: z.number(),
+	changes: z.array(z.object({ change: z.string() })),
+});
+const appliedAnswer = z.object({ applied: z.array(z.unknown()) });
+const contentAnswer = z.object({
+	notes: z.array(
+		z.looseObject({
+			title: z.string(),
+			slug: z.string(),
+			language: z.string(),
+		}),
+	),
+});
+
+async function read<T>(response: Response, schema: z.ZodType<T>): Promise<T> {
+	return schema.parse(await response.json());
 }
 
 afterEach(() => {
@@ -72,7 +96,9 @@ describe("the publish flow", () => {
 			});
 		}
 
-		async function content(secret: string): Promise<readonly Note[]> {
+		async function content(
+			secret: string,
+		): Promise<z.infer<typeof contentAnswer>["notes"]> {
 			const response = await handleContentRequest({
 				request: new Request(`${ORIGIN}/api/content/notes`, {
 					headers: { authorization: `Bearer ${secret}` },
@@ -81,7 +107,7 @@ describe("the publish flow", () => {
 				authorize: authorizeSite(db),
 			});
 			expect(response.status).toBe(200);
-			return (await response.json()).notes;
+			return (await read(response, contentAnswer)).notes;
 		}
 
 		// The onboarding saves the languages. A webhook and an API token connect the site.
@@ -105,12 +131,13 @@ describe("the publish flow", () => {
 			now: NOW,
 		});
 		expect(token.status).toBe(201);
-		const { secret } = await token.json();
+		const { secret } = await read(token, tokenAnswer);
 
 		// New post adds an untitled draft with a free slug.
-		const listed = await (
-			await notes({ method: "GET", path: "/api/notes" })
-		).json();
+		const listed = await read(
+			await notes({ method: "GET", path: "/api/notes" }),
+			listAnswer,
+		);
 		const rules = { languages: LANGUAGES, fields: [] };
 		const added = await notes({
 			method: "POST",
@@ -118,7 +145,7 @@ describe("the publish flow", () => {
 			body: untitledDraft({ notes: listed.notes, rules }),
 		});
 		expect(added.status).toBe(201);
-		const draft: Note = (await added.json()).note;
+		const draft: Note = (await read(added, noteAnswer)).note;
 		expect([draft.title, draft.slug]).toEqual(["Untitled", "untitled"]);
 
 		// The autosave sends the form of the editor. The slug follows the first title.
@@ -133,7 +160,7 @@ describe("the publish flow", () => {
 			body: R.getExn(parseNoteForm(form, rules)),
 		});
 		expect(saved.status).toBe(200);
-		expect((await saved.json()).note.slug).toBe("jotai-recipes");
+		expect((await read(saved, noteAnswer)).note.slug).toBe("jotai-recipes");
 
 		// A save changes no site.
 		expect(await content(secret)).toEqual([]);
@@ -147,9 +174,9 @@ describe("the publish flow", () => {
 			action: "publish",
 		});
 		expect(marked.status).toBe(200);
-		expect((await (await changes("GET")).json()).count).toBe(1);
+		expect((await read(await changes("GET"), changesAnswer)).count).toBe(1);
 		const applied = await changes("POST");
-		expect((await applied.json()).applied).toHaveLength(1);
+		expect((await read(applied, appliedAnswer)).applied).toHaveLength(1);
 		expect(hook).toHaveBeenCalledTimes(1);
 		const [target, init] = hook.mock.calls[0] ?? [];
 		expect(String(target)).toBe(HOOK);
@@ -174,9 +201,8 @@ describe("the publish flow", () => {
 			),
 		});
 		expect((await content(secret))[0]?.title).toBe("Jotai recipes");
-		expect((await (await changes("GET")).json()).changes[0].change).toBe(
-			"edit",
-		);
+		const waiting = await read(await changes("GET"), changesAnswer);
+		expect(waiting.changes).toEqual([{ change: "edit" }]);
 		await changes("POST");
 		expect((await content(secret))[0]?.title).toBe("Jotai recipes, part 2");
 
