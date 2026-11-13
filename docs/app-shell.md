@@ -49,8 +49,13 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
 ## The dashboard
 
 - `/` is the dashboard: `Dashboard` of `apps/cms/src/components/dashboard/dashboard.tsx`.
-  It shows the name of the site, a link to its address, **New post**, and `SetupSteps`:
-  the links to the fields, the API tokens, and the webhooks.
+  It shows the name of the site, a link to its address, and **New post**.
+- `RecentPosts` shows the six last changed posts, each with a link to its editor and its
+  status or its change. **All posts** opens `/posts`.
+- `SetupSteps` links to the fields, the API tokens, and the webhooks.
+- The dashboard and the posts page read the posts with `usePostList` of
+  `apps/cms/src/hooks/notes/use-post-list.ts`. It also gives the navbar the number of
+  changes.
 - `siteHost` of `packages/settings/src/site.ts` gives the address with no scheme, for
   example `rimzzlabs.com`.
 
