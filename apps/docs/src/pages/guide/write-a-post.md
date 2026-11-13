@@ -69,6 +69,10 @@ Two posts with the same slug in different languages are translations of each oth
 3. Select **Publish changes** in the dialog. The CMS applies each change, then sends one
    `publish` event to each [webhook](/guide/webhooks).
 
+If Publish does not accept a field of the post, for example an empty required field or a
+language that is not in the settings, the CMS does not mark the post. It names each field
+to correct, and it links to the post.
+
 The menu of a post also has **Unpublish**, **Delete**, and **Cancel the change**. An
 unpublish and a delete of a published post also wait for **Publish changes**. A delete
 of a draft is at once, after a confirmation.

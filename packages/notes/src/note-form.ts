@@ -3,7 +3,12 @@ import { match } from "ts-pattern";
 import type { ExtraFields } from "./extra-fields";
 import type { FieldDefinition } from "./field-definitions";
 import type { Note, NoteDraft } from "./note";
-import { type DraftRules, isUntitledSlug, noteDraftSchema } from "./note-draft";
+import {
+	type DraftRules,
+	isUntitledSlug,
+	noteDraftSchema,
+	publishedDraftSchema,
+} from "./note-draft";
 import { slugify } from "./slug";
 
 /** The value of an extra field in the editor: a text, or yes or no for a boolean field. */
@@ -185,6 +190,52 @@ function formErrors(issues: readonly Issue[]): NoteFormErrors {
 		A.map((issue) => [errorKey(issue.path), issue.message] as const),
 		A.reverse,
 		D.fromPairs,
+	);
+}
+
+/** One thing that stops a publish: the label of the input, and what the writer must do. */
+export interface PublishBlocker {
+	label: string;
+	message: string;
+}
+
+const CORE_LABELS: Record<string, string> = {
+	title: "Title",
+	slug: "Slug",
+	language: "Language",
+	description: "Description",
+	keywords: "Keywords",
+	body: "Body",
+	fields: "Extra fields",
+};
+
+function blockerLabel(
+	key: string,
+	definitions: readonly FieldDefinition[],
+): string {
+	if (!S.startsWith(key, FIELD_KEY)) return CORE_LABELS[key] ?? key;
+	const name = S.sliceToEnd(key, S.length(FIELD_KEY));
+	return A.find(definitions, (item) => item.name === name)?.label ?? name;
+}
+
+/**
+ * What stops a publish of a note: one entry for each input, with its first message. An
+ * empty list means that Daluang can publish the note. The inputs have the keys of `formErrors`.
+ */
+export function publishBlockers(
+	note: NoteDraft,
+	rules: DraftRules,
+): readonly PublishBlocker[] {
+	const result = publishedDraftSchema(rules).safeParse(note);
+	if (result.success) return [];
+	return pipe(
+		result.error.issues,
+		A.map((issue) => [errorKey(issue.path), issue.message] as const),
+		A.uniqBy(([key]) => key),
+		A.map(([key, message]) => ({
+			label: blockerLabel(key, rules.fields),
+			message,
+		})),
 	);
 }
 

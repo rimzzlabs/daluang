@@ -1,3 +1,4 @@
+import { publishBlockers } from "@daluang/notes/note-form";
 import {
 	inLanguage,
 	type ListedNote,
@@ -21,9 +22,9 @@ import {
 	PageTitle,
 } from "@daluang/ui/components/page";
 import { Skeleton } from "@daluang/ui/components/skeleton";
-import { A, R } from "@mobily/ts-belt";
+import { A, pipe, R } from "@mobily/ts-belt";
 import { PlusIcon, TranslateIcon } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { match } from "ts-pattern";
 import { NavLink, type NavLinkKind } from "@/components/shell/nav-link";
 import { usePostList } from "@/hooks/notes/use-post-list";
@@ -33,11 +34,13 @@ import {
 	markNoteOfCms,
 	NOTES_ERROR_MESSAGES,
 	type NotesError,
+	readNote,
 } from "@/lib/notes/client";
 import type { SettingsStore } from "@/lib/settings/settings-store";
 import { DeletePostDialog } from "./delete-post-dialog";
 import { LanguageFilter } from "./language-filter";
 import { NoPosts } from "./no-posts";
+import { PostLink } from "./post-link";
 import { PostList } from "./post-list";
 
 interface DeleteTarget {
@@ -45,6 +48,16 @@ interface DeleteTarget {
 	/** The dialog keeps the post while it closes, so its title does not change. */
 	post: ListedNote | null;
 }
+
+/** The alert above the list: the message of a code, or the fields that block a publish. */
+type MarkAlert =
+	| { status: "code"; error: NotesError }
+	| {
+			status: "blocked";
+			id: string;
+			title: string;
+			labels: readonly string[];
+	  };
 
 export interface PostsProps {
 	settings: SettingsStore;
@@ -60,25 +73,53 @@ export interface PostsProps {
  */
 export function Posts(props: PostsProps) {
 	const { changes } = props;
-	const { languages } = useSettings(props.settings).languages;
+	const settings = useSettings(props.settings);
+	const { languages } = settings.languages;
 	const { list, reload, retry } = usePostList(changes);
 	const [language, setLanguage] = useState<string | null>(null);
-	const [markError, setMarkError] = useState<NotesError | null>(null);
+	const latestMark = useRef(0);
+	const [markAlert, setMarkAlert] = useState<MarkAlert | null>(null);
 	const [deleting, setDeleting] = useState<DeleteTarget>({
 		open: false,
 		post: null,
 	});
 
+	/** The fields that stop a publish, or `null` when the note cannot tell them. */
+	async function blockedAlert(post: ListedNote): Promise<MarkAlert | null> {
+		const read = await readNote(post.note.id);
+		const note = R.getWithDefault(read, null);
+		if (note === null) return null;
+		const labels = pipe(
+			publishBlockers(note, {
+				languages: settings.languages,
+				fields: settings.fields,
+			}),
+			A.map((blocker) => blocker.label),
+		);
+		if (A.isEmpty(labels)) return null;
+		return { status: "blocked", id: note.id, title: note.title, labels };
+	}
+
 	async function mark(post: ListedNote, action: NoteMarkAction) {
-		setMarkError(null);
+		latestMark.current += 1;
+		const turn = latestMark.current;
+		setMarkAlert(null);
 		const result = await markNoteOfCms({ id: post.note.id, action });
 		const error = R.match(
 			result,
 			(): NotesError | null => null,
 			(failed) => failed,
 		);
-		setMarkError(error);
-		if (error === null) await reload();
+		if (error === null) {
+			await reload();
+			return;
+		}
+		const blocked =
+			error === "invalid" && action === "publish"
+				? await blockedAlert(post)
+				: null;
+		if (turn !== latestMark.current) return;
+		setMarkAlert(blocked ?? { status: "code", error });
 	}
 
 	function act(post: ListedNote, action: NoteAction) {
@@ -143,10 +184,27 @@ export function Posts(props: PostsProps) {
 									onChange={setLanguage}
 								/>
 							) : null}
-							{markError === null ? null : (
-								<p role="alert" className="text-sm text-destructive">
-									{NOTES_ERROR_MESSAGES[markError]}
-								</p>
+							{markAlert === null ? null : (
+								<div role="alert" className="text-sm text-destructive">
+									{match(markAlert)
+										.with({ status: "code" }, (coded) => (
+											<p>{NOTES_ERROR_MESSAGES[coded.error]}</p>
+										))
+										.with({ status: "blocked" }, (blocked) => (
+											<p>
+												Daluang cannot publish "{blocked.title}". Correct each
+												field in this list: {A.join(blocked.labels, ", ")}.{" "}
+												<PostLink
+													kind={props.linkKind}
+													id={blocked.id}
+													className="underline"
+												>
+													Open the post
+												</PostLink>
+											</p>
+										))
+										.exhaustive()}
+								</div>
 							)}
 							{A.isEmpty(shown) ? (
 								<Empty className="flex-none border border-border p-8">

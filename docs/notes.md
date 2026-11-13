@@ -53,6 +53,12 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - A saved draft can have an empty required field, so the writer does not lose text.
   `publishedDraftSchema` adds the required check for Publish: a required field must
   have a value, and a required text or list must not be empty.
+- `publishBlockers` of `src/note-form.ts` gives what stops a publish of a note: for each
+  input that `publishedDraftSchema` refuses, the label of the input and the first
+  message. A defined field has the label of its definition. A core input has a fixed
+  label: Title, Slug, Language, Description, Keywords, or Body. A field with no
+  definition gets its name as the label, and the key `fields` gets "Extra fields". An
+  empty list means that Daluang can publish the note.
 - An extra field that the settings do not define stays as it is, so a value from another
   source is not lost.
 - The body has a limit of 1 MB (`NOTE_BODY_MAX_BYTES`): half of the size limit of a row of
@@ -278,6 +284,11 @@ It gets the languages setting and the field definitions as `DraftRules`.
   so its site keeps it until Publish changes.
 - An item calls `markNoteOfCms`. Then the page reads the list again, so the badges and
   the number of the navbar change. A failed mark shows its message above the list.
+- If the server refuses a publish (the code `invalid`), the page reads the post with
+  `readNote` and calls `publishBlockers` with the current settings. The message above the
+  list then names the post and each field to correct, with a link to the post. If
+  the read fails, or no field blocks the post, the page shows the generic message of the
+  code. The alert state is one union: `code` or `blocked`.
 - The page writes the number of changes of the server to the store of the navbar.
 - The header of the page has **New post**, a link to `/posts/new`.
 - The posts page is at `/posts`. With no post, it shows `NoPosts`: a link to a new post.

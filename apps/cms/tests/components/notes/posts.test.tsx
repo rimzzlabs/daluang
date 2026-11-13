@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { R } from "@mobily/ts-belt";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Posts } from "@/components/notes/posts";
@@ -12,7 +12,8 @@ const client = vi.hoisted(() => ({
 	listPostsOfCms: vi.fn(),
 	markNoteOfCms: vi.fn(),
 	deleteNoteOfCms: vi.fn(),
-	NOTES_ERROR_MESSAGES: { offline: "Offline." },
+	readNote: vi.fn(),
+	NOTES_ERROR_MESSAGES: { offline: "Offline.", invalid: "Refused." },
 }));
 
 vi.mock("@/lib/notes/client", () => client);
@@ -35,6 +36,7 @@ beforeEach(() => {
 	client.listPostsOfCms.mockReset();
 	client.markNoteOfCms.mockReset();
 	client.deleteNoteOfCms.mockReset();
+	client.readNote.mockReset();
 });
 
 describe("Posts", () => {
@@ -210,5 +212,153 @@ describe("Posts", () => {
 		expect(
 			await screen.findByRole("heading", { name: "No posts yet" }),
 		).toBeTruthy();
+	});
+
+	describe("a publish that the server refuses", () => {
+		const DRAFT = { ...POST, change: null };
+		const NOTE = {
+			...POST.note,
+			description: "Small recipes.",
+			keywords: [],
+			fields: { series: " " },
+			body: "",
+		};
+		const store = () =>
+			createSettingsStore({
+				...SETTINGS,
+				fields: [
+					{ name: "series", label: "Series", type: "text", required: true },
+				],
+			});
+
+		async function publishFromMenu(action: string) {
+			client.listPostsOfCms.mockResolvedValue(
+				R.Ok({ posts: [DRAFT], count: 0 }),
+			);
+			render(
+				<Posts
+					settings={store()}
+					changes={createChangesStore(0)}
+					linkKind="anchor"
+				/>,
+			);
+			await userEvent.click(
+				await screen.findByRole("button", { name: "Actions of Jotai recipes" }),
+			);
+			await userEvent.click(
+				await screen.findByRole("menuitem", { name: action }),
+			);
+		}
+
+		it("names the post and each field, and links to the post", async () => {
+			client.markNoteOfCms.mockResolvedValue(R.Error("invalid"));
+			client.readNote.mockResolvedValue(R.Ok(NOTE));
+			await publishFromMenu("Publish");
+			const alert = await screen.findByRole("alert");
+			expect(alert.textContent).toBe(
+				'Daluang cannot publish "Jotai recipes". Correct each field in this list: Series. Open the post',
+			);
+			expect(
+				screen
+					.getByRole("link", { name: "Open the post" })
+					.getAttribute("href"),
+			).toBe("/posts/n1");
+		});
+
+		it("shows the generic message when the post cannot be read", async () => {
+			client.markNoteOfCms.mockResolvedValue(R.Error("invalid"));
+			client.readNote.mockResolvedValue(R.Error("offline"));
+			await publishFromMenu("Publish");
+			expect((await screen.findByRole("alert")).textContent).toBe("Refused.");
+			expect(client.readNote).toHaveBeenCalledWith("n1");
+		});
+
+		it("shows the generic message when no field blocks the post", async () => {
+			client.markNoteOfCms.mockResolvedValue(R.Error("invalid"));
+			client.readNote.mockResolvedValue(
+				R.Ok({ ...NOTE, fields: { series: "Jotai" } }),
+			);
+			await publishFromMenu("Publish");
+			expect((await screen.findByRole("alert")).textContent).toBe("Refused.");
+			expect(client.readNote).toHaveBeenCalledWith("n1");
+		});
+
+		it("keeps the generic message for an action that is not a publish", async () => {
+			client.listPostsOfCms.mockResolvedValue(
+				R.Ok({ posts: [POST], count: 1 }),
+			);
+			client.markNoteOfCms.mockResolvedValue(R.Error("invalid"));
+			render(
+				<Posts
+					settings={store()}
+					changes={createChangesStore(0)}
+					linkKind="anchor"
+				/>,
+			);
+			await userEvent.click(
+				await screen.findByRole("button", { name: "Actions of Jotai recipes" }),
+			);
+			await userEvent.click(
+				await screen.findByRole("menuitem", { name: "Cancel the change" }),
+			);
+			expect((await screen.findByRole("alert")).textContent).toBe("Refused.");
+			expect(client.readNote).not.toHaveBeenCalled();
+		});
+
+		async function choose(name: string) {
+			await userEvent.click(
+				await screen.findByRole("button", { name: "Actions of Jotai recipes" }),
+			);
+			await userEvent.click(await screen.findByRole("menuitem", { name }));
+		}
+
+		function renderPosts() {
+			render(
+				<Posts
+					settings={store()}
+					changes={createChangesStore(0)}
+					linkKind="anchor"
+				/>,
+			);
+		}
+
+		it("clears the alert when a later action succeeds", async () => {
+			client.listPostsOfCms.mockResolvedValue(
+				R.Ok({ posts: [POST], count: 1 }),
+			);
+			client.markNoteOfCms
+				.mockResolvedValueOnce(R.Error("invalid"))
+				.mockResolvedValueOnce(R.Ok(POST.note));
+			renderPosts();
+			await choose("Cancel the change");
+			expect((await screen.findByRole("alert")).textContent).toBe("Refused.");
+			await choose("Cancel the change");
+			await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());
+		});
+
+		it("ignores the alert of an older action", async () => {
+			client.listPostsOfCms.mockResolvedValue(
+				R.Ok({ posts: [DRAFT], count: 0 }),
+			);
+			client.markNoteOfCms
+				.mockResolvedValueOnce(R.Error("invalid"))
+				.mockResolvedValueOnce(R.Ok(POST.note));
+			let release: (value: unknown) => void = () => {};
+			client.readNote.mockReturnValue(
+				new Promise((resolve) => {
+					release = resolve;
+				}),
+			);
+			renderPosts();
+			await choose("Publish");
+			await waitFor(() => expect(client.readNote).toHaveBeenCalledOnce());
+			await choose("Publish");
+			await waitFor(() =>
+				expect(client.listPostsOfCms).toHaveBeenCalledTimes(2),
+			);
+			release(R.Ok(NOTE));
+			await new Promise((resolve) => setTimeout(resolve, 20));
+			expect(screen.queryByRole("alert")).toBeNull();
+		});
 	});
 });
