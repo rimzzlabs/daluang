@@ -212,7 +212,8 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - `dayLabel` of `src/date-label.ts` gives the day of an ISO time for a list, in English,
   in the time zone of the browser: `Oct 18, 2026`.
 - `Posts` of `apps/cms/src/components/notes/posts.tsx` is the posts page. It reads the
-  list with `listPostsOfCms` of the browser client, which calls `GET /api/notes` and
+  list with `usePostList` of `apps/cms/src/hooks/notes/use-post-list.ts`. The hook calls
+  `listPostsOfCms` of the browser client, which calls `GET /api/notes` and
   `GET /api/changes` together and joins them with `listedNotes`.
 - `PostList` shows each post: the title, the slug, the day of the last change, the
   language, the status, and the change. `CHANGE_LABELS` and `STATUS_LABELS` of
