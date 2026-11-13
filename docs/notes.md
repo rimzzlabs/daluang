@@ -299,12 +299,22 @@ It gets the languages setting and the field definitions as `DraftRules`.
   `EditPostForm`. A key of the ID resets the page for another post. A post that does not
   exist shows its message, with a link back to the list.
 - `EditPostForm` of `apps/cms/src/components/notes/edit-post-form.tsx` is the form of a
-  stored post. It starts with `noteFormOf`, and **Save** sends the draft to `saveNote`.
+  stored post. It starts with `noteFormOf`, and it saves by itself: there is no Save
+  button.
+- **Autosave.** `useAutosave` of `apps/cms/src/hooks/notes/use-autosave.ts` sends the
+  draft to `saveNote` 1 s after the last change (`AUTOSAVE_DELAY_MS`). The sites change
+  only at Publish changes, so a save is safe. Mod-S saves at once.
+- One save runs at a time. A change during a save waits, then the next save sends the
+  last form, so an old form never comes after a new one.
+- A value that is not valid shows its error, and the save waits for a valid post.
+- When the page closes with a change that waits, the hook saves it at once. The browser
+  asks before it closes the tab while a save waits or runs.
 - A save of a published post changes only its working copy. After a save,
   `refreshChangeCount` reads the number of changes again for the navbar.
 - `PostStatusBar` of `apps/cms/src/components/notes/post-status-bar.tsx` is below the
   form. It shows the words, the characters, and the read time of the body, from
-  `bodyStats` of `src/body-stats.ts`, then "Saving", "Saved", or the error of the save.
+  `bodyStats` of `src/body-stats.ts`, then "Not saved yet", "Saving", "Saved", "Not saved: correct the
+  marked values", or the error of the save.
 - `bodyStats` counts a word from its first letter or digit, so a mark of Markdown alone,
   such as `#` or `---`, is not a word. It counts each code point as one character. The
   read time is the words divided by 200 (`WORDS_PER_MINUTE`), rounded up.

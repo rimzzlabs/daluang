@@ -12,7 +12,10 @@ you select **Publish changes**.
 4. Type the description, the keywords, and the extra fields of your site.
 5. Write the body in Markdown. Select **Split** to see the body beside the text as Comark
    renders it, or **Preview** to see only the body.
-6. Select **Save**.
+
+The CMS saves the post about 1 second after you stop typing. The bar below the post shows
+"Saving", then "Saved". Press Ctrl+S (⌘S on a Mac) to save at once. Your site does not
+change until you select **Publish changes**.
 
 The editor of the body is CodeMirror. It keeps the Markdown as you type it, also the
 components of Comark, for example `::callout`. Your site gives each component its look.
@@ -23,8 +26,9 @@ Mac) makes the text bold, Ctrl+I makes it italic, and Ctrl+K makes a link.
 
 ## Change a post
 
-1. Select the title of the post in the list.
-2. Change the post, then select **Save**.
+1. Select the title of the post in the list, or in the panel of the posts beside the
+   editor.
+2. Change the post.
 
 A save of a published post changes only the copy in the CMS. Your site keeps the
 published copy until the next **Publish changes**. The list shows the post as "Edited".

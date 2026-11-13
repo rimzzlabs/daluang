@@ -8,6 +8,10 @@ const NUMBER = new Intl.NumberFormat("en-US");
 /** The save of the post, as the status bar shows it. */
 export type SaveState =
 	| { status: "idle" }
+	/** A change waits for the autosave. */
+	| { status: "pending" }
+	/** A value is not valid, so the save waits. */
+	| { status: "invalid" }
 	| { status: "saving" }
 	| { status: "saved" }
 	| { status: "failed"; message: string };
@@ -35,6 +39,12 @@ export function PostStatusBar(props: PostStatusBarProps) {
 			</p>
 			{match(props.save)
 				.with({ status: "idle" }, () => null)
+				.with({ status: "pending" }, () => <p role="status">Not saved yet</p>)
+				.with({ status: "invalid" }, () => (
+					<p role="status" className="text-destructive">
+						Not saved: correct the marked values
+					</p>
+				))
 				.with({ status: "saving" }, () => (
 					<p role="status" className="flex items-center gap-1.5">
 						<Spinner aria-hidden className="size-3" />
