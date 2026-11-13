@@ -1,5 +1,6 @@
-import { A, pipe } from "@mobily/ts-belt";
+import { A, O, pipe, S } from "@mobily/ts-belt";
 import type { NoteDraft } from "./note";
+import { SLUG_MAX_LENGTH } from "./slug";
 
 /** The two fields that place a note among its translations. */
 export interface NoteKey {
@@ -35,6 +36,40 @@ export function isSlugTaken<T extends NoteKey>(
 		query.notes,
 		(other) =>
 			other.slug === query.note.slug && other.language === query.note.language,
+	);
+}
+
+/** The slug with the number `n` at its end, in the size limit of a slug: `untitled-2`. */
+function numberedSlug(slug: string, n: number): string {
+	if (n === 1) return slug;
+	const suffix = `-${n}`;
+	const base = pipe(
+		slug,
+		S.slice(0, SLUG_MAX_LENGTH - suffix.length),
+		S.replaceByRe(/-+$/, ""),
+	);
+	return `${base}${suffix}`;
+}
+
+/**
+ * The first slug that the language of the note does not have: the slug itself, then
+ * `<slug>-2`, `<slug>-3`, and so on. A new draft gets its slug in this way.
+ */
+export function freeSlug<T extends NoteKey>(
+	query: TranslationQuery<T>,
+): string {
+	const taken = pipe(
+		query.notes,
+		A.filter((other) => other.language === query.note.language),
+		A.map((other) => other.slug),
+	);
+	// One slug more than the taken slugs is sufficient: one of them is free.
+	return pipe(
+		A.makeWithIndex(A.length(taken) + 1, (index) =>
+			numberedSlug(query.note.slug, index + 1),
+		),
+		A.getBy((slug) => !A.includes(taken, slug)),
+		O.getWithDefault(query.note.slug),
 	);
 }
 
