@@ -1,7 +1,13 @@
 // @vitest-environment jsdom
 import type { Note } from "@daluang/notes/note";
 import { R } from "@mobily/ts-belt";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import {
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+	within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EditPostForm } from "@/components/notes/edit-post-form";
@@ -58,8 +64,9 @@ describe("EditPostForm", () => {
 		client.saveNote.mockResolvedValue(R.Ok(saved));
 		const { changes, onSaved } = renderForm();
 		const title = screen.getByDisplayValue("Jotai recipes");
-		await userEvent.clear(title);
-		await userEvent.type(title, "Jotai");
+		// One change, not one change for each key: on a busy computer, a gap between two keys
+		// can pass the wait of the autosave, and an early save would send a part of the title.
+		fireEvent.change(title, { target: { value: "Jotai" } });
 		expect(screen.getByRole("status").textContent).toBe("Not saved yet");
 		await userEvent.type(title, "{Control>}s{/Control}");
 		expect(client.saveNote).toHaveBeenCalledExactlyOnceWith({
