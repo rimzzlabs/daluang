@@ -12,6 +12,8 @@ export interface Autosave<T> {
 	schedule: (value: T) => void;
 	/** Saves the value that is not saved now, with no wait. */
 	flush: () => void;
+	/** True while the server does not have the last value, also during its save. */
+	hasUnsaved: () => boolean;
 }
 
 /**
@@ -77,6 +79,10 @@ export function useAutosave<T>(
 		run();
 	}
 
+	function hasUnsaved() {
+		return unsaved.current !== null;
+	}
+
 	const leave = useEffectEvent(() => {
 		gone.current = true;
 		flush();
@@ -96,5 +102,5 @@ export function useAutosave<T>(
 		};
 	}, []);
 
-	return { schedule, flush };
+	return { schedule, flush, hasUnsaved };
 }

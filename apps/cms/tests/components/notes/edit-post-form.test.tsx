@@ -2,6 +2,14 @@
 import type { Note } from "@daluang/notes/note";
 import { R } from "@mobily/ts-belt";
 import {
+	createMemoryHistory,
+	createRootRoute,
+	createRoute,
+	createRouter,
+	Outlet,
+	RouterProvider,
+} from "@tanstack/react-router";
+import {
 	act,
 	fireEvent,
 	render,
@@ -18,6 +26,7 @@ import {
 } from "@/hooks/notes/use-autosave";
 import { createChangesStore } from "@/lib/notes/changes-store";
 import { settingsStore } from "../../settings";
+import { typeInEditor } from "./editor";
 
 const client = vi.hoisted(() => ({
 	saveNote: vi.fn(),
@@ -67,6 +76,40 @@ function renderForm(onSaved = vi.fn()) {
 		/>,
 	);
 	return { changes, onSaved };
+}
+
+/** The form in the app island: a router with the page of the post and the list. */
+function renderFormInRouter() {
+	const rootRoute = createRootRoute({ component: () => <Outlet /> });
+	const postRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/posts/$id",
+		component: () => (
+			<EditPostForm
+				note={NOTE}
+				settings={settingsStore()}
+				changes={createChangesStore(0)}
+				linkKind="router"
+				onSaved={vi.fn()}
+			/>
+		),
+	});
+	const postsRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/posts",
+	});
+	const router = createRouter({
+		routeTree: rootRoute.addChildren([postRoute, postsRoute]),
+		history: createMemoryHistory({ initialEntries: ["/posts/n1"] }),
+	});
+	render(<RouterProvider router={router} />);
+	return router;
+}
+
+async function leaveByLink() {
+	await userEvent.click(
+		screen.getByRole("link", { name: "Back to the posts" }),
+	);
 }
 
 describe("EditPostForm", () => {
@@ -155,6 +198,58 @@ describe("EditPostForm", () => {
 			"Not saved: correct the marked values",
 		);
 		expect(client.saveNote).not.toHaveBeenCalled();
+	});
+
+	it("asks in the app island before it leaves a form that is not valid", async () => {
+		const router = renderFormInRouter();
+		const title = await screen.findByDisplayValue("Jotai recipes");
+		await userEvent.clear(title);
+		await userEvent.type(title, "{Control>}s{/Control}");
+		await leaveByLink();
+		await userEvent.click(
+			await screen.findByRole("button", { name: "Cancel" }),
+		);
+		await waitFor(() =>
+			expect(
+				screen.queryByRole("heading", { name: "Leave the post?" }),
+			).toBeNull(),
+		);
+		expect(router.state.location.pathname).toBe("/posts/n1");
+		expect(screen.getByRole("textbox", { name: "Title" })).toHaveProperty(
+			"value",
+			"",
+		);
+		expect(client.saveNote).not.toHaveBeenCalled();
+	});
+
+	it("asks before it leaves a form that is not valid and waits for its save", async () => {
+		renderFormInRouter();
+		const title = await screen.findByDisplayValue("Jotai recipes");
+		await userEvent.clear(title);
+		await userEvent.type(title, "{Control>}s{/Control}");
+		await typeInEditor("Body", "!");
+		expect(screen.getByRole("status").textContent).toBe("Not saved yet");
+		await leaveByLink();
+		expect(
+			await screen.findByRole("heading", { name: "Leave the post?" }),
+		).toBeTruthy();
+	});
+
+	it("leaves after a failed save at the confirmation, and sends the form one last time", async () => {
+		client.saveNote.mockResolvedValue(R.Error("offline"));
+		const router = renderFormInRouter();
+		await userEvent.type(
+			await screen.findByDisplayValue("Jotai recipes"),
+			"!{Control>}s{/Control}",
+		);
+		await screen.findByRole("alert");
+		expect(client.saveNote).toHaveBeenCalledOnce();
+		await leaveByLink();
+		await userEvent.click(
+			await screen.findByRole("button", { name: "Leave the page" }),
+		);
+		await waitFor(() => expect(router.state.location.pathname).toBe("/posts"));
+		expect(client.saveNote).toHaveBeenCalledTimes(2);
 	});
 
 	it("links back to the list of posts", () => {

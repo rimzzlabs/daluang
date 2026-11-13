@@ -30,6 +30,7 @@ import {
 import type { SettingsStore } from "@/lib/settings/settings-store";
 import { PostBodyField, PostDetailsFields } from "./post-form";
 import { PostStatusBar, type SaveState } from "./post-status-bar";
+import { UnsavedPostGuard } from "./unsaved-post-guard";
 
 export interface EditPostFormProps {
 	note: Note;
@@ -168,6 +169,14 @@ export function EditPostForm(props: EditPostFormProps) {
 				)}
 				<PostBodyField {...fieldProps} />
 				<PostStatusBar body={form.body} save={save} />
+				{/* The guard needs the router, so the HTML of the server has no guard. */}
+				{props.linkKind === "router" ? (
+					<UnsavedPostGuard
+						save={save}
+						hasUnsaved={autosave.hasUnsaved}
+						isInvalid={() => R.isError(parseNoteForm(form, rules))}
+					/>
+				) : null}
 				<div className="flex justify-end gap-2">
 					<NavLink
 						kind={props.linkKind}
