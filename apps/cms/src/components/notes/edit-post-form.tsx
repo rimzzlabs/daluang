@@ -5,9 +5,16 @@ import {
 	noteFormOf,
 	parseNoteForm,
 } from "@daluang/notes/note-form";
-import { buttonVariants } from "@daluang/ui/components/button";
-import { R } from "@mobily/ts-belt";
-import { type KeyboardEvent, useState } from "react";
+import { Button, buttonVariants } from "@daluang/ui/components/button";
+import {
+	Sheet,
+	SheetContent,
+	SheetHeader,
+	SheetTitle,
+} from "@daluang/ui/components/sheet";
+import { useIsWide } from "@daluang/ui/hooks/use-wide";
+import { A, D, pipe, R } from "@mobily/ts-belt";
+import { useEffect, useEffectEvent, useState } from "react";
 import { NavLink, type NavLinkKind } from "@/components/shell/nav-link";
 import { useAutosave } from "@/hooks/notes/use-autosave";
 import { useSettings } from "@/hooks/settings/use-settings";
@@ -18,7 +25,7 @@ import {
 	saveNote,
 } from "@/lib/notes/client";
 import type { SettingsStore } from "@/lib/settings/settings-store";
-import { PostForm } from "./post-form";
+import { PostBodyField, PostDetailsFields } from "./post-form";
 import { PostStatusBar, type SaveState } from "./post-status-bar";
 
 export interface EditPostFormProps {
@@ -31,7 +38,8 @@ export interface EditPostFormProps {
 }
 
 /**
- * The form of a stored post. It saves the working copy about 1 s after the writer stops
+ * The form of a stored post: the body in the middle, and the details in a panel at the
+ * right from 80rem (`xl`), or in a sheet on a smaller screen. It saves the working copy about 1 s after the writer stops
  * (`useAutosave`). The sites change only at Publish changes, so a save is safe. A value
  * that is not valid shows its error, and the save waits for a valid post. A save of a
  * published post changes only its working copy, so the navbar reads the number of changes
@@ -43,6 +51,8 @@ export function EditPostForm(props: EditPostFormProps) {
 	const [form, setForm] = useState(() => noteFormOf(props.note, fields));
 	const [errors, setErrors] = useState<NoteFormErrors>({});
 	const [save, setSave] = useState<SaveState>({ status: "idle" });
+	const [detailsOpen, setDetailsOpen] = useState(false);
+	const isWide = useIsWide();
 
 	async function saveForm(next: NoteForm) {
 		const draft = R.match(
@@ -71,42 +81,94 @@ export function EditPostForm(props: EditPostFormProps) {
 
 	const autosave = useAutosave(saveForm);
 
-	// Mod-S saves at once, as in other editors. The key comes up from each input, also from
-	// the editor of the body.
-	function onKeyDown(event: KeyboardEvent<HTMLFormElement>) {
+	const saveNow = useEffectEvent((event: globalThis.KeyboardEvent) => {
 		if (event.key !== "s" || !(event.metaKey || event.ctrlKey)) return;
 		event.preventDefault();
 		autosave.flush();
-	}
+	});
+
+	// Mod-S saves at once, as in other editors. The window gets the key from each input, also
+	// from the editor of the body and from the sheet of the details.
+	useEffect(() => {
+		window.addEventListener("keydown", saveNow, true);
+		return () => window.removeEventListener("keydown", saveNow, true);
+	}, []);
+
+	const fieldProps = {
+		value: form,
+		errors,
+		languages: languages.languages,
+		definitions: fields,
+		onChange: (next: NoteForm) => {
+			setForm(next);
+			setSave({ status: "pending" });
+			autosave.schedule(next);
+		},
+	};
+	const detailErrors = pipe(
+		errors,
+		D.keys,
+		A.reject((path) => path === "body"),
+		A.length,
+	);
 
 	return (
 		<form
 			noValidate
-			className="flex w-full max-w-3xl flex-col gap-6"
+			className="flex w-full flex-1 flex-col gap-6 xl:flex-row xl:items-start"
 			onSubmit={(event) => event.preventDefault()}
-			onKeyDown={onKeyDown}
 		>
-			<PostForm
-				value={form}
-				errors={errors}
-				languages={languages.languages}
-				definitions={fields}
-				onChange={(next) => {
-					setForm(next);
-					setSave({ status: "pending" });
-					autosave.schedule(next);
-				}}
-			/>
-			<PostStatusBar body={form.body} save={save} />
-			<div className="flex justify-end gap-2">
-				<NavLink
-					kind={props.linkKind}
-					href="/posts"
-					className={buttonVariants({ variant: "outline" })}
-				>
-					Back to the posts
-				</NavLink>
+			<div className="flex min-w-0 flex-1 flex-col gap-4">
+				{isWide ? null : (
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						className="self-end"
+						onClick={() => setDetailsOpen(true)}
+					>
+						Details
+						{/* A flex box shows no space here, but a screen reader needs it. */}
+						{detailErrors === 0 ? null : " "}
+						{detailErrors === 0 ? null : (
+							<span className="text-destructive">
+								{detailErrors === 1 ? "1 error" : `${detailErrors} errors`}
+							</span>
+						)}
+					</Button>
+				)}
+				<PostBodyField {...fieldProps} />
+				<PostStatusBar body={form.body} save={save} />
+				<div className="flex justify-end gap-2">
+					<NavLink
+						kind={props.linkKind}
+						href="/posts"
+						className={buttonVariants({ variant: "outline" })}
+					>
+						Back to the posts
+					</NavLink>
+				</div>
 			</div>
+			{/* One copy of the details at a time, so each input keeps one ID. */}
+			{isWide ? (
+				<aside
+					aria-label="Details"
+					className="w-80 shrink-0 border-l border-border pl-6"
+				>
+					<PostDetailsFields {...fieldProps} />
+				</aside>
+			) : (
+				<Sheet open={detailsOpen} onOpenChange={setDetailsOpen}>
+					<SheetContent side="right" className="w-full sm:max-w-md">
+						<SheetHeader>
+							<SheetTitle>Details</SheetTitle>
+						</SheetHeader>
+						<div className="overflow-y-auto px-4 pb-6">
+							<PostDetailsFields {...fieldProps} />
+						</div>
+					</SheetContent>
+				</Sheet>
+			)}
 		</form>
 	);
 }

@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import type { Note } from "@daluang/notes/note";
 import { R } from "@mobily/ts-belt";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EditPostForm } from "@/components/notes/edit-post-form";
 import { createChangesStore } from "@/lib/notes/changes-store";
 import { settingsStore } from "../../settings";
@@ -120,5 +120,48 @@ describe("EditPostForm", () => {
 				.getByRole("link", { name: "Back to the posts" })
 				.getAttribute("href"),
 		).toBe("/posts");
+	});
+
+	it("shows the details in a panel on a wide screen", () => {
+		renderForm();
+		const panel = screen.getByRole("complementary", { name: "Details" });
+		expect(panel.querySelector("input")?.value).toBe("Jotai recipes");
+		expect(screen.queryByRole("button", { name: "Details" })).toBeNull();
+	});
+});
+
+describe("EditPostForm on a smaller screen", () => {
+	beforeEach(() => {
+		vi.stubGlobal("matchMedia", (query: string) => ({
+			matches: !query.includes("80rem"),
+			media: query,
+			addEventListener: () => {},
+			removeEventListener: () => {},
+		}));
+	});
+
+	afterEach(() => {
+		vi.unstubAllGlobals();
+		vi.stubGlobal("matchMedia", (query: string) => ({
+			matches: query.includes("min-width"),
+			media: query,
+			addEventListener: () => {},
+			removeEventListener: () => {},
+		}));
+	});
+
+	it("opens the details in a sheet, and counts their errors", async () => {
+		renderForm();
+		expect(screen.queryByRole("complementary", { name: "Details" })).toBeNull();
+		await userEvent.click(screen.getByRole("button", { name: "Details" }));
+		const sheet = await screen.findByRole("dialog", { name: "Details" });
+		const title = within(sheet).getByDisplayValue("Jotai recipes");
+		await userEvent.clear(title);
+		await userEvent.type(title, "{Control>}s{/Control}");
+		await userEvent.keyboard("{Escape}");
+		expect(
+			await screen.findByRole("button", { name: "Details 1 error" }),
+		).toBeTruthy();
+		expect(client.saveNote).not.toHaveBeenCalled();
 	});
 });

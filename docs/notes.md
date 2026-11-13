@@ -83,9 +83,14 @@ It gets the languages setting and the field definitions as `DraftRules`.
 
 ## The inputs of the editor
 
-- `PostForm` of `apps/cms/src/components/notes/post-form.tsx` shows the inputs of a
-  `NoteForm`: the title, the slug, the language, the description, the keywords, the extra
-  fields, and the body. It shows the error of each path of `NoteFormErrors`.
+- `apps/cms/src/components/notes/post-form.tsx` shows the inputs of a `NoteForm` in two
+  parts. `PostDetailsFields` has the title, the slug, the language, the description, the
+  keywords, and the extra fields. `PostBodyField` has the body. Each part shows the error
+  of each path of `NoteFormErrors`.
+- `EditPostForm` puts the body in the middle and the details in a panel at the right, from
+  80rem (`xl`, `useIsWide` of `@daluang/ui`). On a smaller screen, **Details** opens the
+  details in a sheet, and it shows the number of their errors. Only one copy of the
+  details renders at a time, so each input keeps one ID.
 - The language choice shows only in a CMS with more than one language.
 - `ExtraFieldInput` shows one extra field: a checkbox for yes or no, and a text box for a
   text, a number, or a list. A number asks for a decimal keyboard on a phone.
@@ -101,7 +106,7 @@ It gets the languages setting and the field definitions as `DraftRules`.
   buttons. Each button has a tooltip with its name.
 - `MarkdownEditor` applies an action as one transaction, and gives the focus back to the
   text. Mod-B, Mod-I, and Mod-K apply bold, italic, and link from the text.
-- `PostForm` loads the editor with `lazy`. CodeMirror and the grammars of Markdown are
+- `PostBodyField` loads the editor with `lazy`. CodeMirror and the grammars of Markdown are
   about 500 KB, so only the pages of the editor load them. A skeleton shows until the
   editor loads.
 - **Write**, **Split**, and **Preview** above the body switch the view. Split shows the
@@ -112,7 +117,7 @@ It gets the languages setting and the field definitions as `DraftRules`.
   `parseMarkdown` of `comark`, and renders the document with `MarkdownDocument` of
   `@comark/react`. A component of Comark shows with its tag, because each site maps the
   tag to its own component. The class `post-preview` of the global CSS gives one plain
-  style. `PostForm` loads the preview with `lazy`.
+  style. `PostBodyField` loads the preview with `lazy`.
 - `PostPreview` does not use `MarkdownClient` of `@comark/react`. That component makes a
   promise during the render, and a new preview can wait for its promise without end.
 - `FormField` puts a label, a control, and its help text or its error together. An

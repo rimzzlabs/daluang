@@ -64,13 +64,12 @@ export interface PostFormProps {
 }
 
 /**
- * The inputs of a post: the title, the slug, the language, the description, the keywords,
- * the extra fields of the site, and the Markdown body.
+ * The details of a post: the title, the slug, the language, the description, the keywords,
+ * and the extra fields of the site.
  */
-export function PostForm(props: PostFormProps) {
+export function PostDetailsFields(props: PostFormProps) {
 	const id = useId();
 	const { value, errors } = props;
-	const [view, setView] = useState<BodyView>("write");
 
 	function change(patch: Partial<NoteForm>) {
 		props.onChange({ ...value, ...patch });
@@ -181,59 +180,71 @@ export function PostForm(props: PostFormProps) {
 					}
 				/>
 			))}
-			<FormField
-				id={`${id}-body`}
-				label="Body"
-				help="Markdown, with the components of Comark."
-				error={errors.body}
+		</FieldGroup>
+	);
+}
+
+/** The Markdown body of a post, with the choice of Write, Split, or Preview. */
+export function PostBodyField(props: PostFormProps) {
+	const id = useId();
+	const { value, errors } = props;
+	const [view, setView] = useState<BodyView>("write");
+
+	function change(patch: Partial<NoteForm>) {
+		props.onChange({ ...value, ...patch });
+	}
+
+	return (
+		<FormField
+			id={`${id}-body`}
+			label="Body"
+			help="Markdown, with the components of Comark."
+			error={errors.body}
+		>
+			<ToggleGroup
+				variant="outline"
+				size="sm"
+				aria-label="View of the body"
+				value={[view]}
+				onValueChange={(values) => {
+					const [next] = values;
+					if (isBodyView(next)) setView(next);
+				}}
 			>
-				<ToggleGroup
-					variant="outline"
-					size="sm"
-					aria-label="View of the body"
-					value={[view]}
-					onValueChange={(values) => {
-						const [next] = values;
-						if (isBodyView(next)) setView(next);
-					}}
-				>
-					<ToggleGroupItem value="write">Write</ToggleGroupItem>
-					<ToggleGroupItem value="split">Split</ToggleGroupItem>
-					<ToggleGroupItem value="preview">Preview</ToggleGroupItem>
-				</ToggleGroup>
-				{/* Split puts the preview beside the text from 64rem, and below it on a phone. */}
-				<div
-					className={cn(
-						"grid gap-3",
-						view === "split" && "lg:grid-cols-2 lg:items-start",
-					)}
-				>
-					{/* The editor stays in the page during the preview, so it keeps its undo history. */}
-					<div hidden={view === "preview"} className="min-w-0">
+				<ToggleGroupItem value="write">Write</ToggleGroupItem>
+				<ToggleGroupItem value="split">Split</ToggleGroupItem>
+				<ToggleGroupItem value="preview">Preview</ToggleGroupItem>
+			</ToggleGroup>
+			{/* Split puts the preview beside the text from 64rem, and below it on a phone. */}
+			<div
+				className={cn(
+					"grid gap-3",
+					view === "split" && "lg:grid-cols-2 lg:items-start",
+				)}
+			>
+				{/* The editor stays in the page during the preview, so it keeps its undo history. */}
+				<div hidden={view === "preview"} className="min-w-0">
+					<Suspense fallback={<Skeleton className="h-80 w-full rounded-xl" />}>
+						<MarkdownEditor
+							id={`${id}-body`}
+							label="Body"
+							defaultValue={value.body}
+							invalid={errors.body !== undefined}
+							describedBy={`${id}-body-help`}
+							onChange={(body) => change({ body })}
+						/>
+					</Suspense>
+				</div>
+				{view === "write" ? null : (
+					<div className="min-w-0">
 						<Suspense
 							fallback={<Skeleton className="h-80 w-full rounded-xl" />}
 						>
-							<MarkdownEditor
-								id={`${id}-body`}
-								label="Body"
-								defaultValue={value.body}
-								invalid={errors.body !== undefined}
-								describedBy={`${id}-body-help`}
-								onChange={(body) => change({ body })}
-							/>
+							<PostPreview body={value.body} />
 						</Suspense>
 					</div>
-					{view === "write" ? null : (
-						<div className="min-w-0">
-							<Suspense
-								fallback={<Skeleton className="h-80 w-full rounded-xl" />}
-							>
-								<PostPreview body={value.body} />
-							</Suspense>
-						</div>
-					)}
-				</div>
-			</FormField>
-		</FieldGroup>
+				)}
+			</div>
+		</FormField>
 	);
 }
