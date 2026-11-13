@@ -25,13 +25,20 @@ const RULES = {
 // pre-push hook, the first load takes more than the 1 s of `findByRole`.
 const LAZY_PREVIEW = { timeout: 10_000 };
 
+const LOST_LANGUAGE =
+	"This language is not in the settings of the CMS. Choose another language.";
+
 let last: NoteForm = emptyNoteForm(RULES);
 
 function Harness(props: {
 	errors?: NoteFormErrors;
 	languages?: readonly string[];
+	language?: string;
 }) {
-	const [form, setForm] = useState(emptyNoteForm(RULES));
+	const [form, setForm] = useState({
+		...emptyNoteForm(RULES),
+		language: props.language ?? "en",
+	});
 	last = form;
 	const fieldProps = {
 		value: form,
@@ -108,7 +115,8 @@ describe("PostDetailsFields and PostBodyField", () => {
 			<Harness
 				errors={{
 					title: "Give the post a title.",
-					language: "Choose a language of this CMS.",
+					language:
+						"This language is not in the settings of the CMS. Choose another language.",
 				}}
 			/>,
 		);
@@ -118,13 +126,59 @@ describe("PostDetailsFields and PostBodyField", () => {
 				.getAttribute("aria-invalid"),
 		).toBe("true");
 		expect(screen.getByText("Give the post a title.")).toBeTruthy();
-		expect(screen.getByText("Choose a language of this CMS.")).toBeTruthy();
+		expect(
+			screen.getByText(
+				"This language is not in the settings of the CMS. Choose another language.",
+			),
+		).toBeTruthy();
 	});
 
 	it("has no language choice in a CMS with one language", () => {
 		render(<Harness languages={["en"]} />);
 		expect(screen.queryByRole("group", { name: "Language" })).toBeNull();
 		expect(screen.queryByRole("button", { name: "English" })).toBeNull();
+	});
+
+	it("has no language choice for a post in the only language of the CMS", () => {
+		render(<Harness languages={["en"]} language="en" />);
+		expect(screen.queryByRole("group", { name: "Language" })).toBeNull();
+	});
+
+	it("shows the language of a post that the CMS lost, with its error", async () => {
+		render(
+			<Harness
+				languages={["en"]}
+				language="id"
+				errors={{ language: LOST_LANGUAGE }}
+			/>,
+		);
+		const indonesian = screen.getByRole("button", { name: "Indonesia" });
+		expect(indonesian.getAttribute("aria-pressed")).toBe("true");
+		expect(screen.getByText(LOST_LANGUAGE)).toBeTruthy();
+		await userEvent.click(screen.getByRole("button", { name: "English" }));
+		expect(last.language).toBe("en");
+	});
+
+	it("shows the error of a keyword at the keywords input", () => {
+		render(
+			<Harness
+				errors={{ keywords: "Keep each keyword at 60 characters or fewer." }}
+			/>,
+		);
+		const keywords = screen.getByRole("textbox", {
+			name: "Keywords (optional)",
+		});
+		expect(keywords.getAttribute("aria-invalid")).toBe("true");
+		expect(
+			screen.getByText("Keep each keyword at 60 characters or fewer."),
+		).toBeTruthy();
+	});
+
+	it("shows the message of an error that no input shows", () => {
+		render(<Harness errors={{ "fields.mood": "Mood is not a field name." }} />);
+		expect(screen.getByRole("alert").textContent).toBe(
+			"mood: Mood is not a field name.",
+		);
 	});
 
 	it("shows the preview of the body, and keeps the editor", async () => {

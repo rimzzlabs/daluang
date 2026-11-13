@@ -6,6 +6,7 @@ import {
 	type NoteForm,
 	noteFormOf,
 	parseNoteForm,
+	unshownErrors,
 	withSlug,
 	withTitle,
 } from "../src/note-form";
@@ -45,6 +46,14 @@ function filled(): NoteForm {
 		},
 		body: "# Jotai",
 	};
+}
+
+function errorsOf(form: NoteForm): Record<string, string> {
+	return R.match(
+		parseNoteForm(form, RULES),
+		() => ({}),
+		(found) => found,
+	);
 }
 
 describe("emptyNoteForm", () => {
@@ -127,9 +136,65 @@ describe("parseNoteForm", () => {
 		);
 		expect(errors).toEqual({
 			title: "Give the post a title.",
-			language: "Choose a language of this CMS.",
+			language:
+				"This language is not in the settings of the CMS. Choose another language.",
 			"fields.readingTime": "Reading time needs a number.",
 		});
+	});
+
+	it("gives the error of a long keyword at the key of the keywords", () => {
+		const form = { ...filled(), keywords: `react, ${"k".repeat(61)}` };
+		expect(errorsOf(form)).toEqual({
+			keywords: "Keep each keyword at 60 characters or fewer.",
+		});
+	});
+
+	it("gives the error of a bad item of a list field at the key of the field", () => {
+		const form = {
+			...filled(),
+			fields: { ...filled().fields, relatedPosts: `a, ${"x".repeat(201)}` },
+		};
+		expect(Object.keys(errorsOf(form))).toEqual(["fields.relatedPosts"]);
+	});
+
+	it("keeps a field name of digits in its key", () => {
+		const form = { ...filled(), kept: { "123": "x" } };
+		expect(Object.keys(errorsOf(form))).toEqual(["fields.123"]);
+	});
+});
+
+describe("unshownErrors", () => {
+	it("gives nothing for the key of each input", () => {
+		const errors = {
+			title: "a",
+			slug: "b",
+			language: "c",
+			description: "d",
+			keywords: "e",
+			body: "f",
+			"fields.series": "g",
+		};
+		expect(unshownErrors(errors, FIELDS)).toEqual([]);
+	});
+
+	it("gives the message of a key that no input shows", () => {
+		const errors = {
+			title: "a",
+			"fields.mood": "Mood is not a field name.",
+			fields: "A post can have 30 extra fields or fewer.",
+		};
+		expect(unshownErrors(errors, FIELDS)).toEqual([
+			"mood: Mood is not a field name.",
+			"A post can have 30 extra fields or fewer.",
+		]);
+	});
+
+	it("names each kept field, so two fields with the same message show two lines", () => {
+		const errors = { "fields.mood": "Too long.", "fields.tone": "Too long." };
+		expect(unshownErrors(errors, FIELDS)).toEqual([
+			"mood: Too long.",
+			"tone: Too long.",
+		]);
 	});
 });
 

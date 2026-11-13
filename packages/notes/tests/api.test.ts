@@ -81,7 +81,13 @@ describe("POST /api/notes", () => {
 		expect(response.status).toBe(422);
 		await expect(response.json()).resolves.toEqual({
 			error: "invalid-note",
-			issues: [{ path: "language", message: "Choose a language of this CMS." }],
+			issues: [
+				{
+					path: "language",
+					message:
+						"This language is not in the settings of the CMS. Choose another language.",
+				},
+			],
 		});
 	});
 

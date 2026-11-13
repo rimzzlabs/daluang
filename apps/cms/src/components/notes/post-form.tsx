@@ -2,6 +2,7 @@ import type { FieldDefinition } from "@daluang/notes/field-definitions";
 import {
 	type NoteForm,
 	type NoteFormErrors,
+	unshownErrors,
 	withSlug,
 	withTitle,
 } from "@daluang/notes/note-form";
@@ -70,6 +71,13 @@ export interface PostFormProps {
 export function PostDetailsFields(props: PostFormProps) {
 	const id = useId();
 	const { value, errors } = props;
+	// A post can keep a language that the settings lost. The choice then shows it too, with
+	// its error, so the writer can pick a language of the CMS.
+	const languageLost = !A.includes(props.languages, value.language);
+	const languageChoices = languageLost
+		? [...props.languages, value.language]
+		: props.languages;
+	const hidden = unshownErrors(errors, props.definitions);
 
 	function change(patch: Partial<NoteForm>) {
 		props.onChange({ ...value, ...patch });
@@ -77,6 +85,7 @@ export function PostDetailsFields(props: PostFormProps) {
 
 	return (
 		<FieldGroup className="gap-6">
+			{A.isEmpty(hidden) ? null : <FieldError errors={hidden} />}
 			<FormField id={`${id}-title`} label="Title" error={errors.title}>
 				<Input
 					id={`${id}-title`}
@@ -110,7 +119,7 @@ export function PostDetailsFields(props: PostFormProps) {
 					}
 				/>
 			</FormField>
-			{A.length(props.languages) > 1 ? (
+			{A.length(props.languages) > 1 || languageLost ? (
 				<FieldSet>
 					<FieldLegend variant="label">Language</FieldLegend>
 					<ToggleGroup
@@ -125,7 +134,7 @@ export function PostDetailsFields(props: PostFormProps) {
 							if (typeof next === "string") change({ language: next });
 						}}
 					>
-						{A.map(props.languages, (tag) => (
+						{A.map(languageChoices, (tag) => (
 							<ToggleGroupItem key={tag} value={tag}>
 								{languageLabel(tag)}
 							</ToggleGroupItem>

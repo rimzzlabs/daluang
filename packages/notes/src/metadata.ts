@@ -13,7 +13,16 @@ export const noteMetadataSchema = z
 		slug: slugSchema,
 		language: languageTagSchema,
 		description: z.string().trim().max(300).default(""),
-		keywords: z.array(z.string().trim().min(1).max(60)).max(30).default([]),
+		keywords: z
+			.array(
+				z
+					.string()
+					.trim()
+					.min(1)
+					.max(60, "Keep each keyword at 60 characters or fewer."),
+			)
+			.max(30, "Use 30 keywords or fewer.")
+			.default([]),
 		status: z.enum(NOTE_STATUSES),
 		publishedAt: z.iso.datetime().nullable(),
 		updatedAt: z.iso.datetime(),
