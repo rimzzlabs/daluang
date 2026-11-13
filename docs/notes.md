@@ -95,6 +95,12 @@ It gets the languages setting and the field definitions as `DraftRules`.
   gives each change to the form.
 - The highlight style of the editor uses the tokens of the theme, so it follows the dark
   theme.
+- `EditorToolbar` of `apps/cms/src/components/notes/editor-toolbar.tsx` is above the
+  body: undo and redo, then the text actions of `markdownEdit`. It is a toolbar of
+  WAI-ARIA: Tab goes to one button, and the arrow keys, Home, and End move between the
+  buttons. Each button has a tooltip with its name.
+- `MarkdownEditor` applies an action as one transaction, and gives the focus back to the
+  text. Mod-B, Mod-I, and Mod-K apply bold, italic, and link from the text.
 - `PostForm` loads the editor with `lazy`. CodeMirror and the grammars of Markdown are
   about 500 KB, so only the pages of the editor load them. A skeleton shows until the
   editor loads.

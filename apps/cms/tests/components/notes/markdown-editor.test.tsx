@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { EditorView } from "@codemirror/view";
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { MarkdownEditor } from "@/components/notes/markdown-editor";
 import { typeInEditor } from "./editor";
@@ -55,5 +56,40 @@ describe("MarkdownEditor", () => {
 		act(() => view?.dispatch({ selection: { anchor: 2 } }));
 		expect(view?.state.selection.main.head).toBe(2);
 		expect(onChange).not.toHaveBeenCalled();
+	});
+
+	it("applies a toolbar action to the selection, and undoes it", async () => {
+		const onChange = vi.fn();
+		render(<MarkdownEditor {...editorProps(onChange)} />);
+		const view = EditorView.findFromDOM(
+			screen.getByRole("textbox", { name: "Body" }),
+		);
+		act(() => view?.dispatch({ selection: { anchor: 2, head: 7 } }));
+		await userEvent.click(screen.getByRole("button", { name: "Bold" }));
+		expect(onChange).toHaveBeenLastCalledWith("# **Jotai**");
+		expect(
+			view?.state.sliceDoc(
+				view.state.selection.main.from,
+				view.state.selection.main.to,
+			),
+		).toBe("Jotai");
+		await userEvent.click(screen.getByRole("button", { name: "Undo" }));
+		expect(onChange).toHaveBeenLastCalledWith("# Jotai");
+		await userEvent.click(screen.getByRole("button", { name: "Redo" }));
+		expect(onChange).toHaveBeenLastCalledWith("# **Jotai**");
+	});
+
+	it("applies bold, italic, and link with the keys of the editor", () => {
+		const onChange = vi.fn();
+		render(<MarkdownEditor {...editorProps(onChange)} />);
+		const content = screen.getByRole("textbox", { name: "Body" });
+		const view = EditorView.findFromDOM(content);
+		act(() => view?.dispatch({ selection: { anchor: 7 } }));
+		for (const key of ["b", "i", "k"]) {
+			act(() => {
+				fireEvent.keyDown(content, { key, ctrlKey: true });
+			});
+		}
+		expect(onChange).toHaveBeenLastCalledWith("# Jotai**_[text](https://)_**");
 	});
 });
