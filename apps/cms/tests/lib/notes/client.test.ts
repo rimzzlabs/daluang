@@ -76,7 +76,9 @@ describe("the notes client", () => {
 	it("reads one post", async () => {
 		const fetch = answer(Response.json({ note: NOTE }));
 		await expect(readNote("n 1")).resolves.toEqual(R.Ok(NOTE));
-		expect(fetch).toHaveBeenCalledWith("/api/notes/n%201", undefined);
+		expect(fetch).toHaveBeenCalledWith("/api/notes/n%201", {
+			signal: expect.any(AbortSignal),
+		});
 	});
 
 	it("adds a post with its draft as JSON", async () => {
@@ -86,6 +88,7 @@ describe("the notes client", () => {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(DRAFT),
+			signal: expect.any(AbortSignal),
 		});
 	});
 
@@ -103,7 +106,27 @@ describe("the notes client", () => {
 	it("deletes a post", async () => {
 		const fetch = answer(new Response(null, { status: 204 }));
 		await expect(deleteNoteOfCms("n1")).resolves.toEqual(R.Ok(true));
-		expect(fetch).toHaveBeenCalledWith("/api/notes/n1", { method: "DELETE" });
+		expect(fetch).toHaveBeenCalledWith("/api/notes/n1", {
+			method: "DELETE",
+			signal: expect.any(AbortSignal),
+		});
+	});
+
+	it("gives offline for a request with no answer before the timeout", async () => {
+		// `answer` checks `instanceof Error`, and a DOMException of another realm fails it.
+		const fetch = vi.fn(() =>
+			Promise.reject(
+				new DOMException("The operation timed out.", "TimeoutError"),
+			),
+		);
+		vi.stubGlobal("fetch", fetch);
+		await expect(saveNote({ id: "n1", draft: DRAFT })).resolves.toEqual(
+			R.Error("offline"),
+		);
+		expect(fetch).toHaveBeenCalledWith(
+			"/api/notes/n1",
+			expect.objectContaining({ signal: expect.any(AbortSignal) }),
+		);
 	});
 
 	it("marks a post, or clears its mark", async () => {
@@ -113,6 +136,7 @@ describe("the notes client", () => {
 		).resolves.toEqual(R.Ok({ ...NOTE, mark: "publish" }));
 		expect(fetch).toHaveBeenCalledWith("/api/notes/n1/publish", {
 			method: "POST",
+			signal: expect.any(AbortSignal),
 		});
 		answer(Response.json({ note: NOTE }));
 		await expect(
@@ -157,13 +181,18 @@ describe("the changes client", () => {
 		await expect(listChangesOfCms()).resolves.toEqual(
 			R.Ok({ count: 1, changes: [{ note: SUMMARY, change: "edit" }] }),
 		);
-		expect(fetch).toHaveBeenCalledWith("/api/changes", undefined);
+		expect(fetch).toHaveBeenCalledWith("/api/changes", {
+			signal: expect.any(AbortSignal),
+		});
 	});
 
 	it("publishes the changes, and gives their number", async () => {
 		const fetch = answer(Response.json({ applied: [{}, {}] }));
 		await expect(publishChanges()).resolves.toEqual(R.Ok(2));
-		expect(fetch).toHaveBeenCalledWith("/api/changes", { method: "POST" });
+		expect(fetch).toHaveBeenCalledWith("/api/changes", {
+			method: "POST",
+			signal: expect.any(AbortSignal),
+		});
 	});
 
 	it("refuses a change of an unknown kind", async () => {
