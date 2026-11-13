@@ -253,6 +253,9 @@ It gets the languages setting and the field definitions as `DraftRules`.
   `publish` one time when it applied a change. Ten changes then cost one rebuild of each
   site. `handleChangesRequest` of `src/changes.ts` answers, and the route file is
   `apps/cms/src/pages/api/changes.ts`.
+- The changes are applied before `notify` runs. If `notify` throws, for example on a D1
+  error of the webhooks, the handler writes the error to the log with `console.error`,
+  and it still answers 200 with the applied changes.
 - The handler gets `notify` as a parameter, so the notes package does not import the
   webhooks package. `notifySites` of `apps/cms/src/lib/notes/notify.ts` gives the event to
   `deliverEvent` of the webhooks package.
