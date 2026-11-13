@@ -8,7 +8,6 @@ import { Button, buttonVariants } from "@daluang/ui/components/button";
 import { Spinner } from "@daluang/ui/components/spinner";
 import { R } from "@mobily/ts-belt";
 import { type SyntheticEvent, useState } from "react";
-import { match } from "ts-pattern";
 import { NavLink, type NavLinkKind } from "@/components/shell/nav-link";
 import { useSettings } from "@/hooks/settings/use-settings";
 import type { ChangesStore } from "@/lib/notes/changes-store";
@@ -19,6 +18,7 @@ import {
 } from "@/lib/notes/client";
 import type { SettingsStore } from "@/lib/settings/settings-store";
 import { PostForm } from "./post-form";
+import { PostStatusBar, type SaveState } from "./post-status-bar";
 
 export interface EditPostFormProps {
 	note: Note;
@@ -28,12 +28,6 @@ export interface EditPostFormProps {
 	/** The server saved the post. The page keeps the saved post. */
 	onSaved: (note: Note) => void;
 }
-
-type SaveState =
-	| { status: "idle" }
-	| { status: "saving" }
-	| { status: "saved" }
-	| { status: "failed"; message: string };
 
 /**
  * The form of a stored post, and Save. A save of a published post changes only its
@@ -88,18 +82,7 @@ export function EditPostForm(props: EditPostFormProps) {
 					if (save.status === "saved") setSave({ status: "idle" });
 				}}
 			/>
-			{match(save)
-				.with({ status: "failed" }, (failed) => (
-					<p role="alert" className="text-sm text-destructive">
-						{failed.message}
-					</p>
-				))
-				.with({ status: "saved" }, () => (
-					<p role="status" className="text-sm text-muted-foreground">
-						Saved. A published post changes on your site at Publish changes.
-					</p>
-				))
-				.otherwise(() => null)}
+			<PostStatusBar body={form.body} save={save} />
 			<div className="flex justify-end gap-2">
 				<NavLink
 					kind={props.linkKind}
