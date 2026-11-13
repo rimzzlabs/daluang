@@ -69,6 +69,7 @@ describe("PublishChanges", () => {
 		);
 		expect(client.publishChanges).toHaveBeenCalledOnce();
 		expect(store.read()).toBe(0);
+		expect(store.readPublished()).toBe(1);
 		expect(
 			screen.queryByRole("button", { name: /Publish changes/ }),
 		).toBeNull();

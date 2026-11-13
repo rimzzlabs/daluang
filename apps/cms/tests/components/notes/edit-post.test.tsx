@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { R } from "@mobily/ts-belt";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { EditPost } from "@/components/notes/edit-post";
@@ -15,6 +15,21 @@ const client = vi.hoisted(() => ({
 }));
 
 vi.mock("@/lib/notes/client", () => client);
+
+// The page gives its note to Translate. The title of that note shows which note the page keeps.
+vi.mock("@/components/notes/translate-post", () => ({
+	TranslatePost: (props: { note: { title: string } }) => (
+		<button type="button" data-title={props.note.title}>
+			Translate
+		</button>
+	),
+}));
+
+function translatedTitle() {
+	return screen
+		.getByRole("button", { name: "Translate" })
+		.getAttribute("data-title");
+}
 
 const NOTE = {
 	id: "n1",
@@ -33,16 +48,23 @@ const NOTE = {
 	mark: null,
 };
 
+const DRAFT = { ...NOTE, status: "draft", publishedAt: null };
+
+/** The answer of a save that the server sent before Publish changes. */
+const SAVED_DRAFT = { ...DRAFT, title: "Jotai recipes!" };
+
 beforeEach(() => {
 	client.readNote.mockReset();
+	client.saveNote.mockReset();
+	client.saveNote.mockResolvedValue(R.Ok(NOTE));
 });
 
-function renderEditPost(onSaved = vi.fn()) {
+function renderEditPost(onSaved = vi.fn(), changes = createChangesStore(0)) {
 	render(
 		<EditPost
 			id="n1"
 			settings={settingsStore()}
-			changes={createChangesStore(0)}
+			changes={changes}
 			linkKind="anchor"
 			onOpenPost={vi.fn()}
 			onSaved={onSaved}
@@ -82,5 +104,86 @@ describe("EditPost", () => {
 		const title = await screen.findByDisplayValue("Jotai recipes");
 		await userEvent.type(title, "!{Control>}s{/Control}");
 		await waitFor(() => expect(onSaved).toHaveBeenCalledOnce());
+	});
+
+	it("reads the post again after Publish changes, and keeps the text of the form", async () => {
+		client.readNote
+			.mockResolvedValueOnce(R.Ok(DRAFT))
+			.mockResolvedValue(R.Ok(NOTE));
+		const changes = createChangesStore(1);
+		renderEditPost(vi.fn(), changes);
+		const title = await screen.findByDisplayValue("Jotai recipes");
+		expect(screen.getByText("Draft")).toBeTruthy();
+		await userEvent.type(title, "!");
+		act(() => changes.markPublished());
+		expect(await screen.findByText("Published")).toBeTruthy();
+		expect(client.readNote).toHaveBeenCalledTimes(2);
+		expect(screen.getByDisplayValue("Jotai recipes!")).toBeTruthy();
+	});
+
+	it("keeps the form and the status when the read after Publish changes fails", async () => {
+		const read = Promise.withResolvers<unknown>();
+		client.readNote
+			.mockResolvedValueOnce(R.Ok(NOTE))
+			.mockReturnValueOnce(read.promise);
+		const changes = createChangesStore(1);
+		renderEditPost(vi.fn(), changes);
+		await screen.findByDisplayValue("Jotai recipes");
+		act(() => changes.markPublished());
+		expect(client.readNote).toHaveBeenCalledTimes(2);
+		await act(async () => read.resolve(R.Error("offline")));
+		expect(screen.getByDisplayValue("Jotai recipes")).toBeTruthy();
+		expect(screen.getByText("Published")).toBeTruthy();
+		expect(screen.queryByText("Offline.")).toBeNull();
+	});
+
+	it("keeps the saved title when the read after Publish changes gives an older one", async () => {
+		const read = Promise.withResolvers<unknown>();
+		client.readNote
+			.mockResolvedValueOnce(R.Ok(DRAFT))
+			.mockReturnValueOnce(read.promise);
+		client.saveNote.mockResolvedValue(R.Ok(SAVED_DRAFT));
+		const changes = createChangesStore(1);
+		const onSaved = renderEditPost(vi.fn(), changes);
+		const title = await screen.findByDisplayValue("Jotai recipes");
+		await userEvent.type(title, "!{Control>}s{/Control}");
+		await waitFor(() => expect(onSaved).toHaveBeenCalledOnce());
+		expect(translatedTitle()).toBe("Jotai recipes!");
+		act(() => changes.markPublished());
+		await act(async () => read.resolve(R.Ok(NOTE)));
+		expect(screen.getByText("Published")).toBeTruthy();
+		expect(translatedTitle()).toBe("Jotai recipes!");
+	});
+
+	it("keeps the status Published when a save answers after the read", async () => {
+		const saved = Promise.withResolvers<unknown>();
+		client.readNote
+			.mockResolvedValueOnce(R.Ok(DRAFT))
+			.mockResolvedValueOnce(R.Ok(NOTE));
+		client.saveNote.mockReturnValueOnce(saved.promise);
+		const changes = createChangesStore(1);
+		const onSaved = renderEditPost(vi.fn(), changes);
+		const title = await screen.findByDisplayValue("Jotai recipes");
+		await userEvent.type(title, "!{Control>}s{/Control}");
+		expect(client.saveNote).toHaveBeenCalledOnce();
+		act(() => changes.markPublished());
+		expect(await screen.findByText("Published")).toBeTruthy();
+		await act(async () => saved.resolve(R.Ok(SAVED_DRAFT)));
+		expect(onSaved).toHaveBeenCalledOnce();
+		expect(screen.getByText("Published")).toBeTruthy();
+		expect(translatedTitle()).toBe("Jotai recipes!");
+	});
+
+	it("tells when Publish changes deleted the post", async () => {
+		client.readNote
+			.mockResolvedValueOnce(R.Ok(NOTE))
+			.mockResolvedValue(R.Error("not-found"));
+		const changes = createChangesStore(1);
+		renderEditPost(vi.fn(), changes);
+		await screen.findByDisplayValue("Jotai recipes");
+		act(() => changes.markPublished());
+		expect((await screen.findByRole("alert")).textContent).toContain(
+			"Not found.",
+		);
 	});
 });
