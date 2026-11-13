@@ -6,6 +6,7 @@ import {
 	type NoteForm,
 	noteFormOf,
 	parseNoteForm,
+	publishBlockers,
 	unshownErrors,
 	withSlug,
 	withTitle,
@@ -273,5 +274,78 @@ describe("noteFormOf", () => {
 			series: "3",
 			relatedPosts: "",
 		});
+	});
+});
+
+describe("publishBlockers", () => {
+	const REQUIRED_RULES = {
+		...RULES,
+		fields: [
+			...FIELDS,
+			{ name: "cover", label: "Cover", type: "list", required: true },
+		] satisfies readonly FieldDefinition[],
+	};
+	const NOTE = {
+		title: "Jotai recipes",
+		slug: "jotai-recipes",
+		language: "en",
+		description: "Small recipes.",
+		keywords: [],
+		fields: { series: "Jotai", cover: ["a.png"] },
+		body: "",
+	};
+
+	it("names each empty required field by its label", () => {
+		const note = { ...NOTE, fields: { series: " ", cover: [] } };
+		expect(publishBlockers(note, REQUIRED_RULES)).toEqual([
+			{ label: "Series", message: "Give Series a value." },
+			{ label: "Cover", message: "Give Cover a value." },
+		]);
+	});
+
+	it("gives an empty list for a note that can go", () => {
+		expect(publishBlockers(NOTE, REQUIRED_RULES)).toEqual([]);
+	});
+
+	it("names a core input by a fixed label", () => {
+		const blockers = publishBlockers(
+			{ ...NOTE, language: "fr" },
+			REQUIRED_RULES,
+		);
+		expect(blockers.map((blocker) => blocker.label)).toEqual(["Language"]);
+	});
+
+	it("uses the name of a kept field that has no definition", () => {
+		const note = {
+			...NOTE,
+			fields: { ...NOTE.fields, extra: Array.from({ length: 51 }, () => "a") },
+		};
+		expect(publishBlockers(note, REQUIRED_RULES).map((b) => b.label)).toEqual([
+			"extra",
+		]);
+	});
+
+	it("names the root key of the extra fields", () => {
+		const many = Object.fromEntries(
+			Array.from({ length: 31 }, (_, index) => [`f${index}`, "x"]),
+		);
+		const note = { ...NOTE, fields: { ...NOTE.fields, ...many } };
+		expect(publishBlockers(note, REQUIRED_RULES).map((b) => b.label)).toEqual([
+			"Extra fields",
+		]);
+	});
+
+	it("gives one blocker for two bad keywords", () => {
+		const note = { ...NOTE, keywords: ["", " "] };
+		expect(publishBlockers(note, REQUIRED_RULES).map((b) => b.label)).toEqual([
+			"Keywords",
+		]);
+	});
+
+	it("names a field of the wrong type", () => {
+		const note = { ...NOTE, fields: { ...NOTE.fields, readingTime: "long" } };
+		expect(publishBlockers(note, REQUIRED_RULES)).toEqual([
+			{ label: "Reading time", message: "Reading time needs a number." },
+		]);
 	});
 });
