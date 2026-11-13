@@ -302,6 +302,12 @@ It gets the languages setting and the field definitions as `DraftRules`.
   stored post. It starts with `noteFormOf`, and **Save** sends the draft to `saveNote`.
 - A save of a published post changes only its working copy. After a save,
   `refreshChangeCount` reads the number of changes again for the navbar.
+- `PostStatusBar` of `apps/cms/src/components/notes/post-status-bar.tsx` is below the
+  form. It shows the words, the characters, and the read time of the body, from
+  `bodyStats` of `src/body-stats.ts`, then "Saving", "Saved", or the error of the save.
+- `bodyStats` counts a word from its first letter or digit, so a mark of Markdown alone,
+  such as `#` or `---`, is not a word. It counts each code point as one character. The
+  read time is the words divided by 200 (`WORDS_PER_MINUTE`), rounded up.
 
 ## The Publish changes button
 

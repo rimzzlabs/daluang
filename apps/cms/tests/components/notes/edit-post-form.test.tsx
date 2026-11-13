@@ -73,7 +73,7 @@ describe("EditPostForm", () => {
 				body: "# Jotai",
 			},
 		});
-		expect((await screen.findByRole("status")).textContent).toMatch(/^Saved\./);
+		expect((await screen.findByRole("status")).textContent).toBe("Saved");
 		expect(onSaved).toHaveBeenCalledWith(saved);
 		expect(client.refreshChangeCount).toHaveBeenCalledWith(changes);
 		await userEvent.type(title, "!");
