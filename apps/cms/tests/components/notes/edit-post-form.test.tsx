@@ -200,6 +200,20 @@ describe("EditPostForm", () => {
 		expect(client.saveNote).not.toHaveBeenCalled();
 	});
 
+	it("shows the error of a long keyword at the keywords input, and saves nothing", async () => {
+		renderForm();
+		const keywords = screen.getByDisplayValue("react");
+		await userEvent.clear(keywords);
+		await userEvent.type(keywords, `${"k".repeat(61)}{Control>}s{/Control}`);
+		expect(
+			screen.getByText("Keep each keyword at 60 characters or fewer."),
+		).toBeTruthy();
+		expect(screen.getByRole("status").textContent).toBe(
+			"Not saved: correct the marked values",
+		);
+		expect(client.saveNote).not.toHaveBeenCalled();
+	});
+
 	it("asks in the app island before it leaves a form that is not valid", async () => {
 		const router = renderFormInRouter();
 		const title = await screen.findByDisplayValue("Jotai recipes");

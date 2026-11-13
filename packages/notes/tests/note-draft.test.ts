@@ -57,7 +57,7 @@ describe("noteDraftSchema", () => {
 
 	it("refuses a language that the CMS does not have", () => {
 		expect(messages({ ...DRAFT, language: "fr" })).toEqual([
-			"Choose a language of this CMS.",
+			"This language is not in the settings of the CMS. Choose another language.",
 		]);
 	});
 

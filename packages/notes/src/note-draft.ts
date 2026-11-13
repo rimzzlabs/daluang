@@ -82,7 +82,7 @@ function draftSchema(check: DraftCheck): z.ZodType<NoteDraft> {
 		slug: shape.slug,
 		language: shape.language.refine(
 			(language) => isLanguageOfCms({ language, setting: rules.languages }),
-			"Choose a language of this CMS.",
+			"This language is not in the settings of the CMS. Choose another language.",
 		),
 		description: shape.description,
 		keywords: shape.keywords,

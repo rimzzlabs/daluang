@@ -79,7 +79,14 @@ It gets the languages setting and the field definitions as `DraftRules`.
   required field.
 - A number field with a text that is not a number keeps the text. The schema then tells
   the writer that the field needs a number.
-- An error is a message for each path: `title`, or `fields.<name>` for an extra field.
+- An error is a message for each input: `title`, or `fields.<name>` for an extra field.
+  A path stops before its first index, so a long keyword gives the key `keywords`, and a
+  bad item of a list field gives `fields.<name>`. The first message of a key stays.
+- `unshownErrors` gives the messages of the errors whose key is not an input: a key that
+  is not `title`, `slug`, `language`, `description`, `keywords`, `body`, or
+  `fields.<name>` of a defined field. For example, a stored extra field that the settings
+  no longer define (a kept field) can make the schema fail. The message of an extra
+  field starts with the name of the field.
 
 ## The inputs of the editor
 
@@ -91,7 +98,12 @@ It gets the languages setting and the field definitions as `DraftRules`.
   80rem (`xl`, `useIsWide` of `@daluang/ui`). On a smaller screen, **Details** opens the
   details in a sheet, and it shows the number of their errors. Only one copy of the
   details renders at a time, so each input keeps one ID.
-- The language choice shows only in a CMS with more than one language.
+- The language choice shows in a CMS with more than one language. It also shows when the
+  language of the post is not in the settings, also in a CMS with one language. It then
+  lists the languages of the CMS and the language of the post, and it shows the error of
+  the language below the choice. A post in the only language of the CMS has no choice.
+- `PostDetailsFields` shows the messages of `unshownErrors` in one alert at the top of the
+  details, so no error stays hidden.
 - `ExtraFieldInput` shows one extra field: a checkbox for yes or no, and a text box for a
   text, a number, or a list. A number asks for a decimal keyboard on a phone.
 - `MarkdownEditor` of `apps/cms/src/components/notes/markdown-editor.tsx` is the input of

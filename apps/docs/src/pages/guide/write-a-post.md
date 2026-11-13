@@ -8,7 +8,9 @@ you select **Publish changes**.
 1. Open **Posts** in the sidebar, then select **New post**. The CMS adds an "Untitled"
    draft and opens it.
 2. Type the title. The slug follows the title until you change the slug.
-3. If the CMS has more than one language, choose the language of the post.
+3. If the CMS has more than one language, choose the language of the post. A post in a
+   language that the settings no longer have also shows the choice: choose a language of
+   the CMS.
 4. Type the description, the keywords, and the extra fields of your site.
 5. Write the body in Markdown. Select **Split** to see the body beside the text as Comark
    renders it, or **Preview** to see only the body.

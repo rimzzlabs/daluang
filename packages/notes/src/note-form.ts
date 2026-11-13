@@ -30,8 +30,8 @@ export interface NoteForm {
 }
 
 /**
- * The message of each value that is not valid, by its path: `title`, or `fields.featured`
- * for an extra field.
+ * The message of each value that is not valid, by the key of its input: `title`, or
+ * `fields.featured` for an extra field. An item of a list gives the key of the list.
  */
 export type NoteFormErrors = Record<string, string>;
 
@@ -164,16 +164,66 @@ interface Issue {
 	message: string;
 }
 
-/** The first message of each path. */
+/**
+ * The key of the input that shows an issue. An index belongs to its array, so the path
+ * stops before the first index: `keywords.1` shows at `keywords`, and `fields.tags.0` at
+ * `fields.tags`. A name in a path is a text, so a field name of digits keeps its place.
+ */
+function errorKey(path: readonly PropertyKey[]): string {
+	return pipe(
+		path,
+		A.takeWhile((segment) => typeof segment !== "number"),
+		A.map(String),
+		A.join("."),
+	);
+}
+
+/** The first message of each input. */
 function formErrors(issues: readonly Issue[]): NoteFormErrors {
 	return pipe(
 		issues,
-		A.map(
-			(issue) =>
-				[pipe(issue.path, A.map(String), A.join(".")), issue.message] as const,
-		),
+		A.map((issue) => [errorKey(issue.path), issue.message] as const),
 		A.reverse,
 		D.fromPairs,
+	);
+}
+
+const CORE_INPUTS = [
+	"title",
+	"slug",
+	"language",
+	"description",
+	"keywords",
+	"body",
+];
+
+const FIELD_KEY = "fields.";
+
+/** The message of an error with no input. An extra field gets its name first. */
+function unshownMessage(error: readonly [string, string]): string {
+	const [key, message] = error;
+	if (!S.startsWith(key, FIELD_KEY)) return message;
+	return `${S.sliceToEnd(key, S.length(FIELD_KEY))}: ${message}`;
+}
+
+/**
+ * The messages of the errors that no input shows: a key that is not a core input and not
+ * a defined field. A stored extra field that the settings no longer define can cause one,
+ * so its message starts with the name of the field.
+ */
+export function unshownErrors(
+	errors: NoteFormErrors,
+	definitions: readonly FieldDefinition[],
+): readonly string[] {
+	const shown = [
+		...CORE_INPUTS,
+		...A.map(definitions, (definition) => `fields.${definition.name}`),
+	];
+	return pipe(
+		errors,
+		D.toPairs,
+		A.reject(([key]) => A.includes(shown, key)),
+		A.map(unshownMessage),
 	);
 }
 
