@@ -11,6 +11,7 @@ import {
 	publishChanges,
 	readNote,
 	refreshChangeCount,
+	SAVE_ERROR_OUTCOMES,
 	saveNote,
 } from "@/lib/notes/client";
 
@@ -212,5 +213,19 @@ describe("refreshChangeCount", () => {
 		const changes = createChangesStore(5);
 		await refreshChangeCount(changes);
 		expect(changes.read()).toBe(5);
+	});
+});
+
+describe("SAVE_ERROR_OUTCOMES", () => {
+	it("refuses a value that a retry cannot store, and tries again after each other error", () => {
+		expect(SAVE_ERROR_OUTCOMES).toEqual({
+			invalid: "refused",
+			"slug-taken": "refused",
+			"settings-needed": "refused",
+			"not-found": "refused",
+			"signed-out": "failed",
+			offline: "failed",
+			server: "failed",
+		});
 	});
 });

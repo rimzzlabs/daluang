@@ -16,12 +16,15 @@ import { useIsWide } from "@daluang/ui/hooks/use-wide";
 import { A, D, pipe, R } from "@mobily/ts-belt";
 import { useEffect, useEffectEvent, useState } from "react";
 import { NavLink, type NavLinkKind } from "@/components/shell/nav-link";
-import { useAutosave } from "@/hooks/notes/use-autosave";
+import { AUTOSAVE_RETRY_MS, useAutosave } from "@/hooks/notes/use-autosave";
 import { useSettings } from "@/hooks/settings/use-settings";
 import type { ChangesStore } from "@/lib/notes/changes-store";
 import {
+	type AutosaveOutcome,
 	NOTES_ERROR_MESSAGES,
+	type NotesError,
 	refreshChangeCount,
+	SAVE_ERROR_OUTCOMES,
 	saveNote,
 } from "@/lib/notes/client";
 import type { SettingsStore } from "@/lib/settings/settings-store";
@@ -35,6 +38,28 @@ export interface EditPostFormProps {
 	linkKind: NavLinkKind;
 	/** The server saved the post. The page keeps the saved post. */
 	onSaved: (note: Note) => void;
+}
+
+const RETRY_SECONDS = AUTOSAVE_RETRY_MS / 1000;
+
+/**
+ * The message of a save error. After a refused save, the writer must change a value. After
+ * a failed save, the text is not saved, and the autosave tries again.
+ */
+function saveErrorMessage(error: NotesError): string {
+	if (SAVE_ERROR_OUTCOMES[error] === "refused")
+		return NOTES_ERROR_MESSAGES[error];
+	const retry = `Daluang tries again in ${RETRY_SECONDS} seconds.`;
+	if (error === "signed-out")
+		return `Not saved: your session ended. Sign in again in another tab. The text stays on this page, and ${retry}`;
+	if (error === "offline")
+		return `Not saved: Daluang could not reach the server. ${retry}`;
+	return `Not saved: the server could not save the post. ${retry}`;
+}
+
+/** The status after a save ends. A change during the save keeps its status "pending". */
+function afterSave(next: SaveState): (current: SaveState) => SaveState {
+	return (current) => (current.status === "saving" ? next : current);
 }
 
 /**
@@ -54,7 +79,7 @@ export function EditPostForm(props: EditPostFormProps) {
 	const [detailsOpen, setDetailsOpen] = useState(false);
 	const isWide = useIsWide();
 
-	async function saveForm(next: NoteForm) {
+	async function saveForm(next: NoteForm): Promise<AutosaveOutcome> {
 		const draft = R.match(
 			parseNoteForm(next, rules),
 			(valid): NoteDraft | null => valid,
@@ -64,18 +89,22 @@ export function EditPostForm(props: EditPostFormProps) {
 				return null;
 			},
 		);
-		if (draft === null) return;
+		if (draft === null) return "refused";
 		setErrors({});
 		setSave({ status: "saving" });
-		R.match(
+		return R.match(
 			await saveNote({ id: props.note.id, draft }),
-			(note) => {
-				setSave({ status: "saved" });
+			(note): AutosaveOutcome => {
+				setSave(afterSave({ status: "saved" }));
 				props.onSaved(note);
 				refreshChangeCount(props.changes);
+				return "saved";
 			},
-			(error) =>
-				setSave({ status: "failed", message: NOTES_ERROR_MESSAGES[error] }),
+			(error) => {
+				const message = saveErrorMessage(error);
+				setSave(afterSave({ status: "failed", message }));
+				return SAVE_ERROR_OUTCOMES[error];
+			},
 		);
 	}
 

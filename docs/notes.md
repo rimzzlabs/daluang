@@ -198,6 +198,9 @@ It gets the languages setting and the field definitions as `DraftRules`.
   publish, an unpublish, or a cancel. Each one gives an `R.Result`, and it does not throw.
 - An error is a code of `NotesError`, and `NOTES_ERROR_MESSAGES` has the message of each
   code. A 409 gives `slug-taken` or `settings-needed` from the `error` of its body.
+- `SAVE_ERROR_OUTCOMES` tells the autosave what to do after each code. `invalid`,
+  `slug-taken`, `settings-needed`, and `not-found` give `refused`. `signed-out`,
+  `offline`, and `server` give `failed`, so the autosave tries again.
 - The client reads each answer with `noteSchema` or `noteSummarySchema` of `src/note.ts`.
   An answer that the schema refuses gives `server`.
 - The editor checks a draft with `noteDraftSchema` before a save, so the writer sees the
@@ -311,15 +314,38 @@ It gets the languages setting and the field definitions as `DraftRules`.
   only at Publish changes, so a save is safe. Mod-S saves at once.
 - One save runs at a time. A change during a save waits, then the next save sends the
   last form, so an old form never comes after a new one.
-- A value that is not valid shows its error, and the save waits for a valid post.
-- When the page closes with a change that waits, the hook saves it at once. The browser
-  asks before it closes the tab while a save waits or runs.
+- The save gives an outcome (`AutosaveOutcome` of the browser client): `saved`,
+  `refused`, or `failed`. The hook keeps the last form until a save of that form gives
+  `saved`. A newer form replaces the kept form, and the hook never sends an old form
+  again.
+- `refused`: a retry cannot help. A form that is not valid gives `refused`. The error
+  codes `invalid`, `slug-taken`, `settings-needed`, and `not-found` also give `refused`.
+  The hook waits for the next change of the writer.
+- `failed`: a retry can help, for example when the writer is offline or signs in again
+  in another tab. The error codes `signed-out`, `offline`, and `server` give `failed`.
+  The hook sends the kept form again after 5 s (`AUTOSAVE_RETRY_MS`), until a save
+  succeeds. A change during that wait uses the normal wait of 1 s.
+- `SAVE_ERROR_OUTCOMES` of the browser client gives the outcome of each `NotesError`.
+- Mod-S sends a kept form again, also after `refused`.
+- When the form goes away because the writer opens another page of the CMS, the hook
+  sends the form one last time. After that, the hook does not try again. If the last
+  send fails, the text is lost. A later change will add a confirmation before the writer
+  leaves the page.
+- A close or a reload of the browser tab runs no code of the hook, so the hook sends
+  nothing. The browser asks before it closes the tab while a form is not saved.
 - A save of a published post changes only its working copy. After a save,
   `refreshChangeCount` reads the number of changes again for the navbar.
 - `PostStatusBar` of `apps/cms/src/components/notes/post-status-bar.tsx` is below the
   form. It shows the words, the characters, and the read time of the body, from
   `bodyStats` of `src/body-stats.ts`, then "Not saved yet", "Saving", "Saved", "Not saved: correct the
   marked values", or the error of the save.
+- "Saved" shows only when no newer change waits. When a save ends, its result replaces
+  the status only if the status is still "Saving". A change during the save sets "Not
+  saved yet", and that status stays until the save of the change.
+- After `failed`, the message tells the writer that the post is not saved and that
+  Daluang tries again in 5 seconds. After the end of the session, the message tells the
+  writer to sign in again in another tab, and that the text stays on the page. After
+  `refused`, the message is the message of the error in `NOTES_ERROR_MESSAGES`.
 - `bodyStats` counts a word from its first letter or digit, so a mark of Markdown alone,
   such as `#` or `---`, is not a word. It counts each code point as one character. The
   read time is the words divided by 200 (`WORDS_PER_MINUTE`), rounded up.

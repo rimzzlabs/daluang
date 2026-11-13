@@ -1,7 +1,12 @@
 // @vitest-environment jsdom
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AUTOSAVE_DELAY_MS, useAutosave } from "@/hooks/notes/use-autosave";
+import {
+	AUTOSAVE_DELAY_MS,
+	AUTOSAVE_RETRY_MS,
+	useAutosave,
+} from "@/hooks/notes/use-autosave";
+import type { AutosaveOutcome } from "@/lib/notes/client";
 
 beforeEach(() => {
 	vi.useFakeTimers();
@@ -11,13 +16,25 @@ afterEach(() => {
 	vi.useRealTimers();
 });
 
-function renderAutosave(save: (value: string) => Promise<void>) {
+type Save = (value: string) => Promise<AutosaveOutcome>;
+
+function renderAutosave(save: Save) {
 	return renderHook(() => useAutosave(save));
+}
+
+function saving(outcome: AutosaveOutcome) {
+	return vi.fn<Save>(() => Promise.resolve(outcome));
+}
+
+function closing(): boolean {
+	const event = new Event("beforeunload", { cancelable: true });
+	window.dispatchEvent(event);
+	return event.defaultPrevented;
 }
 
 describe("useAutosave", () => {
 	it("saves the last value after the wait", async () => {
-		const save = vi.fn(() => Promise.resolve());
+		const save = saving("saved");
 		const { result } = renderAutosave(save);
 		act(() => result.current.schedule("a"));
 		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS - 1));
@@ -29,24 +46,24 @@ describe("useAutosave", () => {
 	});
 
 	it("runs one save at a time, and then saves the change of the wait", async () => {
-		const first = Promise.withResolvers<void>();
+		const first = Promise.withResolvers<AutosaveOutcome>();
 		const save = vi
-			.fn<(value: string) => Promise<void>>()
+			.fn<Save>()
 			.mockReturnValueOnce(first.promise)
-			.mockResolvedValue(undefined);
+			.mockResolvedValue("saved");
 		const { result } = renderAutosave(save);
 		act(() => result.current.schedule("a"));
 		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS));
 		act(() => result.current.schedule("ab"));
 		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS));
 		expect(save).toHaveBeenCalledTimes(1);
-		await act(async () => first.resolve());
+		await act(async () => first.resolve("saved"));
 		expect(save).toHaveBeenLastCalledWith("ab");
 		expect(save).toHaveBeenCalledTimes(2);
 	});
 
 	it("saves at once on flush, and gives nothing to save after it", async () => {
-		const save = vi.fn(() => Promise.resolve());
+		const save = saving("saved");
 		const { result } = renderAutosave(save);
 		act(() => result.current.schedule("a"));
 		await act(async () => result.current.flush());
@@ -57,7 +74,7 @@ describe("useAutosave", () => {
 	});
 
 	it("saves the waiting value when the component goes away", () => {
-		const save = vi.fn(() => Promise.resolve());
+		const save = saving("saved");
 		const { result, unmount } = renderAutosave(save);
 		act(() => result.current.schedule("a"));
 		unmount();
@@ -65,17 +82,130 @@ describe("useAutosave", () => {
 	});
 
 	it("asks before the page closes while a value waits", async () => {
-		const save = vi.fn(() => Promise.resolve());
+		const save = saving("saved");
 		const { result } = renderAutosave(save);
-		function closing(): boolean {
-			const event = new Event("beforeunload", { cancelable: true });
-			window.dispatchEvent(event);
-			return event.defaultPrevented;
-		}
 		expect(closing()).toBe(false);
 		act(() => result.current.schedule("a"));
 		expect(closing()).toBe(true);
 		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS));
 		expect(closing()).toBe(false);
+	});
+
+	it("keeps a failed value, and sends it again after the retry wait", async () => {
+		const save = vi
+			.fn<Save>()
+			.mockResolvedValueOnce("failed")
+			.mockResolvedValue("saved");
+		const { result } = renderAutosave(save);
+		act(() => result.current.schedule("a"));
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS));
+		expect(save).toHaveBeenCalledOnce();
+		expect(closing()).toBe(true);
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_RETRY_MS - 1));
+		expect(save).toHaveBeenCalledOnce();
+		await act(() => vi.advanceTimersByTimeAsync(1));
+		expect(save).toHaveBeenCalledTimes(2);
+		expect(save).toHaveBeenLastCalledWith("a");
+		expect(closing()).toBe(false);
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_RETRY_MS));
+		expect(save).toHaveBeenCalledTimes(2);
+	});
+
+	it("keeps a refused value with no retry, and sends it when the component goes away", async () => {
+		const save = saving("refused");
+		const { result, unmount } = renderAutosave(save);
+		act(() => result.current.schedule("a"));
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS));
+		expect(closing()).toBe(true);
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_RETRY_MS * 2));
+		expect(save).toHaveBeenCalledOnce();
+		unmount();
+		expect(save).toHaveBeenCalledTimes(2);
+		expect(save).toHaveBeenLastCalledWith("a");
+	});
+
+	it("sends a kept value again on flush", async () => {
+		const save = saving("refused");
+		const { result } = renderAutosave(save);
+		act(() => result.current.schedule("a"));
+		await act(async () => result.current.flush());
+		await act(async () => result.current.flush());
+		expect(save).toHaveBeenCalledTimes(2);
+		expect(save).toHaveBeenLastCalledWith("a");
+	});
+
+	it("sends the newer value after a failed save, and never the old value", async () => {
+		const first = Promise.withResolvers<AutosaveOutcome>();
+		const save = vi
+			.fn<Save>()
+			.mockReturnValueOnce(first.promise)
+			.mockResolvedValue("saved");
+		const { result } = renderAutosave(save);
+		act(() => result.current.schedule("a"));
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS));
+		act(() => result.current.schedule("ab"));
+		await act(async () => first.resolve("failed"));
+		expect(save).toHaveBeenCalledOnce();
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS));
+		expect(save).toHaveBeenCalledTimes(2);
+		expect(save).toHaveBeenLastCalledWith("ab");
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_RETRY_MS * 2));
+		expect(save).toHaveBeenCalledTimes(2);
+		expect(closing()).toBe(false);
+	});
+
+	it("waits the normal time for a change during the retry wait", async () => {
+		const save = vi
+			.fn<Save>()
+			.mockResolvedValueOnce("failed")
+			.mockResolvedValue("saved");
+		const { result } = renderAutosave(save);
+		act(() => result.current.schedule("a"));
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS));
+		act(() => result.current.schedule("ab"));
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS));
+		expect(save).toHaveBeenCalledTimes(2);
+		expect(save).toHaveBeenLastCalledWith("ab");
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_RETRY_MS));
+		expect(save).toHaveBeenCalledTimes(2);
+	});
+
+	it("does not try again after the component goes away", async () => {
+		const save = saving("failed");
+		const { result, unmount } = renderAutosave(save);
+		act(() => result.current.schedule("a"));
+		unmount();
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_RETRY_MS * 2));
+		expect(save).toHaveBeenCalledOnce();
+	});
+
+	it("does not try again when a save that runs at unmount fails", async () => {
+		const first = Promise.withResolvers<AutosaveOutcome>();
+		const save = vi.fn<Save>().mockReturnValueOnce(first.promise);
+		const { result, unmount } = renderAutosave(save);
+		act(() => result.current.schedule("a"));
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS));
+		// The save of "a" runs, so the send of the unmount cannot start a second save.
+		unmount();
+		await act(async () => first.resolve("failed"));
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_RETRY_MS * 2));
+		expect(save).toHaveBeenCalledExactlyOnceWith("a");
+	});
+
+	it("starts no second save on a flush during a save", async () => {
+		const first = Promise.withResolvers<AutosaveOutcome>();
+		const save = vi
+			.fn<Save>()
+			.mockReturnValueOnce(first.promise)
+			.mockResolvedValue("saved");
+		const { result } = renderAutosave(save);
+		act(() => result.current.schedule("a"));
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS));
+		act(() => result.current.schedule("ab"));
+		await act(async () => result.current.flush());
+		expect(save).toHaveBeenCalledOnce();
+		await act(async () => first.resolve("saved"));
+		expect(save).toHaveBeenCalledTimes(2);
+		expect(save).toHaveBeenLastCalledWith("ab");
 	});
 });
