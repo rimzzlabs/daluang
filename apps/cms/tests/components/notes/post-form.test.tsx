@@ -131,4 +131,20 @@ describe("PostForm", () => {
 			"# Resep",
 		);
 	});
+
+	it("shows the text and the preview together in Split", async () => {
+		render(<Harness />);
+		await typeInEditor("Body", "# Resep");
+		await userEvent.click(screen.getByRole("button", { name: "Split" }));
+		expect(
+			await screen.findByRole("heading", { level: 1, name: "Resep" }),
+		).toBeTruthy();
+		expect(screen.getByRole("textbox", { name: "Body" })).toBeTruthy();
+		await userEvent.click(screen.getByRole("button", { name: "Split" }));
+		expect(
+			screen
+				.getByRole("button", { name: "Split" })
+				.getAttribute("aria-pressed"),
+		).toBe("true");
+	});
 });

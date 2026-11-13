@@ -104,8 +104,10 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - `PostForm` loads the editor with `lazy`. CodeMirror and the grammars of Markdown are
   about 500 KB, so only the pages of the editor load them. A skeleton shows until the
   editor loads.
-- **Write** and **Preview** above the body switch the view. The editor stays in the page
-  during the preview, so it keeps its text and its undo history.
+- **Write**, **Split**, and **Preview** above the body switch the view. Split shows the
+  preview beside the text from 64rem (`lg`), and below the text on a smaller screen. The
+  editor stays in the page during the preview, so it keeps its text and its undo history.
+- The editor numbers the lines, and tints the line of the cursor with the `muted` token.
 - `PostPreview` of `apps/cms/src/components/notes/post-preview.tsx` parses the body with
   `parseMarkdown` of `comark`, and renders the document with `MarkdownDocument` of
   `@comark/react`. A component of Comark shows with its tag, because each site maps the

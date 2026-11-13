@@ -92,4 +92,11 @@ describe("MarkdownEditor", () => {
 		}
 		expect(onChange).toHaveBeenLastCalledWith("# Jotai**_[text](https://)_**");
 	});
+
+	it("numbers the lines", () => {
+		render(<MarkdownEditor {...editorProps()} />);
+		expect(document.querySelector(".cm-lineNumbers")?.textContent).toContain(
+			"1",
+		);
+	});
 });

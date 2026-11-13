@@ -8,7 +8,13 @@ import {
 import { markdown } from "@codemirror/lang-markdown";
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
-import { EditorView, keymap } from "@codemirror/view";
+import {
+	EditorView,
+	highlightActiveLine,
+	highlightActiveLineGutter,
+	keymap,
+	lineNumbers,
+} from "@codemirror/view";
 import { type MarkdownEdit, markdownEdit } from "@daluang/notes/markdown-edit";
 import { tags } from "@lezer/highlight";
 import { cn } from "cn";
@@ -43,6 +49,17 @@ const EDITOR_THEME = EditorView.theme({
 	},
 	".cm-content": { padding: "0.75rem", caretColor: "var(--foreground)" },
 	".cm-cursor": { borderLeftColor: "var(--foreground)" },
+	".cm-gutters": {
+		backgroundColor: "transparent",
+		border: "none",
+		color: "var(--muted-foreground)",
+	},
+	".cm-lineNumbers .cm-gutterElement": { padding: "0 0.5rem 0 0.75rem" },
+	// The line of the cursor is a tint of the muted token, so the text stays readable.
+	".cm-activeLine, .cm-activeLineGutter": {
+		backgroundColor: "color-mix(in oklch, var(--muted) 60%, transparent)",
+	},
+	".cm-activeLineGutter": { color: "var(--foreground)" },
 });
 
 /**
@@ -86,7 +103,7 @@ export interface MarkdownEditorProps {
 
 /**
  * The editor of the Markdown body: the toolbar, then CodeMirror 6 with the syntax of
- * Markdown, the undo history, and the default keys. It keeps the text as the writer types
+ * Markdown, line numbers, the line of the cursor, the undo history, and the default keys. It keeps the text as the writer types
  * it.
  */
 export function MarkdownEditor(props: MarkdownEditorProps) {
@@ -107,6 +124,9 @@ export function MarkdownEditor(props: MarkdownEditorProps) {
 			state: EditorState.create({
 				doc: initial,
 				extensions: [
+					lineNumbers(),
+					highlightActiveLine(),
+					highlightActiveLineGutter(),
 					history(),
 					EDIT_KEYS,
 					keymap.of([...defaultKeymap, ...historyKeymap]),
