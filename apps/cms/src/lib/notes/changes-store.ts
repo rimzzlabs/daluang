@@ -1,4 +1,8 @@
 import { A } from "@mobily/ts-belt";
+import type { AutosaveOutcome } from "./client";
+
+/** Saves the open post before Publish changes. `saved` when the server has its last text. */
+export type OpenPostSave = () => Promise<AutosaveOutcome>;
 
 /**
  * The number of changes that wait for Publish changes, in the browser. The app island makes
@@ -6,7 +10,8 @@ import { A } from "@mobily/ts-belt";
  * it, and the navbar renders again.
  *
  * The store also counts each Publish changes that succeeds (`readPublished`). A page that
- * shows posts reads them again when this number changes.
+ * shows posts reads them again when this number changes. The page of a post registers the
+ * save of its form, so Publish changes saves the open post first.
  */
 export interface ChangesStore {
 	read: () => number;
@@ -16,12 +21,17 @@ export interface ChangesStore {
 	/** Publish changes succeeded: no change waits, and each page reads its posts again. */
 	markPublished: () => void;
 	subscribe: (listener: () => void) => () => void;
+	/** Registers the save of the open post. The returned function removes it. */
+	registerOpenPost: (save: OpenPostSave) => () => void;
+	/** Saves the open post. `saved` when no post is open. */
+	saveOpenPost: () => Promise<AutosaveOutcome>;
 }
 
 export function createChangesStore(initial: number): ChangesStore {
 	let current = initial;
 	let published = 0;
 	let listeners: readonly (() => void)[] = [];
+	let openPost: OpenPostSave | null = null;
 
 	function tell() {
 		A.forEach(listeners, (listener) => {
@@ -47,5 +57,16 @@ export function createChangesStore(initial: number): ChangesStore {
 				listeners = A.reject(listeners, (item) => item === listener);
 			};
 		},
+		registerOpenPost: (save) => {
+			openPost = save;
+			return () => {
+				// A new page can register before the old page removes its save.
+				if (openPost === save) openPost = null;
+			};
+		},
+		saveOpenPost: () =>
+			openPost === null
+				? Promise.resolve<AutosaveOutcome>("saved")
+				: openPost(),
 	};
 }

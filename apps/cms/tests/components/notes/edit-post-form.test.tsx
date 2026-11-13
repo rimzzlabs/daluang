@@ -11,6 +11,7 @@ import {
 } from "@tanstack/react-router";
 import {
 	act,
+	cleanup,
 	fireEvent,
 	render,
 	screen,
@@ -113,6 +114,30 @@ async function leaveByLink() {
 }
 
 describe("EditPostForm", () => {
+	it("gives Publish changes the save of the form while it is open", async () => {
+		client.saveNote.mockResolvedValue(R.Ok({ ...NOTE, title: "Jotai" }));
+		const { changes } = renderForm();
+		fireEvent.change(screen.getByDisplayValue("Jotai recipes"), {
+			target: { value: "Jotai" },
+		});
+		let saved = "";
+		await act(async () => {
+			saved = await changes.saveOpenPost();
+		});
+		expect(saved).toBe("saved");
+		expect(client.saveNote).toHaveBeenCalledOnce();
+		fireEvent.change(screen.getByDisplayValue("Jotai"), {
+			target: { value: "" },
+		});
+		await act(async () => {
+			saved = await changes.saveOpenPost();
+		});
+		expect(saved).toBe("refused");
+		expect(client.saveNote).toHaveBeenCalledOnce();
+		cleanup();
+		await expect(changes.saveOpenPost()).resolves.toBe("saved");
+	});
+
 	it("saves at Mod-S, then reads the number of changes again", async () => {
 		const saved = { ...NOTE, title: "Jotai" };
 		client.saveNote.mockResolvedValue(R.Ok(saved));

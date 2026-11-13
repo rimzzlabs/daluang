@@ -232,6 +232,9 @@ It gets the languages setting and the field definitions as `DraftRules`.
   number of changes to 0 and adds 1 to this count (`readPublished`). `usePublishCount`
   renders a component again after each Publish changes, so the component reads its posts
   again.
+- The store keeps the save of the open post: `registerOpenPost` adds it, and the function
+  that it returns removes it. `saveOpenPost` calls it, and gives its `AutosaveOutcome`.
+  With no open post, it gives `saved` at once.
 
 ## Publish
 
@@ -379,6 +382,12 @@ It gets the languages setting and the field definitions as `DraftRules`.
   send fails, the text is lost.
 - `hasUnsaved()` of the hook is true while the server does not have the last form, also
   during its save.
+- `settle()` of the hook sends the kept form with no wait, and waits for each save,
+  also for a newer form behind a save that runs. It gives `saved` when the server has
+  the last form, at once when no form waits. Else it gives the outcome of the last save
+  of the last form: `refused` or `failed`. A failed save still tries again after 5 s.
+- **Save before Publish changes.** `EditPostForm` registers `settle()` in the store of
+  the changes while it is open (`registerOpenPost`), and removes it when it goes away.
 - `UnsavedPostGuard` of `apps/cms/src/components/notes/unsaved-post-guard.tsx` asks before
   a router navigation leaves the post, also to another post. It asks only when
   `hasUnsaved()` is true and one of these is true (`mustConfirmLeave`):
@@ -423,10 +432,25 @@ It gets the languages setting and the field definitions as `DraftRules`.
   HTML and the island then show the same number, with no request from the browser.
 - A click opens a dialog with the list of `listChangesOfCms`: the title, the language, and
   the change of each note. The list also writes the new number to the store.
-- **Publish changes** in the dialog calls `publishChanges`. If it succeeds, the dialog
-  calls `markPublished` of the store, so the button goes away and each page reads its
-  posts again. If it fails, the dialog stays open with the message, and the number
-  stays.
+- Before it reads the list, the dialog saves the open post with `saveOpenPost` of the
+  store. The list then shows the change of the last text of the post. With no open post,
+  the dialog sends no other request.
+- If that save does not give `saved`, the dialog shows the list with the message of the
+  outcome (`OPEN_POST_MESSAGES`):
+  - `refused`: "The open post has a value that is not correct. Correct the post, then
+    publish again."
+  - `failed`: "Daluang could not save the open post. Daluang tries again in 5 seconds.
+    Then publish again."
+- The dialog publishes only a list that it read after a save that gave `saved`. After
+  another save, or after a list that did not load, **Publish changes** does not
+  publish. It saves the open post and reads the list again. The next click publishes
+  the new list.
+- **Publish changes** in the dialog saves the open post again, then calls
+  `publishChanges`. If this save does not give `saved`, the dialog does not publish,
+  and it shows the message of the outcome.
+- If `publishChanges` succeeds, the dialog calls `markPublished` of the store, so the
+  button goes away and each page reads its posts again. If it fails, the dialog stays
+  open with the message, and the number stays.
 
 ## The content API
 
