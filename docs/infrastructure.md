@@ -51,6 +51,10 @@ The guide for a person who hosts a copy is `apps/docs/src/pages/guide/deploy.md`
 - `deploy.yml` deploys the CMS: it makes the D1 database `daluang` if it is missing,
   applies the migrations, builds, and deploys with `--secrets-file` and `--domain`. The
   migrations come before the deploy, so new code never runs on an old schema.
+- The first step of `deploy.yml` checks the settings of the repository. It stops when a
+  value is missing, when `BETTER_AUTH_SECRET` has fewer than 32 characters, or when
+  `CMS_DOMAIN` is not a domain only. The CMS refuses such a value at each request, so a
+  deploy with it answers 500 on each page.
 - `deploy.yml` deploys the landing page and the docs site only in `rimzzlabs/daluang`. A
   fork deploys only its CMS.
 - The values come from the settings of the repository: the secrets

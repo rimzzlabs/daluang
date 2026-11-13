@@ -62,6 +62,18 @@ jobs:
             echo "::error::Set these secrets or variables in the settings of the repository:$missing"
             exit 1
           fi
+          # The CMS refuses these two values at each request. A deploy with one of them
+          # answers 500 on each page, so the workflow stops before the deploy.
+          if [ "${#BETTER_AUTH_SECRET}" -lt 32 ]; then
+            echo "::error::Set the secret BETTER_AUTH_SECRET to 32 or more characters."
+            exit 1
+          fi
+          case "$CMS_DOMAIN" in
+            *://* | */*)
+              echo "::error::Set the variable CMS_DOMAIN to the domain only, for example cms.example.com."
+              exit 1
+              ;;
+          esac
 
       - uses: actions/checkout@v7
         with:
