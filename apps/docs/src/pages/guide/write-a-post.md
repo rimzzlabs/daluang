@@ -5,12 +5,13 @@ you select **Publish changes**.
 
 ## Write a post
 
-1. Open **Posts** in the sidebar, then select **New post**.
+1. Open **Posts** in the sidebar, then select **New post**. The CMS adds an "Untitled"
+   draft and opens it.
 2. Type the title. The slug follows the title until you change the slug.
 3. If the CMS has more than one language, choose the language of the post.
 4. Type the description, the keywords, and the extra fields of your site.
 5. Write the body in Markdown. Select **Preview** to see the body as Comark renders it.
-6. Select **Save draft**. The list of posts opens, with the new draft.
+6. Select **Save**.
 
 The editor of the body is CodeMirror. It keeps the Markdown as you type it, also the
 components of Comark, for example `::callout`. Your site gives each component its look.

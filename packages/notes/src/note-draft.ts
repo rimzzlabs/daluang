@@ -9,6 +9,7 @@ import type { FieldDefinition, FieldType } from "./field-definitions";
 import { isLanguageOfCms, type LanguagesSetting } from "./languages-setting";
 import { noteMetadataSchema } from "./metadata";
 import type { NoteDraft } from "./note";
+import { freeSlug, type NoteKey } from "./translation";
 
 /** The size limit of a body, in bytes: half of the size limit of a row of D1, 2 MB. */
 export const NOTE_BODY_MAX_BYTES = 1_000_000;
@@ -124,4 +125,43 @@ export function noteDraftSchema(rules: DraftRules): z.ZodType<NoteDraft> {
  */
 export function publishedDraftSchema(rules: DraftRules): z.ZodType<NoteDraft> {
 	return draftSchema({ rules, requireValues: true });
+}
+
+const UNTITLED_SLUG = "untitled";
+
+/** True for the slug of an untitled draft: `untitled`, `untitled-2`, and so on. */
+export function isUntitledSlug(slug: string): boolean {
+	return /^untitled(?:-\d+)?$/.test(slug);
+}
+
+export interface UntitledQuery {
+	/** The notes of the CMS. The slug of the draft must be free in its language. */
+	notes: readonly NoteKey[];
+	rules: DraftRules;
+}
+
+/**
+ * The draft that New post adds at once, in the default language: "Untitled" with the slug
+ * `untitled`, or "Untitled 2" with the slug `untitled-2` when the language has `untitled`.
+ * The title and the slug then follow each other until the writer types a slug.
+ */
+export function untitledDraft(query: UntitledQuery): NoteDraft {
+	const language = query.rules.languages.defaultLanguage;
+	const slug = freeSlug({
+		note: { slug: UNTITLED_SLUG, language },
+		notes: query.notes,
+	});
+	return {
+		title: pipe(
+			slug,
+			S.replace(UNTITLED_SLUG, "Untitled"),
+			S.replace("-", " "),
+		),
+		slug,
+		language,
+		description: "",
+		keywords: [],
+		fields: {},
+		body: "",
+	};
 }

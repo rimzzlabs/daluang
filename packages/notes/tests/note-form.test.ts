@@ -156,6 +156,21 @@ describe("noteFormOf", () => {
 		mark: null,
 	};
 
+	it("lets the slug of an untitled draft follow the title", () => {
+		const untitled = { ...NOTE, title: "Untitled 2", slug: "untitled-2" };
+		const form = noteFormOf(untitled, FIELDS);
+		expect(withTitle(form, "Resep Jotai").slug).toBe("resep-jotai");
+	});
+
+	it("keeps the slug of an untitled post that was published", () => {
+		const published = {
+			...NOTE,
+			slug: "untitled",
+			publishedAt: "2026-10-18T12:00:00.000Z",
+		};
+		expect(noteFormOf(published, FIELDS).slugTouched).toBe(true);
+	});
+
 	it("gives the input of each stored value, and keeps the slug", () => {
 		const form = noteFormOf(NOTE, FIELDS);
 		expect(form).toEqual({

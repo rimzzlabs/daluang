@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 import type { ExtraFields } from "./extra-fields";
 import type { FieldDefinition } from "./field-definitions";
 import type { Note, NoteDraft } from "./note";
-import { type DraftRules, noteDraftSchema } from "./note-draft";
+import { type DraftRules, isUntitledSlug, noteDraftSchema } from "./note-draft";
 import { slugify } from "./slug";
 
 /** The value of an extra field in the editor: a text, or yes or no for a boolean field. */
@@ -71,7 +71,8 @@ function storedInput(
 
 /**
  * The form of a stored post. The slug counts as typed, so a new title does not change the
- * address of the post.
+ * address of the post. An untitled draft that was never published is the exception: its
+ * slug follows the title, so the first title gives the slug.
  */
 export function noteFormOf(
 	note: Note,
@@ -81,7 +82,7 @@ export function noteFormOf(
 	return {
 		title: note.title,
 		slug: note.slug,
-		slugTouched: true,
+		slugTouched: note.publishedAt !== null || !isUntitledSlug(note.slug),
 		language: note.language,
 		description: note.description,
 		keywords: A.join(note.keywords, ", "),

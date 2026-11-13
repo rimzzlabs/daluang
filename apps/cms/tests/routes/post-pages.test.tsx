@@ -6,7 +6,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { createChangesStore } from "@/lib/notes/changes-store";
 import { readNote } from "@/lib/notes/client";
-import { EditPostPage, NewPostPage } from "@/routes/post-pages";
+import { EditPostPage } from "@/routes/post-pages";
 import { createAppRouter } from "@/routes/router";
 import { settingsStore } from "../settings";
 
@@ -38,20 +38,10 @@ vi.mock("@/lib/notes/client", async (importOriginal) => ({
 }));
 
 describe("post pages", () => {
-	it("shows the form of a new post", () => {
-		render(
-			<NewPostPage
-				settings={settingsStore()}
-				changes={createChangesStore(0)}
-				linkKind="anchor"
-				pathname="/posts/new"
-			/>,
-		);
-		expect(screen.getByRole("heading", { name: "New post" })).toBeTruthy();
-		expect(screen.getByRole("button", { name: "Save draft" })).toBeTruthy();
-	});
-
-	it("opens the list of posts after a new post is saved", async () => {
+	it("replaces the new post page with the page of the draft", async () => {
+		const history = createMemoryHistory({
+			initialEntries: ["/posts", "/posts/new"],
+		});
 		const router = createAppRouter({
 			context: {
 				user: { name: "Rizki Citra", githubLogin: "rimzzlabs", image: null },
@@ -59,14 +49,16 @@ describe("post pages", () => {
 				settings: settingsStore(),
 				changes: createChangesStore(0),
 			},
-			history: createMemoryHistory({ initialEntries: ["/posts/new"] }),
+			history,
 		});
 		render(<RouterProvider router={router} />);
-		await userEvent.type(
-			await screen.findByRole("textbox", { name: "Title" }),
-			"Jotai",
+		expect(
+			await screen.findByRole("heading", { name: "New post" }),
+		).toBeTruthy();
+		await waitFor(() =>
+			expect(router.state.location.pathname).toBe("/posts/n9"),
 		);
-		await userEvent.click(screen.getByRole("button", { name: "Save draft" }));
+		history.back();
 		await waitFor(() => expect(router.state.location.pathname).toBe("/posts"));
 	});
 
