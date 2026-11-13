@@ -7,6 +7,8 @@ export interface PostLinkProps {
 	/** The ID of the post. */
 	id: string;
 	className?: string;
+	/** `page` on the link of the open post. */
+	"aria-current"?: "page";
 	children: ReactNode;
 }
 
@@ -17,6 +19,7 @@ export function PostLink(props: PostLinkProps) {
 			<Link
 				to="/posts/$id"
 				params={{ id: props.id }}
+				aria-current={props["aria-current"]}
 				className={props.className}
 			>
 				{props.children}
@@ -25,6 +28,7 @@ export function PostLink(props: PostLinkProps) {
 	return (
 		<a
 			href={`/posts/${encodeURIComponent(props.id)}`}
+			aria-current={props["aria-current"]}
 			className={props.className}
 		>
 			{props.children}

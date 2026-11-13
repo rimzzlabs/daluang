@@ -39,6 +39,8 @@ export interface EditPostProps {
 	linkKind: NavLinkKind;
 	/** Opens the page of another post, for example a new translation. */
 	onOpenPost: (id: string) => void;
+	/** The server saved the post, so a list of the posts can read it again. */
+	onSaved: () => void;
 }
 
 /** The page of a stored post: it reads the post, then shows its form. */
@@ -125,7 +127,10 @@ export function EditPost(props: EditPostProps) {
 						settings={props.settings}
 						changes={props.changes}
 						linkKind={props.linkKind}
-						onSaved={(note) => setLoad({ status: "ready", note })}
+						onSaved={(note) => {
+							setLoad({ status: "ready", note });
+							props.onSaved();
+						}}
 					/>
 				))
 				.exhaustive()}

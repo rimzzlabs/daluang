@@ -72,6 +72,9 @@ describe("post pages", () => {
 			/>,
 		);
 		expect(await screen.findByDisplayValue("Jotai recipes")).toBeTruthy();
+		expect(
+			screen.getByRole("complementary", { name: "Posts" }).textContent,
+		).toContain("0 posts");
 	});
 
 	it("reads no post for a path with no ID", async () => {

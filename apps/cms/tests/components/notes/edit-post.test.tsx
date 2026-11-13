@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { R } from "@mobily/ts-belt";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { EditPost } from "@/components/notes/edit-post";
 import { createChangesStore } from "@/lib/notes/changes-store";
@@ -8,6 +9,8 @@ import { settingsStore } from "../../settings";
 
 const client = vi.hoisted(() => ({
 	readNote: vi.fn(),
+	saveNote: vi.fn(),
+	refreshChangeCount: vi.fn(),
 	NOTES_ERROR_MESSAGES: { "not-found": "Not found.", offline: "Offline." },
 }));
 
@@ -34,17 +37,18 @@ beforeEach(() => {
 	client.readNote.mockReset();
 });
 
-function renderEditPost(changes = createChangesStore(0)) {
+function renderEditPost(onSaved = vi.fn()) {
 	render(
 		<EditPost
 			id="n1"
 			settings={settingsStore()}
-			changes={changes}
+			changes={createChangesStore(0)}
 			linkKind="anchor"
 			onOpenPost={vi.fn()}
+			onSaved={onSaved}
 		/>,
 	);
-	return changes;
+	return onSaved;
 }
 
 describe("EditPost", () => {
@@ -69,5 +73,14 @@ describe("EditPost", () => {
 				.getByRole("link", { name: "Back to the posts" })
 				.getAttribute("href"),
 		).toBe("/posts");
+	});
+
+	it("tells the page after a save, so the list reads the post again", async () => {
+		client.readNote.mockResolvedValue(R.Ok(NOTE));
+		client.saveNote.mockResolvedValue(R.Ok(NOTE));
+		const onSaved = renderEditPost();
+		await screen.findByDisplayValue("Jotai recipes");
+		await userEvent.click(screen.getByRole("button", { name: "Save" }));
+		await waitFor(() => expect(onSaved).toHaveBeenCalledOnce());
 	});
 });
