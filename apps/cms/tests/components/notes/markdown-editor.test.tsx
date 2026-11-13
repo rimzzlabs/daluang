@@ -2,7 +2,7 @@
 import { EditorView } from "@codemirror/view";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, onTestFinished, vi } from "vitest";
 import { MarkdownEditor } from "@/components/notes/markdown-editor";
 import { typeInEditor } from "./editor";
 
@@ -98,5 +98,25 @@ describe("MarkdownEditor", () => {
 		expect(document.querySelector(".cm-lineNumbers")?.textContent).toContain(
 			"1",
 		);
+	});
+
+	// jsdom does not apply a policy. In a browser, the meta is in the head before the editor
+	// loads, so the style element has the nonce when CodeMirror inserts it.
+	it("gives the nonce of the page to CodeMirror and to its style element", () => {
+		const meta = document.createElement("meta");
+		meta.setAttribute("property", "csp-nonce");
+		meta.nonce = "abc=";
+		document.head.appendChild(meta);
+		onTestFinished(() => {
+			meta.remove();
+		});
+		render(<MarkdownEditor {...editorProps()} />);
+		const host = document.querySelector<HTMLElement>(".cm-editor");
+		const editor = host === null ? null : EditorView.findFromDOM(host);
+		expect(editor?.state.facet(EditorView.cspNonce)).toBe("abc=");
+		const style = Array.from(document.head.querySelectorAll("style")).find(
+			(element) => element.textContent?.includes(".cm-") ?? false,
+		);
+		expect(style?.nonce).toBe("abc=");
 	});
 });

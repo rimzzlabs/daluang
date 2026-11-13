@@ -18,6 +18,8 @@ export function scriptHash(source: string): `sha256-${string}` {
  * of each page. A script that an attacker puts in a page has no hash, so it does not run.
  *
  * - `PREFERENCES_SCRIPT` is an inline script of the layout, so its hash is here.
+ * - `'self'` keeps the stylesheets of the CMS in `style-src`. A page that adds a nonce with
+ *   `Astro.csp.insertStyleResource` replaces the default `'self'` of Astro, so it is here.
  * - React renders a `style` attribute, for example the width of the sidebar. A `style`
  *   attribute cannot run code, so `style-src-attr` allows it.
  * - The avatar of the user comes from GitHub.
@@ -35,6 +37,6 @@ export const CMS_CSP = {
 	],
 	scriptDirective: { hashes: [scriptHash(PREFERENCES_SCRIPT)] },
 	styleDirective: {
-		resources: [{ resource: "'unsafe-inline'", kind: "attribute" }],
+		resources: ["'self'", { resource: "'unsafe-inline'", kind: "attribute" }],
 	},
 } satisfies CspConfig;

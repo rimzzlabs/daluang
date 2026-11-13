@@ -19,6 +19,7 @@ import { type MarkdownEdit, markdownEdit } from "@daluang/notes/markdown-edit";
 import { tags } from "@lezer/highlight";
 import { cn } from "cn";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { readStyleNonce } from "@/lib/security/style-nonce";
 import { EditorToolbar, type ToolbarAction } from "./editor-toolbar";
 
 // The colors come from the tokens of the theme, so the editor follows the dark theme.
@@ -119,6 +120,9 @@ export function MarkdownEditor(props: MarkdownEditorProps) {
 	useEffect(() => {
 		const parent = host.current;
 		if (parent === null) return;
+		// CodeMirror puts its styles in a `<style>` element. The policy of the page refuses a
+		// `<style>` element with no nonce or hash, so the element gets the nonce of the page.
+		const nonce = readStyleNonce(parent.ownerDocument);
 		const editor = new EditorView({
 			parent,
 			state: EditorState.create({
@@ -134,6 +138,7 @@ export function MarkdownEditor(props: MarkdownEditorProps) {
 					syntaxHighlighting(MARKDOWN_STYLE),
 					EditorView.lineWrapping,
 					EDITOR_THEME,
+					nonce === undefined ? [] : EditorView.cspNonce.of(nonce),
 					EditorView.contentAttributes.of({ id, "aria-label": label }),
 					EditorView.updateListener.of((update) => {
 						if (update.docChanged) change(update.state.doc.toString());
