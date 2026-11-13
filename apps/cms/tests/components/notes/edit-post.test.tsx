@@ -84,6 +84,14 @@ describe("EditPost", () => {
 		expect(client.readNote).toHaveBeenCalledWith("n1");
 	});
 
+	it("tells the writer that the post saves by itself", () => {
+		client.readNote.mockResolvedValue(R.Ok(NOTE));
+		renderEditPost();
+		expect(
+			screen.getByText(/Daluang saves each change by itself\./),
+		).toBeTruthy();
+	});
+
 	it("tells when the post does not exist, with a way back", async () => {
 		client.readNote.mockResolvedValue(R.Error("not-found"));
 		renderEditPost();
