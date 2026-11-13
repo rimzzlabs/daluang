@@ -192,6 +192,31 @@ describe("useAutosave", () => {
 		expect(save).toHaveBeenCalledExactlyOnceWith("a");
 	});
 
+	it("tells if the server does not have the last value", async () => {
+		const first = Promise.withResolvers<AutosaveOutcome>();
+		const save = vi
+			.fn<Save>()
+			.mockReturnValueOnce(first.promise)
+			.mockResolvedValueOnce("refused")
+			.mockResolvedValueOnce("failed");
+		const { result } = renderAutosave(save);
+		expect(result.current.hasUnsaved()).toBe(false);
+		act(() => result.current.schedule("a"));
+		expect(result.current.hasUnsaved()).toBe(true);
+		await act(() => vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS));
+		expect(save).toHaveBeenCalledOnce();
+		expect(result.current.hasUnsaved()).toBe(true);
+		await act(async () => first.resolve("saved"));
+		expect(result.current.hasUnsaved()).toBe(false);
+		act(() => result.current.schedule("ab"));
+		await act(async () => result.current.flush());
+		expect(save).toHaveBeenLastCalledWith("ab");
+		expect(result.current.hasUnsaved()).toBe(true);
+		await act(async () => result.current.flush());
+		expect(save).toHaveBeenCalledTimes(3);
+		expect(result.current.hasUnsaved()).toBe(true);
+	});
+
 	it("starts no second save on a flush during a save", async () => {
 		const first = Promise.withResolvers<AutosaveOutcome>();
 		const save = vi

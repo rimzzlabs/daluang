@@ -329,8 +329,26 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - Mod-S sends a kept form again, also after `refused`.
 - When the form goes away because the writer opens another page of the CMS, the hook
   sends the form one last time. After that, the hook does not try again. If the last
-  send fails, the text is lost. A later change will add a confirmation before the writer
-  leaves the page.
+  send fails, the text is lost.
+- `hasUnsaved()` of the hook is true while the server does not have the last form, also
+  during its save.
+- `UnsavedPostGuard` of `apps/cms/src/components/notes/unsaved-post-guard.tsx` asks before
+  a router navigation leaves the post, also to another post. It asks only when
+  `hasUnsaved()` is true and one of these is true (`mustConfirmLeave`):
+  - The status is "invalid" or "failed". After a refused or a failed save, the last send
+    will very probably fail too.
+  - The current form is not valid (`isInvalid`, from `parseNoteForm`). The browser
+    refuses the last send for certain, also while the status is "Not saved yet".
+- A valid form that only waits for its save ("Not saved yet") gets no question, because
+  the last send saves it.
+- The dialog says: "This post has text that Daluang could not save. If you leave the
+  page, you can lose the text."
+- The question is a `ConfirmDialog` from `useBlocker` of TanStack Router, with
+  `withResolver`. Cancel keeps the page and the form. "Leave the page" continues the
+  navigation, and the hook sends the form one last time. `enableBeforeUnload` is false,
+  so the hook keeps the one `beforeunload` warning.
+- `useBlocker` needs the router, so `EditPostForm` renders the guard only when `linkKind`
+  is `router`. The HTML of the server and the tests with no router have no guard.
 - A close or a reload of the browser tab runs no code of the hook, so the hook sends
   nothing. The browser asks before it closes the tab while a form is not saved.
 - A save of a published post changes only its working copy. After a save,

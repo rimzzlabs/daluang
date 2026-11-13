@@ -28,8 +28,10 @@ If a save fails, the bar shows the reason. The text stays on the page:
 If you close the tab before the CMS saves the text, the browser asks you first.
 
 If you open another page of the CMS before the CMS saves the text, the CMS sends the
-text one last time. If that save fails, the text is lost. Look at the bar before you
-leave the post: it must show "Saved".
+text one last time. If the last save failed, or if a value is not correct, Daluang asks
+you first. Select **Cancel** to stay on the post and correct the problem. If you leave the
+page and the last send fails, the text is lost. Look at the bar before you leave the
+post: it must show "Saved".
 
 The editor of the body is CodeMirror. It keeps the Markdown as you type it, also the
 components of Comark, for example `::callout`. Your site gives each component its look.
