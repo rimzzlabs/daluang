@@ -68,7 +68,8 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - `emptyNoteForm` starts a new post in the default language, with an empty input for each
   defined field.
 - `noteFormOf` gives the form of a stored post. Its slug counts as typed, so a new title
-  does not change the address of the post. A stored value of another type becomes text.
+  does not change the address of the post. An untitled draft that was never published
+  is the exception (`isUntitledSlug`): its slug follows the title. A stored value of another type becomes text.
 - `kept` holds the stored extra fields that the settings do not define. The editor does
   not show them, and `parseNoteForm` puts them back in the draft, so a save keeps them.
 - `withTitle` makes the slug from the title with `slugify`, until the writer types a slug.
@@ -242,12 +243,15 @@ It gets the languages setting and the field definitions as `DraftRules`.
 ## The New post page
 
 - `NewPost` of `apps/cms/src/components/notes/new-post.tsx` is the page of `/posts/new`.
-  It starts with `emptyNoteForm` and shows `PostForm`.
-- **Save draft** checks the form with `parseNoteForm`. An error shows at its input, and the
-  page sends nothing. A valid draft goes to `addNote`. Then the page opens the list of
-  posts.
-- A refused save, for example a slug that another post has, shows its message above the
-  buttons. **Cancel** goes back to the list.
+  It adds a draft at once, then opens the page of the draft. Autosave needs a stored
+  post, and the editor then keeps its cursor and its undo history.
+- `untitledDraft` of `src/note-draft.ts` gives the draft: "Untitled" with the slug
+  `untitled`, in the default language. `freeSlug` of `src/translation.ts` gives the first
+  slug that the language does not have, so a second draft is "Untitled 2" with
+  `untitled-2`.
+- The page of the draft replaces `/posts/new` in the history, so Back does not add a
+  second draft.
+- A refused draft shows its message, with **Try again** and a link back to the list.
 
 ## The page of a post
 

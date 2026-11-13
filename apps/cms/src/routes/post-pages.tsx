@@ -5,13 +5,16 @@ import { pageParams } from "@/lib/shell/app-pages";
 import type { AppPageProps } from "./page-content";
 
 export function NewPostPage(props: AppPageProps) {
-	// The server renders this page with no router. Only Save navigates, in the island.
+	// The server renders this page with no router. The draft opens only in the island.
 	const router = useRouter({ warn: false });
+	// The new draft replaces `/posts/new` in the history, so Back does not add a second one.
 	return (
 		<NewPost
 			settings={props.settings}
 			linkKind={props.linkKind}
-			onSaved={() => router.navigate({ to: "/posts" })}
+			onCreated={(id) =>
+				router.navigate({ to: "/posts/$id", params: { id }, replace: true })
+			}
 		/>
 	);
 }

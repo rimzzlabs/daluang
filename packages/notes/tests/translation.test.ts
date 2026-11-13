@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { SLUG_MAX_LENGTH } from "../src/slug";
 import {
+	freeSlug,
 	isSlugTaken,
 	missingLanguages,
 	translationDraft,
@@ -83,5 +85,29 @@ describe("translationDraft", () => {
 			fields: { featured: true },
 			body: "# Lefthook",
 		});
+	});
+});
+
+describe("freeSlug", () => {
+	it("gives the slug when the language does not have it", () => {
+		expect(freeSlug({ note: { slug: "husky", language: "id" }, notes })).toBe(
+			"husky",
+		);
+	});
+
+	it("adds the first free number when the language has the slug", () => {
+		const taken = [...notes, { id: "4", slug: "lefthook-2", language: "en" }];
+		expect(
+			freeSlug({ note: { slug: "lefthook", language: "en" }, notes: taken }),
+		).toBe("lefthook-3");
+	});
+
+	it("keeps a numbered slug in the size limit, with no double hyphen", () => {
+		const long = `${"a".repeat(SLUG_MAX_LENGTH - 3)}-bc`;
+		const slug = freeSlug({
+			note: { slug: long, language: "en" },
+			notes: [{ slug: long, language: "en" }],
+		});
+		expect(slug).toBe(`${"a".repeat(SLUG_MAX_LENGTH - 3)}-2`);
 	});
 });

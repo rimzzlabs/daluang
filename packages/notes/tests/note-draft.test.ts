@@ -2,9 +2,11 @@ import { A } from "@mobily/ts-belt";
 import { describe, expect, it } from "vitest";
 import type { FieldDefinition } from "../src/field-definitions";
 import {
+	isUntitledSlug,
 	NOTE_BODY_MAX_BYTES,
 	noteDraftSchema,
 	publishedDraftSchema,
+	untitledDraft,
 } from "../src/note-draft";
 
 const LANGUAGES = { languages: ["en", "id"], defaultLanguage: "en" };
@@ -118,5 +120,48 @@ describe("publishedDraftSchema", () => {
 			["fields", "series"],
 			["fields", "tags"],
 		]);
+	});
+});
+
+describe("untitledDraft", () => {
+	const rules = { languages: LANGUAGES, fields: FIELDS };
+
+	it("gives an empty draft in the default language", () => {
+		expect(untitledDraft({ notes: [], rules })).toEqual({
+			title: "Untitled",
+			slug: "untitled",
+			language: "en",
+			description: "",
+			keywords: [],
+			fields: {},
+			body: "",
+		});
+	});
+
+	it("numbers the title and the slug when the language has the slug", () => {
+		const notes = [
+			{ slug: "untitled", language: "en" },
+			{ slug: "untitled-2", language: "en" },
+			{ slug: "untitled-3", language: "id" },
+		];
+		const draft = untitledDraft({ notes, rules });
+		expect([draft.title, draft.slug]).toEqual(["Untitled 3", "untitled-3"]);
+	});
+
+	it("gives a draft that the schema of a save accepts", () => {
+		expect(schema.safeParse(untitledDraft({ notes: [], rules })).success).toBe(
+			true,
+		);
+	});
+});
+
+describe("isUntitledSlug", () => {
+	it.each([
+		["untitled", true],
+		["untitled-12", true],
+		["untitled-post", false],
+		["my-untitled", false],
+	])("%s gives %s", (slug, expected) => {
+		expect(isUntitledSlug(slug)).toBe(expected);
 	});
 });
