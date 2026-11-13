@@ -1,7 +1,7 @@
 # Deploy [Host your own copy of Daluang on Cloudflare]
 
-A GitHub workflow deploys the CMS to your Cloudflare account. It runs when release-please
-makes a release of your fork. You can also run it by hand.
+A GitHub workflow deploys the CMS to your Cloudflare account. You run it by hand. The
+workflow `release.yml` also runs it after release-please cuts a release.
 
 ## What you need
 
@@ -58,8 +58,25 @@ The workflow does these steps:
 2. It applies the migrations of `apps/cms/migrations`.
 3. It builds the CMS and deploys it, with the secrets and the domain.
 
-After that, each release deploys again. release-please opens a pull request for each
-release, and a merge of that pull request makes the release.
+The workflow sets each secret of the CMS at each deploy. A secret that you set by hand with
+`wrangler secret put` is replaced at the next deploy. Change a value in the settings of
+your fork, then deploy again.
+
+## Deploy new code
+
+Your fork does not get the new code of the upstream repository by itself. After you sync
+your fork with the upstream repository, deploy the new code by hand:
+
+1. Open **Actions → Deploy → Run workflow** in your fork.
+2. In the field `ref`, type the tag or the branch to deploy, for example `main` or
+   `v0.1.0`.
+3. Select **Run workflow**.
+
+The workflow applies the new migrations before it deploys the new code.
+
+A release of your fork also deploys. If release-please runs in your fork, it opens a pull
+request for each release. A merge of that pull request makes the release, and the release
+starts the Deploy workflow.
 
 ## Protect the sign-in
 

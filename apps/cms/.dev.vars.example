@@ -1,5 +1,5 @@
 # Copy this file to `.dev.vars` for `astro dev`. Git ignores `.dev.vars`.
-# In production, set each value with `wrangler secret put <NAME>`.
+# In production, the deploy workflow sets each value at each deploy. See /guide/deploy.
 
 # 32 or more random characters. Make one with: openssl rand -base64 32
 BETTER_AUTH_SECRET=
