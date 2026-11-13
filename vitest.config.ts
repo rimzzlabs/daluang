@@ -4,6 +4,10 @@ export default defineConfig({
 	test: {
 		// Each workspace keeps its tests in `tests/`, next to `src/`.
 		projects: ["apps/*/vitest.config.ts", "packages/*/vitest.config.ts"],
+		// On a computer, the tests use half of the CPU cores. The pre-push hook runs the
+		// typecheck at the same time, and the person keeps cores for other work. CI uses
+		// the default of Vitest.
+		maxWorkers: process.env.CI ? undefined : "50%",
 		coverage: {
 			provider: "v8",
 			// Each source file counts, also a file that no test imports. `pnpm test` fails
