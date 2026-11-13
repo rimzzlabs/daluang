@@ -70,3 +70,33 @@ export function noteActions(listed: ListedNote): readonly NoteAction[] {
 		})
 		.exhaustive();
 }
+
+/** The number of notes in one language. */
+export interface LanguageCount {
+	language: string;
+	count: number;
+}
+
+/** The numbers of the notes of a CMS, for its dashboard. */
+export interface NoteCounts {
+	drafts: number;
+	published: number;
+	/** Each language of the CMS in its order, then each other language of a note. */
+	languages: readonly LanguageCount[];
+}
+
+/** The number of drafts, of published notes, and of notes in each language. */
+export function noteCounts(
+	notes: readonly NoteSummary[],
+	languages: readonly string[],
+): NoteCounts {
+	const tags = A.uniq([...languages, ...A.map(notes, (note) => note.language)]);
+	return {
+		drafts: A.length(A.filter(notes, (note) => note.status === "draft")),
+		published: A.length(A.filter(notes, (note) => note.status === "published")),
+		languages: A.map(tags, (language) => ({
+			language,
+			count: A.length(A.filter(notes, (note) => note.language === language)),
+		})),
+	};
+}

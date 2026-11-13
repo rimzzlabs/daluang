@@ -8,12 +8,15 @@ import {
 	PageHeading,
 	PageTitle,
 } from "@daluang/ui/components/page";
+import { Skeleton } from "@daluang/ui/components/skeleton";
 import { PlusIcon } from "@phosphor-icons/react";
+import { match } from "ts-pattern";
 import { NavLink, type NavLinkKind } from "@/components/shell/nav-link";
 import { usePostList } from "@/hooks/notes/use-post-list";
 import { useSettings } from "@/hooks/settings/use-settings";
 import type { ChangesStore } from "@/lib/notes/changes-store";
 import type { SettingsStore } from "@/lib/settings/settings-store";
+import { PostCounts } from "./post-counts";
 import { RecentPosts } from "./recent-posts";
 import { SetupSteps } from "./setup-steps";
 
@@ -24,11 +27,11 @@ export interface DashboardProps {
 }
 
 /**
- * The first page after the sign-in: the site, the recent posts, and the steps to set up
- * the site.
+ * The first page after the sign-in: the site, the recent posts, the number of posts, and
+ * the steps to set up the site.
  */
 export function Dashboard(props: DashboardProps) {
-	const { site } = useSettings(props.settings);
+	const { site, languages } = useSettings(props.settings);
 	const { list, retry } = usePostList(props.changes);
 	return (
 		<Page>
@@ -81,6 +84,30 @@ export function Dashboard(props: DashboardProps) {
 					<RecentPosts list={list} linkKind={props.linkKind} onRetry={retry} />
 				</section>
 				<div className="flex min-w-0 flex-col gap-8">
+					<section
+						aria-labelledby="counts-title"
+						className="flex flex-col gap-3"
+					>
+						<h2 id="counts-title" className="text-sm font-medium">
+							Posts
+						</h2>
+						{match(list)
+							.with({ status: "ready" }, (ready) => (
+								<PostCounts
+									posts={ready.posts}
+									languages={languages.languages}
+								/>
+							))
+							.with({ status: "loading" }, () => (
+								<Skeleton className="h-24 w-full" />
+							))
+							.with({ status: "failed" }, () => (
+								<p className="text-sm text-muted-foreground">
+									The numbers show when the posts load.
+								</p>
+							))
+							.exhaustive()}
+					</section>
 					<section
 						aria-labelledby="setup-title"
 						className="flex flex-col gap-3"

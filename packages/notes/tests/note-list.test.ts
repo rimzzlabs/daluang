@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { NoteSummary } from "../src/note";
-import { inLanguage, listedNotes, noteActions } from "../src/note-list";
+import {
+	inLanguage,
+	listedNotes,
+	noteActions,
+	noteCounts,
+} from "../src/note-list";
 
 function summary(id: string, language = "en"): NoteSummary {
 	return {
@@ -87,5 +92,26 @@ describe("noteActions", () => {
 		expect(noteActions({ note: published, change: "delete" })).toEqual([
 			"cancel",
 		]);
+	});
+});
+
+describe("noteCounts", () => {
+	it("counts the drafts, the published notes, and the notes of each language", () => {
+		const notes = [
+			summary("a", "en"),
+			{ ...summary("b", "id"), status: "published" as const },
+			summary("c", "en"),
+			summary("d", "ja"),
+		];
+		expect(noteCounts(notes, ["en", "id", "pt-BR"])).toEqual({
+			drafts: 3,
+			published: 1,
+			languages: [
+				{ language: "en", count: 2 },
+				{ language: "id", count: 1 },
+				{ language: "pt-BR", count: 0 },
+				{ language: "ja", count: 1 },
+			],
+		});
 	});
 });
