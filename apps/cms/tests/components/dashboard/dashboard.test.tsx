@@ -61,7 +61,7 @@ describe("Dashboard", () => {
 		).toBeTruthy();
 	});
 
-	it("shows the recent posts, and gives the navbar the changes", async () => {
+	it("shows the recent posts and their numbers, and gives the navbar the changes", async () => {
 		client.listPostsOfCms.mockResolvedValue(
 			R.Ok({
 				posts: [post("a", "draft"), post("b", "published", "id")],
@@ -71,6 +71,11 @@ describe("Dashboard", () => {
 		const changes = renderDashboard();
 		const list = await screen.findByRole("list", { name: "Recent posts" });
 		expect(within(list).getAllByRole("listitem")).toHaveLength(2);
+		const byStatus = screen.getByLabelText("Posts by status");
+		expect(byStatus.textContent).toBe("Drafts1Published1");
+		expect(screen.getByLabelText("Posts by language").textContent).toBe(
+			"English1Indonesia1",
+		);
 		expect(changes.read()).toBe(2);
 	});
 
@@ -81,5 +86,13 @@ describe("Dashboard", () => {
 		});
 		renderDashboard(settings);
 		expect(screen.getByText(/Your site has no address yet/)).toBeTruthy();
+	});
+
+	it("tells why the numbers are missing when the posts do not load", async () => {
+		client.listPostsOfCms.mockResolvedValue(R.Error("offline"));
+		renderDashboard();
+		expect(
+			await screen.findByText("The numbers show when the posts load."),
+		).toBeTruthy();
 	});
 });

@@ -52,6 +52,8 @@ planout-ai. The sidebar and the navbar stay, and a menu click changes only the p
   It shows the name of the site, a link to its address, and **New post**.
 - `RecentPosts` shows the six last changed posts, each with a link to its editor and its
   status or its change. **All posts** opens `/posts`.
+- `PostCounts` shows the number of drafts, of published posts, and of posts in each
+  language, from `noteCounts` of `packages/notes/src/note-list.ts`.
 - `SetupSteps` links to the fields, the API tokens, and the webhooks.
 - The dashboard and the posts page read the posts with `usePostList` of
   `apps/cms/src/hooks/notes/use-post-list.ts`. It also gives the navbar the number of
