@@ -789,3 +789,10 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - `importSummary` counts the files of each state, and the imported posts with the mark
   `publish`. `importSummaryText` gives one line, for example
   `12 imported, 1 skipped, 0 failed. 12 with the mark To publish.`
+- `apps/cms/src/lib/notes/import-send.ts` has the side effects of a run. `importOneFile`
+  does not read or send a file above `NOTE_BODY_MAX_BYTES`: the row gets
+  `too-large`. Else it reads the file with `file.text()`, and sends it with the language
+  of the import.
+- `sendFiles` sends the rows one at a time, in their order. One request at a time keeps
+  the order stable, and the load of the server low. Before each file, it calls
+  `shouldContinue`. When that gives false, the run sends no more files.
