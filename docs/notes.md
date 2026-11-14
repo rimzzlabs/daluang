@@ -479,8 +479,7 @@ It gets the languages setting and the field definitions as `DraftRules`.
 ## The import of a file
 
 - `importDate` of `src/import-date.ts` gives the UTC time of a date of a frontmatter, as the
-  text of `toISOString()`, or `None`. It is a pure function. The import of old posts will call
-  it, and no code calls it yet.
+  text of `toISOString()`, or `None`. It is a pure function. `importedNote` calls it.
 - `importDate` reads these forms, after a trim:
   - `YYYY-MM-DD`
   - an ISO date-time with `Z` or with an offset, for example `2023-09-30T10:00:00+07:00`
@@ -523,8 +522,7 @@ It gets the languages setting and the field definitions as `DraftRules`.
   away from the sites. After an empty line, Comark reads `---` as a rule.
 
 - `src/import-fields.ts` reads the values of a frontmatter for the import of old posts.
-  Each function is pure, and it never throws. The import of old posts will call the
-  functions, and no code calls them yet.
+  Each function is pure, and it never throws. `importedNote` calls the functions.
 - `textOf` reads a text or a finite number as a trimmed text. A number becomes its text:
   `2024` gives `"2024"`. An empty text, and a value of another kind, give `None`.
   `isPresent` is false only for `null` and `undefined`.
@@ -546,6 +544,46 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - The warnings of the core keys come first, in the order `slug`, `description`,
   `keywords`, and `status`. The warnings of the extra keys come next, in the order of the
   frontmatter.
+
+- `importedNote` of `src/note-import.ts` turns the text of one file into the data of a
+  draft. The file is Markdown or MDX, with YAML frontmatter. The function gets the file
+  name, the text, and the language of the import. It gives `R.Ok` with an `ImportedNote`,
+  or an error: `frontmatter-not-read` of `readFrontmatter`, or `no-title`. It never throws.
+  No code calls `importedNote` yet.
+- The function reads the file with `readFrontmatter`, `importDate`, the functions of
+  `src/import-fields.ts`, and `mdxToComark`. It does not check the draft against the
+  settings of the CMS. The caller checks it with `noteDraftSchema`.
+- **The title** is the `title` key, read with `textOf`. If `textOf` gives `None`, the
+  function gives the error `no-title`.
+- **The slug** is the first of these that is not empty: the `slug` key (read with
+  `textOf`), the file name with no folder and no `.md` or `.mdx`, and the title. If a value
+  is not a valid slug, the function makes the slug with `slugify`. If the three values give
+  an empty slug, the slug is `untitled` (`UNTITLED_SLUG` of `src/note-draft.ts`). The caller
+  can then find a free slug.
+- **The description** is the `description` key, read with `textOf`, else an empty text.
+  **The keywords** come from `importKeywords`, and **the extra fields** from
+  `importFields`.
+- **The language** is always the language of the import. The function ignores the keys
+  `language` and `lang`, and gives no warning for them.
+- **The dates**: the function reads `publishedAt` and `updatedAt` with `importDate`. If a
+  key has a value that `importDate` cannot read, the function gives the warning
+  `date-not-read` with the name of the key. A key with `null` gives no warning.
+  - `publishedAt` is the date of the `publishedAt` key, or `null`.
+  - `updatedAt` is the date of the `updatedAt` key. If that key has no date, `updatedAt` is
+    the value of `publishedAt`. For example, a bad `updatedAt` and a good `publishedAt` give
+    the time of `publishedAt` and the warning.
+  - The function does not compare the two dates.
+- **`wantsPublish`** is true only when `status` is the text `published`, in any case, after
+  a trim.
+- **The body** is the body of `readFrontmatter` after `mdxToComark`. If the body starts with
+  `---`, `readFrontmatter` puts one empty line before it. If `mdxToComark` removes imports
+  and the body then starts with `---`, it puts one empty line also. `importedNote` keeps
+  that line. Each name in `kept` gives one warning `component-kept`, with its count, in the
+  order of first use.
+- **The warnings** have a fixed order:
+  1. `date-not-read` of `publishedAt`, then of `updatedAt`
+  2. the warnings of `importFields`, in their order
+  3. `component-kept`
 
 ## The import of MDX
 
@@ -575,7 +613,7 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - `mdxToComark` of `src/mdx-to-comark.ts` changes the MDX syntax of a body to the syntax of
   Comark. It changes `\r\n` to `\n`, calls `withoutImports`, and then converts the
   components. It gives the new `body`, and `kept`: the components that stay, one name for
-  each use, in order. The function never throws. No code calls it yet.
+  each use, in order. The function never throws. `importedNote` calls it.
 - If `withoutImports` removes imports and the body then starts with `---`, the function
   puts one blank line at the start. Comark then reads the `---` as a rule, not as the start
   of frontmatter. A body that starts with `---` and has no import stays as it is.
