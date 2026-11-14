@@ -834,6 +834,9 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - During a run, **Import** and **Done** are disabled. If the run stops, an alert tells the
   reason and what to do. **Import** then continues. **Import** is disabled when no row is
   to send.
+- A disabled **Import** has `aria-disabled`, not the native `disabled` attribute
+  (`focusableWhenDisabled` of Base UI). The keyboard focus then stays on the button when
+  a run starts. With the native attribute, a browser moves the focus to the page body.
 
 ### The dialog
 

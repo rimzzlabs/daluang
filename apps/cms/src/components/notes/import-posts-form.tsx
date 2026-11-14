@@ -139,6 +139,8 @@ export function ImportForm(props: ImportFormProps) {
 				</ResponsiveDialogClose>
 				<Button
 					type="button"
+					// A browser takes the focus from a button with the native `disabled`.
+					focusableWhenDisabled
 					disabled={running || !A.some(rows, isToSend)}
 					onClick={() => props.importRun.start(language)}
 				>

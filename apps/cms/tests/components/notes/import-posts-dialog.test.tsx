@@ -124,7 +124,7 @@ describe("ImportPostsDialog", () => {
 			),
 		).toBeTruthy();
 		expect(onImported).toHaveBeenCalledOnce();
-		expect(importButton().hasAttribute("disabled")).toBe(true);
+		expect(importButton().getAttribute("aria-disabled")).toBe("true");
 		expect(
 			screen.getByText(
 				"To import other files, select Done, then select Import again.",
@@ -146,12 +146,27 @@ describe("ImportPostsDialog", () => {
 		await userEvent.click(importButton());
 		await userEvent.keyboard("{Escape}");
 		await userEvent.click(document.body);
-		expect(importButton().hasAttribute("disabled")).toBe(true);
+		expect(importButton().getAttribute("aria-disabled")).toBe("true");
 		expect(status()).toBe("Import in progress: 0 of 1 files done.");
 		expect(client.importNoteOfCms).toHaveBeenCalledOnce();
 		expect(onOpenChange).not.toHaveBeenCalled();
 		answers[0]?.(imported(null));
 		await screen.findByText("Done");
+	});
+
+	it("keeps the focus on Import when the run starts", async () => {
+		const answers = holdRequests();
+		renderDialog();
+		await choose([file("a.md")]);
+		await userEvent.click(importButton());
+		expect(status()).toBe("Import in progress: 0 of 1 files done.");
+		// A browser blurs a button with the native `disabled` attribute. jsdom does not,
+		// so the test also checks that the attribute is absent.
+		expect(importButton().hasAttribute("disabled")).toBe(false);
+		expect(document.activeElement).toBe(importButton());
+		answers[0]?.(imported(null));
+		await screen.findByText("Done");
+		expect(document.activeElement).toBe(importButton());
 	});
 
 	it("keeps the run when the width changes from a dialog to a drawer", async () => {
@@ -180,7 +195,7 @@ describe("ImportPostsDialog", () => {
 			).not.toBeNull(),
 		);
 		expect(rowOf("a.md").getByText("In progress")).toBeTruthy();
-		expect(importButton().hasAttribute("disabled")).toBe(true);
+		expect(importButton().getAttribute("aria-disabled")).toBe("true");
 		answers[0]?.(imported(null));
 		await waitFor(() => expect(answers).toHaveLength(2));
 		expect(client.importNoteOfCms).toHaveBeenCalledTimes(2);
