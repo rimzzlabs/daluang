@@ -17,6 +17,7 @@ A Markdown CMS that runs as a Cloudflare Worker. Open source under the MIT licen
 | `packages/settings`   | `@daluang/settings`   | The settings of a CMS and the questions of the first sign-in          |
 | `packages/api-tokens` | `@daluang/api-tokens` | The API tokens that let a site read the published posts               |
 | `packages/webhooks`   | `@daluang/webhooks`   | The webhooks that tell a site to rebuild                              |
+| `packages/media`      | `@daluang/media`      | The images: the type of an image, read from its bytes                 |
 | `packages/tsconfig`   | `@daluang/tsconfig`   | The TypeScript base of each workspace                                 |
 
 ## Start
