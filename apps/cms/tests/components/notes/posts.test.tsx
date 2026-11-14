@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { R } from "@mobily/ts-belt";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Posts } from "@/components/notes/posts";
@@ -13,6 +13,7 @@ const client = vi.hoisted(() => ({
 	markNoteOfCms: vi.fn(),
 	deleteNoteOfCms: vi.fn(),
 	readNote: vi.fn(),
+	importNoteOfCms: vi.fn(),
 	NOTES_ERROR_MESSAGES: { offline: "Offline.", invalid: "Refused." },
 }));
 
@@ -37,7 +38,29 @@ beforeEach(() => {
 	client.markNoteOfCms.mockReset();
 	client.deleteNoteOfCms.mockReset();
 	client.readNote.mockReset();
+	client.importNoteOfCms.mockReset();
 });
+
+function renderPosts() {
+	render(
+		<Posts
+			settings={settingsStore()}
+			changes={createChangesStore(0)}
+			linkKind="anchor"
+		/>,
+	);
+}
+
+async function importOneFile(name: string) {
+	await userEvent.click(screen.getByRole("button", { name: "Import" }));
+	const dialog = await screen.findByRole("dialog", { name: "Import posts" });
+	await userEvent.upload(
+		within(dialog).getByLabelText("Markdown or MDX files"),
+		[new File(["---\ntitle: A\n---\n"], name)],
+	);
+	await userEvent.click(within(dialog).getByRole("button", { name: "Import" }));
+	return dialog;
+}
 
 describe("Posts", () => {
 	it("lists the posts, and gives the navbar the number of changes", async () => {
@@ -66,6 +89,60 @@ describe("Posts", () => {
 		);
 		expect(
 			await screen.findByRole("heading", { name: "No posts yet" }),
+		).toBeTruthy();
+	});
+
+	it.each([
+		[[POST], "Jotai recipes"],
+		[[], "No posts yet"],
+	])("opens the import dialog from the page", async (posts, text) => {
+		client.listPostsOfCms.mockResolvedValue(R.Ok({ posts, count: 0 }));
+		renderPosts();
+		await screen.findByText(text);
+		await userEvent.click(screen.getByRole("button", { name: "Import" }));
+		expect(
+			await screen.findByRole("dialog", { name: "Import posts" }),
+		).toBeTruthy();
+	});
+
+	it("keeps the dialog and its rows when the first posts come, then gives the focus back", async () => {
+		client.listPostsOfCms
+			.mockResolvedValueOnce(R.Ok({ posts: [], count: 0 }))
+			.mockResolvedValue(R.Ok({ posts: [POST], count: 1 }));
+		client.importNoteOfCms.mockResolvedValue(
+			R.Ok({ note: { ...POST.note, mark: null }, warnings: [] }),
+		);
+		renderPosts();
+		await screen.findByRole("heading", { name: "No posts yet" });
+		const dialog = await importOneFile("a.md");
+		await within(dialog).findByText(
+			"1 imported, 0 skipped, 0 failed. 0 with the mark To publish.",
+		);
+		expect(within(dialog).getByText("a.md")).toBeTruthy();
+		expect(screen.getByText("Jotai recipes")).toBeTruthy();
+		await userEvent.click(within(dialog).getByRole("button", { name: "Done" }));
+		await waitFor(() =>
+			expect(document.activeElement?.textContent).toBe("Import"),
+		);
+	});
+
+	it("starts the dialog with no files at each open", async () => {
+		client.listPostsOfCms.mockResolvedValue(R.Ok({ posts: [POST], count: 1 }));
+		client.importNoteOfCms.mockResolvedValue(R.Error({ code: "slug-taken" }));
+		renderPosts();
+		await screen.findByText("Jotai recipes");
+		const dialog = await importOneFile("a.md");
+		await userEvent.click(
+			await within(dialog).findByRole("button", { name: "Done" }),
+		);
+		await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+		await userEvent.click(screen.getByRole("button", { name: "Import" }));
+		const reopened = await screen.findByRole("dialog", {
+			name: "Import posts",
+		});
+		expect(within(reopened).queryByText("a.md")).toBeNull();
+		expect(
+			within(reopened).getByRole("button", { name: "Cancel" }),
 		).toBeTruthy();
 	});
 
