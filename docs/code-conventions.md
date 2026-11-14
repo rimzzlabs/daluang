@@ -121,6 +121,8 @@ see `docs/app-shell.md`.
 - **Each action of a page opens a `ResponsiveDialog`**: a form, or a `ConfirmDialog`
   before a change. It is a dialog from 64rem (`lg`, `useIsDesktop`), and a drawer from the
   bottom on a phone or a tablet. Do not put a form or a confirmation inline in a list.
+  The content of the dialog stays in its box. The dialog is not higher than the window:
+  longer content scrolls. A long word, such as a file name, does not make the dialog wider.
 - **A page of the app shell is a `Page`** of `@daluang/ui/components/page`: the full
   width of the shell, with compact padding. Its `PageHeader` has the title and the
   description on the left and the primary action at the right edge. A form keeps a
