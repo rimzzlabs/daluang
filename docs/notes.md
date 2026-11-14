@@ -479,8 +479,7 @@ It gets the languages setting and the field definitions as `DraftRules`.
 ## The import of MDX
 
 - `withoutImports` of `src/mdx-imports.ts` removes the import statements at the start of
-  an MDX body. It is a pure function. The import of old posts will call it, and no code
-  calls it yet. It removes the blank lines before the imports,
+  an MDX body. It is a pure function. `mdxToComark` calls it. It removes the blank lines before the imports,
   between them, and after them. The first line that is not blank and not an import stops
   the removal. An import after text, in a component, or in a paragraph stays. A body with
   no import stays the same.
@@ -495,8 +494,65 @@ It gets the languages setting and the field definitions as `DraftRules`.
   spaces and the same character, with the same length or more. A fence with no end runs to
   the end of the text. A line with a tab or four spaces before the marker is not a fence. A
   backtick fence with a backtick in its info string is not a fence.
+
 - `parseTag` of `src/mdx-tag.ts` reads the opening tag of a JSX component, which can span
   lines. A prop is `name="text"`, `name='text'`, `name` with no value, or an expression
   `name={…}`. A spread `{…}` is an expression also. A string in an expression can hold a
   brace. A string or an expression with no end breaks the tag up to the end of the text, so
   the parse reads each part of the text one time.
+
+- `mdxToComark` of `src/mdx-to-comark.ts` changes the MDX syntax of a body to the syntax of
+  Comark. It changes `\r\n` to `\n`, calls `withoutImports`, and then converts the
+  components. It gives the new `body`, and `kept`: the components that stay, one name for
+  each use, in order. The function never throws. No code calls it yet.
+- If `withoutImports` removes imports and the body then starts with `---`, the function
+  puts one blank line at the start. Comark then reads the `---` as a rule, not as the start
+  of frontmatter. A body that starts with `---` and has no import stays as it is.
+- **A component converts only in the clear case.** A conversion that is wrong is worse than
+  a component that stays. The clear case is a component with all these properties:
+  - It starts at column 0 of its level, at the start of a block: the first line of the
+    level, or the line after a blank line, a converted component, or a code fence that
+    starts a block. After a component that stays, a line of text, or a fence after one of
+    them, no block starts: an HTML block of Comark can hold the next lines.
+  - Its name has only letters and digits, and starts with a capital letter. Each prop is
+    `name="text"`, `name='text'`, or `name` with no value. A prop name has only letters,
+    digits, `_`, and `-`. Comark drops another prop name, for example `client:visible`.
+  - No value has a backslash, an `&`, or a line break. JSX decodes an entity such as
+    `&amp;`, and Comark reads a backslash and a line break in another way.
+  - The opening tag is alone on its lines, in 32 lines or less. The tag is self-closing, or
+    its closing tag is alone on a later line.
+  - Out of the code fences and the code spans, no child line starts with `::`, and no child
+    line has `{`. Comark reads `::` as the end of a block, and drops an expression.
+  - It holds 8 levels of components or less, and each component in its children converts
+    also.
+- A converted component is a block of Comark. The name becomes kebab-case:
+  `<Callout type="note">` becomes `::callout{type="note"}`, and the block ends with `::`.
+  A prop with no value stays with no value, and Comark reads it as true. A value with `"`
+  goes in single quotes, because a value of Comark has no escape. A self-closing component
+  becomes `::note-image{src="a.png"}`, then `::`. The children lose their common
+  indentation. A nested block also starts with `::`, because Comark matches each `::` with
+  the nearest open block.
+- Each other component stays as it is: the opening tag, and the children and the closing
+  tag when the closing tag exists. A tag that does not parse keeps only its first line, and
+  the next lines are text. For example, these components stay:
+  - a component in a line of text, or a component and its closing tag on one line, such as
+    `<Kbd>Ctrl</Kbd>`
+  - a component with an expression prop, a spread, or a prop that Comark reads in another
+    way
+  - a component with no closing tag, or a tag with a syntax error
+  - a component with a child that stays, or with crossed tags such as `<A><B></A></B>` on
+    four lines
+  - a component with more than 8 levels of components. The components around it stay also.
+- `kept` has one name for each use of a component in the text that stays, out of the code
+  fences and the code spans. An opening tag adds its name. A closing tag adds its name only
+  when no opening tag of that name is open in the text that stays before it. A
+  self-closing tag on one line, such as `<B />`, does not stay open. A lowercase
+  HTML tag, such as `<details>` or `<br />`, does not change and is not in `kept`.
+- A second run of the function on its output changes nothing. A body with no MDX syntax
+  gives the same text, with the same last newline.
+- A code fence is found at the indentation of its level, after the function removes the
+  common indentation of the children. A fence in a list item with four or more spaces is
+  not found, so its lines count as text.
+- The function is for a post of a normal size: a post of rimzzlabs.com takes 2 ms or less.
+  The cost is linear in the length of the body, at any depth of nesting. The worst case
+  that we measured for 1 MB takes about 0.7 s: 12,000 blocks of 8 nested components.
