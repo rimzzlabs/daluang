@@ -796,3 +796,15 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - `sendFiles` sends the rows one at a time, in their order. One request at a time keeps
   the order stable, and the load of the server low. Before each file, it calls
   `shouldContinue`. When that gives false, the run sends no more files.
+
+### The hook and the row
+
+- `useImportRun` of `apps/cms/src/hooks/notes/use-import-run.ts` keeps the rows and the
+  state of the run: `idle`, `running`, `stopped` with its failure, or `done`. The chosen
+  files cannot change after the first run.
+- A ref stops a second start during a run. The hook clears the ref in a `finally`.
+- After each run, the hook reads the posts again, so the list and the number of the
+  navbar change. A failed read does not stop the end of the run, so a new run can start.
+- When the component of the hook goes away, for example after Back in the browser, the
+  cleanup of an effect stops the run. The request in progress ends, and no next file
+  goes.
