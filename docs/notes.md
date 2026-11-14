@@ -812,3 +812,23 @@ It gets the languages setting and the field definitions as `DraftRules`.
   the file name and its state: Not sent yet, In progress, To publish, Draft, Skipped, or
   Failed. An imported post with warnings shows each warning. A failed file shows its
   message, and an `invalid-note` adds the line of each issue, one time for each text.
+
+### The form
+
+- `ImportForm` of `apps/cms/src/components/notes/import-posts-form.tsx` is the content of
+  the Import dialog. It gets the state of the run as `importRun` (`ImportRunHandle`), and
+  the language and its change as props.
+- The writer chooses Markdown or MDX files (`.md`, `.mdx`, or `text/markdown`). After the
+  first run, the input is disabled, and its description says: "To import other files,
+  select Done, then select Import again."
+- In a CMS with more than one language, the form shows the language choice of the
+  editor. After the first run, the choice is disabled: one import has one language. To
+  import translations, the writer imports each language in a run of its own.
+- One line with `role="status"` tells the progress during a run, then the summary. A
+  screen reader then hears one line, not one announcement for each row. The spinner of
+  the Import button has `aria-hidden`, so it is not a second status.
+- At the end, the form tells the next step: Publish changes for the posts with the mark,
+  and a check of each post with the label Draft.
+- During a run, **Import** and **Done** are disabled. If the run stops, an alert tells the
+  reason and what to do. **Import** then continues. **Import** is disabled when no row is
+  to send.
