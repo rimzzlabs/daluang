@@ -189,6 +189,16 @@ It gets the languages setting and the field definitions as `DraftRules`.
   whose summary is not valid.
 - `createNote` and `updateNote` throw when D1 refuses the slug: another note has it in the
   same language.
+- `createImportedNote` adds the draft of an imported file. It writes one row, as
+  `createNote` does, with three differences:
+  - `publishedAt` is the date of the file, or `null`.
+  - `updatedAt` is the date of the file, or the time of the import when the file has no
+    date.
+  - The mark is the mark that the caller gives: `publish` or `null`.
+- The status of an imported note is `draft`, and its published copy is `null`. The first
+  publish keeps the `publishedAt` of the row, and the published copy takes `updatedAt` of
+  the working copy. The sites then get the dates of the file. D1 refuses a slug that
+  another note has in the same language, as for `createNote`.
 - `src/env.ts` has the schema of the `DB` binding of the domain.
 
 ## The endpoint

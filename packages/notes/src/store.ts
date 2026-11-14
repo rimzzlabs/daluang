@@ -12,6 +12,7 @@ import {
 	type NoteSummary,
 	publishedCopySchema,
 } from "./note";
+import type { ImportedNote } from "./note-import";
 
 const COLUMNS =
 	'"id", "slug", "language", "title", "description", "keywords", "status", "publishedAt", "fields", "body", "createdAt", "updatedAt", "published", "mark"';
@@ -106,6 +107,33 @@ export async function findNote(ref: NoteRef): Promise<O.Option<Note>> {
 	return pipe(parseRows(result.results, noteRowSchema), A.head);
 }
 
+/**
+ * Side effect: writes one new row of the table `note` to D1. The sites do not have a new
+ * note, so its published copy is `null`.
+ */
+async function insertNote(db: D1Database, note: Note): Promise<void> {
+	await db
+		.prepare(
+			`insert into "note" (${COLUMNS}) values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, null, ?13)`,
+		)
+		.bind(
+			note.id,
+			note.slug,
+			note.language,
+			note.title,
+			note.description,
+			JSON.stringify(note.keywords),
+			note.status,
+			note.publishedAt,
+			JSON.stringify(note.fields),
+			note.body,
+			note.createdAt,
+			note.updatedAt,
+			note.mark,
+		)
+		.run();
+}
+
 export interface NoteCreate {
 	db: D1Database;
 	draft: NoteDraft;
@@ -130,25 +158,42 @@ export async function createNote(create: NoteCreate): Promise<Note> {
 		published: null,
 		mark: null,
 	};
-	await create.db
-		.prepare(
-			`insert into "note" (${COLUMNS}) values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, null, null)`,
-		)
-		.bind(
-			note.id,
-			note.slug,
-			note.language,
-			note.title,
-			note.description,
-			JSON.stringify(note.keywords),
-			note.status,
-			note.publishedAt,
-			JSON.stringify(note.fields),
-			note.body,
-			note.createdAt,
-			note.updatedAt,
-		)
-		.run();
+	await insertNote(create.db, note);
+	return note;
+}
+
+export interface ImportedNoteCreate {
+	db: D1Database;
+	imported: Pick<ImportedNote, "draft" | "publishedAt" | "updatedAt">;
+	/** `publish` when the file asks for a publish and passes the checks, else `null`. */
+	mark: "publish" | null;
+	now: Date;
+}
+
+/**
+ * Side effect: writes a row with a random ID to D1. The imported post must stay after this
+ * request.
+ *
+ * Adds the draft of an imported file. It keeps the dates of the file: `publishedAt`, and
+ * `updatedAt` with the time of the import as the fallback. The first publish keeps that
+ * `publishedAt`. D1 refuses a second note with the same slug and language.
+ */
+export async function createImportedNote(
+	create: ImportedNoteCreate,
+): Promise<Note> {
+	const { imported } = create;
+	const at = create.now.toISOString();
+	const note: Note = {
+		...imported.draft,
+		id: crypto.randomUUID(),
+		status: "draft",
+		publishedAt: imported.publishedAt,
+		createdAt: at,
+		updatedAt: imported.updatedAt ?? at,
+		published: null,
+		mark: create.mark,
+	};
+	await insertNote(create.db, note);
 	return note;
 }
 
