@@ -79,7 +79,9 @@ export function ResponsiveDialogContent(props: ResponsiveDialogContentProps) {
 	if (desktop)
 		return (
 			<DialogContent
-				className={props.className}
+				// The content stays in the box: a long word does not make the column wider, and
+				// a long list scrolls.
+				className={cn("max-h-dvh grid-cols-1 overflow-y-auto", props.className)}
 				showCloseButton={props.showCloseButton}
 				finalFocus={props.finalFocus}
 			>
