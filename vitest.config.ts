@@ -54,12 +54,13 @@ export default defineConfig({
 				"apps/cms/src/pages/api/webhooks.ts",
 				"apps/cms/src/pages/api/webhooks/\\[...path\\].ts",
 				// The env module and the route files of the notes are wiring also. They need the
-				// Workers runtime, and they give the request to `handleNotesRequest`, which has
-				// tests.
+				// Workers runtime, and they give the request to `handleNotesRequest` and
+				// `handleImportRequest`, which have tests.
 				"apps/cms/src/lib/notes/env.ts",
 				"apps/cms/src/pages/api/notes.ts",
 				"apps/cms/src/pages/api/notes/\\[id\\].ts",
 				"apps/cms/src/pages/api/notes/\\[id\\]/\\[action\\].ts",
+				"apps/cms/src/pages/api/notes/import.ts",
 				"apps/cms/src/pages/api/changes.ts",
 				// It builds the `notify` of the route file of the changes from `deliverEvent`, which
 				// has tests.

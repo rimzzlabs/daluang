@@ -559,7 +559,7 @@ It gets the languages setting and the field definitions as `DraftRules`.
   draft. The file is Markdown or MDX, with YAML frontmatter. The function gets the file
   name, the text, and the language of the import. It gives `R.Ok` with an `ImportedNote`,
   or an error: `frontmatter-not-read` of `readFrontmatter`, or `no-title`. It never throws.
-  No code calls `importedNote` yet.
+  The import endpoint calls it.
 - The function reads the file with `readFrontmatter`, `importDate`, the functions of
   `src/import-fields.ts`, and `mdxToComark`. It does not check the draft against the
   settings of the CMS. The caller checks it with `noteDraftSchema`.
@@ -679,7 +679,7 @@ It gets the languages setting and the field definitions as `DraftRules`.
 ## The import endpoint
 
 - `src/import-draft.ts` has the pure functions of the import of a file. The import
-  endpoint will call them. No code calls them yet.
+  endpoint calls them.
 - `importRules` gives the rules of a draft from the stored settings: the languages, and
   the field definitions or `[]`. Before the onboarding saves the languages, it gives
   `None`.
@@ -697,3 +697,37 @@ It gets the languages setting and the field definitions as `DraftRules`.
   import cannot read, a field that it leaves out, or a component that stays.
 - A file with `status: published` and no `publishedAt` gives no warning, so it gets the
   mark. Its first publish then sets `publishedAt`.
+- `POST /api/notes/import` adds a post from one Markdown or MDX file.
+  `handleImportRequest` of `src/import.ts` answers, and the route file is
+  `apps/cms/src/pages/api/notes/import.ts`. The handler calls the functions of
+  `src/import-draft.ts`. The dialog of the import comes in a later step.
+- A body of another type answers 415, a body that is not JSON 400, and a body above the
+  limit of the notes endpoint 413. A body that `importFileOf` refuses answers 422
+  (`invalid-import`), with the issues. Another method answers 405, with
+  `Allow: POST`.
+- Before the onboarding saves the languages, the import answers 409 (`settings-needed`).
+- `importedNote` reads the file. Its error answers 422: `frontmatter-not-read` or
+  `no-title`. A draft that `checkedImport` refuses answers 422 (`invalid-note`), with the
+  issues.
+- A slug that another post has in the same language answers 409 (`slug-taken`). The
+  import does not find a new slug: the writer imported the file before, or must rename
+  it.
+- **The import keeps the dates of the file.** `createImportedNote` writes the post with
+  `publishedAt` and `updatedAt` of the frontmatter, and with the mark of `importMark`.
+  The editor has no input for the dates.
+- The answer is 201 with `{ note, warnings }`. `note.mark` tells if the post has the mark
+  `publish`. `warnings` are the warnings of `importedNote`. The CMS does not store the
+  warnings.
+- **The unique index is the one check of the slug.** The import does not read the list
+  of the posts first. If D1 refuses the slug, the handler answers 409 (`slug-taken`), so
+  two imports of one slug at the same time add one post. The handler finds the refusal
+  by the text `UNIQUE constraint failed: note.slug, note.language`, which D1 gives after
+  the prefix `D1_ERROR:`. The handler throws each other error again.
+- The import changes no site. A marked post goes to the sites at the next Publish
+  changes, with the dates of the file.
+- A file of a normal size takes a few milliseconds. A hostile file of 1 MB can take
+  about 0.7 s of CPU in `mdxToComark`. So the request needs a session, and it has the
+  size limit of a note.
+- The sign-in guard needs a session for the path, and it refuses a write from another
+  origin. Astro gives the static route priority over `[id].ts`. An ID is a UUID, so no
+  post has the ID `import`.
