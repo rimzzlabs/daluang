@@ -23,7 +23,11 @@ import {
 } from "@daluang/ui/components/page";
 import { Skeleton } from "@daluang/ui/components/skeleton";
 import { A, pipe, R } from "@mobily/ts-belt";
-import { PlusIcon, TranslateIcon } from "@phosphor-icons/react";
+import {
+	FileArrowUpIcon,
+	PlusIcon,
+	TranslateIcon,
+} from "@phosphor-icons/react";
 import { useRef, useState } from "react";
 import { match } from "ts-pattern";
 import { NavLink, type NavLinkKind } from "@/components/shell/nav-link";
@@ -38,6 +42,7 @@ import {
 } from "@/lib/notes/client";
 import type { SettingsStore } from "@/lib/settings/settings-store";
 import { DeletePostDialog } from "./delete-post-dialog";
+import { ImportPostsDialog } from "./import-posts-dialog";
 import { LanguageFilter } from "./language-filter";
 import { NoPosts } from "./no-posts";
 import { PostLink } from "./post-link";
@@ -79,6 +84,11 @@ export function Posts(props: PostsProps) {
 	const [language, setLanguage] = useState<string | null>(null);
 	const latestMark = useRef(0);
 	const [markAlert, setMarkAlert] = useState<MarkAlert | null>(null);
+	const [importing, setImporting] = useState(false);
+	// A new key at each open, so the Import dialog starts with no files.
+	const [importKey, setImportKey] = useState(0);
+	// The Import button of the page: of `NoPosts`, or of the header.
+	const importButton = useRef<HTMLButtonElement>(null);
 	const [deleting, setDeleting] = useState<DeleteTarget>({
 		open: false,
 		post: null,
@@ -130,111 +140,152 @@ export function Posts(props: PostsProps) {
 		mark(post, action);
 	}
 
-	if (list.status === "ready" && A.isEmpty(list.posts))
-		return <NoPosts linkKind={props.linkKind} />;
+	function openImport() {
+		setImportKey((key) => key + 1);
+		setImporting(true);
+	}
 
+	// The Import dialog stays at one place of the tree. It then keeps its rows when the
+	// first posts of the CMS come, and the page changes from `NoPosts` to the list.
 	return (
-		<Page>
-			<PageHeader>
-				<PageHeading>
-					<PageTitle>Posts</PageTitle>
-					<PageDescription>
-						The posts of the CMS, the last changed first. A change goes to your
-						site when you select Publish changes.
-					</PageDescription>
-				</PageHeading>
-				<PageActions>
-					<NavLink
-						kind={props.linkKind}
-						href="/posts/new"
-						className={buttonVariants()}
-					>
-						<PlusIcon data-icon="inline-start" />
-						New post
-					</NavLink>
-				</PageActions>
-			</PageHeader>
-			{match(list)
-				.with({ status: "loading" }, () => (
-					<div role="status" className="flex flex-col gap-2">
-						<span className="sr-only">Loading the posts</span>
-						<Skeleton className="h-16 w-full" />
-						<Skeleton className="h-16 w-full" />
-						<Skeleton className="h-16 w-full" />
-					</div>
-				))
-				.with({ status: "failed" }, (failed) => (
-					<div role="alert" className="flex flex-col items-start gap-3 text-sm">
-						<p className="text-destructive">
-							{NOTES_ERROR_MESSAGES[failed.error]}
-						</p>
-						<Button type="button" variant="outline" size="sm" onClick={retry}>
-							Try again
-						</Button>
-					</div>
-				))
-				.with({ status: "ready" }, (ready) => {
-					const shown = inLanguage(ready.posts, language);
-					return (
-						<>
-							{A.length(languages) > 1 ? (
-								<LanguageFilter
-									languages={languages}
-									value={language}
-									onChange={setLanguage}
-								/>
-							) : null}
-							{markAlert === null ? null : (
-								<div role="alert" className="text-sm text-destructive">
-									{match(markAlert)
-										.with({ status: "code" }, (coded) => (
-											<p>{NOTES_ERROR_MESSAGES[coded.error]}</p>
-										))
-										.with({ status: "blocked" }, (blocked) => (
-											<p>
-												Daluang cannot publish "{blocked.title}". Correct each
-												field in this list: {A.join(blocked.labels, ", ")}.{" "}
-												<PostLink
-													kind={props.linkKind}
-													id={blocked.id}
-													className="underline"
-												>
-													Open the post
-												</PostLink>
-											</p>
-										))
-										.exhaustive()}
-								</div>
-							)}
-							{A.isEmpty(shown) ? (
-								<Empty className="flex-none border border-border p-8">
-									<EmptyHeader>
-										<EmptyMedia variant="icon">
-											<TranslateIcon />
-										</EmptyMedia>
-										<EmptyTitle>No posts in this language</EmptyTitle>
-										<EmptyDescription>
-											Choose All to see the posts of each language.
-										</EmptyDescription>
-									</EmptyHeader>
-								</Empty>
-							) : (
-								<PostList
-									posts={shown}
-									linkKind={props.linkKind}
-									onAction={act}
-								/>
-							)}
-						</>
-					);
-				})
-				.exhaustive()}
-			<DeletePostDialog
-				open={deleting.open}
-				post={deleting.post}
-				onOpenChange={(open) => setDeleting({ ...deleting, open })}
-				onDeleted={reload}
+		<>
+			{list.status === "ready" && A.isEmpty(list.posts) ? (
+				<NoPosts
+					linkKind={props.linkKind}
+					importRef={importButton}
+					onImport={openImport}
+				/>
+			) : (
+				<Page>
+					<PageHeader>
+						<PageHeading>
+							<PageTitle>Posts</PageTitle>
+							<PageDescription>
+								The posts of the CMS, the last changed first. A change goes to
+								your site when you select Publish changes.
+							</PageDescription>
+						</PageHeading>
+						<PageActions>
+							<Button
+								ref={importButton}
+								type="button"
+								variant="outline"
+								onClick={openImport}
+							>
+								<FileArrowUpIcon data-icon="inline-start" />
+								Import
+							</Button>
+							<NavLink
+								kind={props.linkKind}
+								href="/posts/new"
+								className={buttonVariants()}
+							>
+								<PlusIcon data-icon="inline-start" />
+								New post
+							</NavLink>
+						</PageActions>
+					</PageHeader>
+					{match(list)
+						.with({ status: "loading" }, () => (
+							<div role="status" className="flex flex-col gap-2">
+								<span className="sr-only">Loading the posts</span>
+								<Skeleton className="h-16 w-full" />
+								<Skeleton className="h-16 w-full" />
+								<Skeleton className="h-16 w-full" />
+							</div>
+						))
+						.with({ status: "failed" }, (failed) => (
+							<div
+								role="alert"
+								className="flex flex-col items-start gap-3 text-sm"
+							>
+								<p className="text-destructive">
+									{NOTES_ERROR_MESSAGES[failed.error]}
+								</p>
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									onClick={retry}
+								>
+									Try again
+								</Button>
+							</div>
+						))
+						.with({ status: "ready" }, (ready) => {
+							const shown = inLanguage(ready.posts, language);
+							return (
+								<>
+									{A.length(languages) > 1 ? (
+										<LanguageFilter
+											languages={languages}
+											value={language}
+											onChange={setLanguage}
+										/>
+									) : null}
+									{markAlert === null ? null : (
+										<div role="alert" className="text-sm text-destructive">
+											{match(markAlert)
+												.with({ status: "code" }, (coded) => (
+													<p>{NOTES_ERROR_MESSAGES[coded.error]}</p>
+												))
+												.with({ status: "blocked" }, (blocked) => (
+													<p>
+														Daluang cannot publish "{blocked.title}". Correct
+														each field in this list:{" "}
+														{A.join(blocked.labels, ", ")}.{" "}
+														<PostLink
+															kind={props.linkKind}
+															id={blocked.id}
+															className="underline"
+														>
+															Open the post
+														</PostLink>
+													</p>
+												))
+												.exhaustive()}
+										</div>
+									)}
+									{A.isEmpty(shown) ? (
+										<Empty className="flex-none border border-border p-8">
+											<EmptyHeader>
+												<EmptyMedia variant="icon">
+													<TranslateIcon />
+												</EmptyMedia>
+												<EmptyTitle>No posts in this language</EmptyTitle>
+												<EmptyDescription>
+													Choose All to see the posts of each language.
+												</EmptyDescription>
+											</EmptyHeader>
+										</Empty>
+									) : (
+										<PostList
+											posts={shown}
+											linkKind={props.linkKind}
+											onAction={act}
+										/>
+									)}
+								</>
+							);
+						})
+						.exhaustive()}
+					<DeletePostDialog
+						open={deleting.open}
+						post={deleting.post}
+						onOpenChange={(open) => setDeleting({ ...deleting, open })}
+						onDeleted={reload}
+					/>
+				</Page>
+			)}
+			<ImportPostsDialog
+				key={importKey}
+				open={importing}
+				onOpenChange={setImporting}
+				languages={settings.languages}
+				fields={settings.fields}
+				onImported={reload}
+				returnFocus={importButton}
 			/>
-		</Page>
+		</>
 	);
 }

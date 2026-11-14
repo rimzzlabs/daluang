@@ -319,9 +319,10 @@ It gets the languages setting and the field definitions as `DraftRules`.
   action reads it again. A failed first read and a failed retry show the error.
 - Each read of `usePostList` gets a number, and only the answer of the last read changes
   the list and the number of changes in the navbar.
-- The header of the page has **New post**, a link to `/posts/new`.
-- The posts page is at `/posts`. With no post, it shows `NoPosts`: a link to a new post.
-  The steps to set up a site are on the dashboard (`docs/app-shell.md`).
+- The header of the page has **Import**, which opens the Import dialog, and **New post**, a
+  link to `/posts/new`.
+- The posts page is at `/posts`. With no post, it shows `NoPosts`: **Import** and a link
+  to a new post. The steps to set up a site are on the dashboard (`docs/app-shell.md`).
 
 ## The explorer of the editor
 
@@ -845,3 +846,11 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - The dialog does not reset its state. The page gives it a new `key` at each open.
 - `returnFocus` goes to `finalFocus` of `ResponsiveDialogContent`: the element that gets
   the focus after a close.
+
+### The Import button
+
+- `Posts` renders the Import dialog at one place of the tree, after `NoPosts` or the list.
+  The dialog then stays open with its rows when the first posts of the CMS come.
+- `importKey` of `Posts` goes up at each open, so each open starts with no files.
+- After a close, the focus goes to the Import button of the page: of `NoPosts`, or of the
+  header.
