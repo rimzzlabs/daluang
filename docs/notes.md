@@ -522,6 +522,31 @@ It gets the languages setting and the field definitions as `DraftRules`.
   `parseMarkdown`. Comark reads a body that starts with `---` as frontmatter, so text goes
   away from the sites. After an empty line, Comark reads `---` as a rule.
 
+- `src/import-fields.ts` reads the values of a frontmatter for the import of old posts.
+  Each function is pure, and it never throws. The import of old posts will call the
+  functions, and no code calls them yet.
+- `textOf` reads a text or a finite number as a trimmed text. A number becomes its text:
+  `2024` gives `"2024"`. An empty text, and a value of another kind, give `None`.
+  `isPresent` is false only for `null` and `undefined`.
+- `importKeywords` reads the keywords of a list, or of a text or a number that it splits at
+  commas. It changes each item that is a text or a finite number to a trimmed text. It
+  removes an empty item, a `null` item, and an item of another kind, such as a list or an
+  object. A value of another kind gives no keywords.
+- `importFields` gives the extra fields of a frontmatter and the warnings `field-left-out`
+  (`FieldLeftOut`), each with the name of a key.
+- These keys never become an extra field: the core fields of `isCoreField` (`title`,
+  `slug`, `language`, `description`, `keywords`, `status`, `publishedAt`, and `updatedAt`)
+  and `lang`. The function adds each other key when `isFieldName` accepts its name and
+  `extraValueSchema` accepts its value. Else it gives the warning with the name of the key,
+  also for `__proto__`. A key with `null` gives no field and no warning.
+- If `slug`, `description`, `keywords`, or `status` has a value of another kind, for
+  example a list or `true`, `importFields` gives the warning with the name of the key. A
+  list of keywords with an item of another kind gives one warning `keywords`. A key with
+  `null` gives no warning.
+- The warnings of the core keys come first, in the order `slug`, `description`,
+  `keywords`, and `status`. The warnings of the extra keys come next, in the order of the
+  frontmatter.
+
 ## The import of MDX
 
 - `withoutImports` of `src/mdx-imports.ts` removes the import statements at the start of
