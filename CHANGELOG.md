@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.4.1](https://github.com/rimzzlabs/daluang/compare/v0.4.0...v0.4.1) (2026-11-14)
+
+
+### Bug Fixes
+
+* **cms:** allow the styles of the editor in the content security policy ([#84](https://github.com/rimzzlabs/daluang/issues/84)) ([d1ff8da](https://github.com/rimzzlabs/daluang/commit/d1ff8dae2d93061891ffe03501d1f4d3ba60e74a))
+* **cms:** ask before the writer leaves a post that is not saved ([#87](https://github.com/rimzzlabs/daluang/issues/87)) ([7aa0dc0](https://github.com/rimzzlabs/daluang/commit/7aa0dc08a3c5b5aed1003893f47eb530c7f09393))
+* **cms:** keep the text of a post after a save that did not succeed ([#86](https://github.com/rimzzlabs/daluang/issues/86)) ([6ca134f](https://github.com/rimzzlabs/daluang/commit/6ca134faf563f60040628258209ed2f797fbb65a))
+* **cms:** name each field that stops the publish of a post ([#89](https://github.com/rimzzlabs/daluang/issues/89)) ([4902b08](https://github.com/rimzzlabs/daluang/commit/4902b080e8bc880be438f876deb126eede9ed5ce))
+* **cms:** read the posts again after publish changes ([#91](https://github.com/rimzzlabs/daluang/issues/91)) ([888419b](https://github.com/rimzzlabs/daluang/commit/888419b22f1568606395f28512d3fc8e407ddee7))
+* **cms:** save the open post before publish changes ([#92](https://github.com/rimzzlabs/daluang/issues/92)) ([3efecdd](https://github.com/rimzzlabs/daluang/commit/3efecdd27a6894920c28b587615f25f723fa1275))
+* **cms:** show each error that stops the save of a post ([#88](https://github.com/rimzzlabs/daluang/issues/88)) ([e23998b](https://github.com/rimzzlabs/daluang/commit/e23998bef92b4e8128390dcfc3aa3741ff467ae1))
+* **cms:** stop a request of the posts after 30 s ([#93](https://github.com/rimzzlabs/daluang/issues/93)) ([5671b71](https://github.com/rimzzlabs/daluang/commit/5671b71c5a9d28359a742aaebc6a9c27f513529a))
+* **cms:** tell the writer that a post saves by itself ([#96](https://github.com/rimzzlabs/daluang/issues/96)) ([ad09826](https://github.com/rimzzlabs/daluang/commit/ad0982661ca104a303bf6231a9bc69db3db73336))
+* **notes:** answer publish changes after an error of the webhook event ([#90](https://github.com/rimzzlabs/daluang/issues/90)) ([6ae7205](https://github.com/rimzzlabs/daluang/commit/6ae7205f0c9bbe9e375235bc52bee02b9f6193b5))
+
+
+### Documentation
+
+* **docs:** correct the guides of a site and of a deploy ([#94](https://github.com/rimzzlabs/daluang/issues/94)) ([4ea2794](https://github.com/rimzzlabs/daluang/commit/4ea2794f1c0e69aae45a1b884a872936eb094fd3))
+
 ## [0.4.0](https://github.com/rimzzlabs/daluang/compare/v0.3.0...v0.4.0) (2026-11-13)
 
 
