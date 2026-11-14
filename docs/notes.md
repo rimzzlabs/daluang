@@ -808,3 +808,7 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - When the component of the hook goes away, for example after Back in the browser, the
   cleanup of an effect stops the run. The request in progress ends, and no next file
   goes.
+- `ImportRowItem` of `apps/cms/src/components/notes/import-row-item.tsx` shows one row:
+  the file name and its state: Not sent yet, In progress, To publish, Draft, Skipped, or
+  Failed. An imported post with warnings shows each warning. A failed file shows its
+  message, and an `invalid-note` adds the line of each issue, one time for each text.
