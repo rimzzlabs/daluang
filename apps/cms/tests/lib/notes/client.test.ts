@@ -1,9 +1,11 @@
+import { NOTES_IMPORT_API_PATH } from "@daluang/notes/import";
 import { R } from "@mobily/ts-belt";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createChangesStore } from "@/lib/notes/changes-store";
 import {
 	addNote,
 	deleteNoteOfCms,
+	importNoteOfCms,
 	listChangesOfCms,
 	listNotesOfCms,
 	listPostsOfCms,
@@ -226,6 +228,72 @@ describe("the posts client", () => {
 	it("fails when a list fails", async () => {
 		answer(new Response(null, { status: 401 }));
 		await expect(listPostsOfCms()).resolves.toEqual(R.Error("signed-out"));
+	});
+});
+
+describe("importNoteOfCms", () => {
+	const FILE = {
+		fileName: "a.mdx",
+		language: "id",
+		text: "---\ntitle: A\n---\n",
+	};
+	const WARNINGS = [
+		{ code: "date-not-read", name: "updatedAt" },
+		{ code: "field-left-out", name: "cover" },
+		{ code: "component-kept", name: "NoteImage", count: 2 },
+	];
+
+	it("sends the file as JSON, and gives the post and its warnings", async () => {
+		const fetch = answer(
+			Response.json({ note: NOTE, warnings: WARNINGS }, { status: 201 }),
+		);
+		await expect(importNoteOfCms(FILE)).resolves.toEqual(
+			R.Ok({ note: NOTE, warnings: WARNINGS }),
+		);
+		expect(fetch).toHaveBeenCalledWith(NOTES_IMPORT_API_PATH, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(FILE),
+			signal: expect.any(AbortSignal),
+		});
+	});
+
+	it("keeps the path and the message of each issue of a refused draft", async () => {
+		const issues = [{ path: "title", message: "Give the post a title." }];
+		answer(Response.json({ error: "invalid-note", issues }, { status: 422 }));
+		await expect(importNoteOfCms(FILE)).resolves.toEqual(
+			R.Error({ code: "invalid-note", issues }),
+		);
+	});
+
+	it.each([
+		[Response.json({ error: "no-title" }, { status: 422 }), "no-title"],
+		[
+			Response.json({ error: "frontmatter-not-read" }, { status: 422 }),
+			"frontmatter-not-read",
+		],
+		[Response.json({ error: "slug-taken" }, { status: 409 }), "slug-taken"],
+		[
+			Response.json({ error: "settings-needed" }, { status: 409 }),
+			"settings-needed",
+		],
+		[Response.json({ error: "too-large" }, { status: 413 }), "too-large"],
+		[new Response(null, { status: 401 }), "signed-out"],
+		[Response.json({ error: "invalid-note" }, { status: 422 }), "server"],
+		[Response.json({ error: "invalid-import" }, { status: 422 }), "server"],
+		[new Response("down", { status: 503 }), "server"],
+		[Response.json({ note: { id: 1 }, warnings: [] }), "server"],
+		[new Response("not json", { status: 201 }), "server"],
+	])("gives the code of each other answer", async (response, code) => {
+		answer(response);
+		await expect(importNoteOfCms(FILE)).resolves.toEqual(R.Error({ code }));
+	});
+
+	it("gives offline for a request that does not reach the server", async () => {
+		answer(new Error("network"));
+		await expect(importNoteOfCms(FILE)).resolves.toEqual(
+			R.Error({ code: "offline" }),
+		);
 	});
 });
 
