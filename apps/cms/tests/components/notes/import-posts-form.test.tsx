@@ -87,6 +87,11 @@ function disabled(element: HTMLElement) {
 	return element.hasAttribute("disabled");
 }
 
+// The Import button stays focusable during a run, so it has no native `disabled`.
+function ariaDisabled(element: HTMLElement) {
+	return element.getAttribute("aria-disabled") === "true";
+}
+
 describe("ImportForm", () => {
 	it("gives the chosen files and the language before a run", async () => {
 		const { importRun, onLanguageChange } = renderForm({
@@ -102,7 +107,7 @@ describe("ImportForm", () => {
 		expect(importRun.choose).toHaveBeenCalledWith([expect.any(File)]);
 		await userEvent.click(button("English"));
 		expect(onLanguageChange).toHaveBeenCalledWith("en");
-		expect(disabled(button("Import"))).toBe(true);
+		expect(ariaDisabled(button("Import"))).toBe(true);
 		expect(button("Cancel")).toBeTruthy();
 		expect(screen.getByRole("status").textContent).toBe("");
 	});
@@ -114,6 +119,19 @@ describe("ImportForm", () => {
 		});
 		await userEvent.click(button("Import"));
 		expect(importRun.start).toHaveBeenCalledWith("id");
+	});
+
+	it("does not start a second run from the Import button that has the focus", async () => {
+		const { importRun } = renderForm({
+			run: { status: "running" },
+			rows: rows([{ status: "importing" }, { status: "waiting" }]),
+		});
+		button("Import").focus();
+		expect(document.activeElement).toBe(button("Import"));
+		await userEvent.keyboard("{Enter}");
+		await userEvent.keyboard(" ");
+		await userEvent.click(button("Import"));
+		expect(importRun.start).not.toHaveBeenCalled();
 	});
 
 	it("locks each control during a run, and tells the progress", () => {
@@ -131,7 +149,7 @@ describe("ImportForm", () => {
 		expect(disabled(screen.getByLabelText("Markdown or MDX files"))).toBe(true);
 		expect(disabled(button("Indonesia"))).toBe(true);
 		expect(disabled(button("Done"))).toBe(true);
-		expect(disabled(button("Import"))).toBe(true);
+		expect(ariaDisabled(button("Import"))).toBe(true);
 	});
 
 	it("tells why a run stopped, and lets the writer continue", () => {
@@ -145,6 +163,7 @@ describe("ImportForm", () => {
 		expect(screen.getByRole("status").textContent).toBe(
 			"1 imported, 0 skipped, 0 failed, 1 not imported yet. 0 with the mark To publish.",
 		);
+		expect(ariaDisabled(button("Import"))).toBe(false);
 		expect(disabled(button("Import"))).toBe(false);
 		expect(disabled(button("Indonesia"))).toBe(true);
 		expect(
@@ -169,7 +188,7 @@ describe("ImportForm", () => {
 				"Open each post with the label Draft, check it, then publish it.",
 			),
 		).toBeTruthy();
-		expect(disabled(button("Import"))).toBe(true);
+		expect(ariaDisabled(button("Import"))).toBe(true);
 		expect(disabled(button("Done"))).toBe(false);
 	});
 
