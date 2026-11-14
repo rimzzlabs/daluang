@@ -21,6 +21,8 @@ This page tells which code needs a test, where the test goes, and how coverage c
   server: the settings, a webhook, an API token, a new draft, an autosave, Publish
   changes, and the content API. It also checks that a later save and a delete wait for
   the next Publish changes.
+- A second test imports an old post with `status: published`. After Publish changes, the
+  content API gives the post with the dates of its file.
 - Each step calls the handler of an endpoint with the wiring of its route file, on one
   fake D1. A step of the editor uses the pure functions of the editor. A fake `fetch`
   gets the calls of the webhook.
