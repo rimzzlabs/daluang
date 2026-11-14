@@ -757,3 +757,13 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - The client does not import `NOTES_IMPORT_API_PATH`: its module imports the code of the
   server. The client makes the same path from `NOTES_API_PATH`, and a test checks that
   the two paths are equal.
+- `apps/cms/src/lib/notes/import-messages.ts` gives the message of each failure
+  (`importFailureMessage`) and of each warning (`importWarningMessage`). `FileFailure`
+  adds `file-not-read`: the browser cannot read the file.
+- The message of `too-large` is true for the two causes: a file above the limit of a
+  post, and a request that the server refuses with 413. A file with many `"` can pass the
+  first check, because JSON escapes each `"`.
+- `importIssueMessages` gives one line for each issue of `invalid-note`: the label of the
+  input, then the message, for example `Title: Give the post a title.` `issueLabel` of
+  `src/note-form.ts` gives the label, with the labels of `publishBlockers`. An extra field
+  has the label of its definition, or its name.
