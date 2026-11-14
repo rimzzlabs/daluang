@@ -476,6 +476,24 @@ It gets the languages setting and the field definitions as `DraftRules`.
   `WWW-Authenticate: Bearer`. Another method answers 405.
 - The sign-in guard needs no session below `/api/content/` (`docs/auth.md`).
 
+## The import of a file
+
+- `importDate` of `src/import-date.ts` gives the UTC time of a date of a frontmatter, as the
+  text of `toISOString()`, or `None`. It is a pure function. The import of old posts will call
+  it, and no code calls it yet.
+- `importDate` reads these forms, after a trim:
+  - `YYYY-MM-DD`
+  - an ISO date-time with `Z` or with an offset, for example `2023-09-30T10:00:00+07:00`
+  - `MM/DD/YYYY`, month first, as in the old posts. The month and the day have one or two
+    digits. The year has four digits.
+  - a `Date` object. Comark gives an unquoted YAML date as a text, so a `Date` is rare.
+- A date with no time is midnight UTC of that day. A date-time with no zone, for example
+  `2023-09-30T10:00:00`, is `None`, because the zone is not known. A day that does not exist,
+  such as `2023-02-30` or `02/30/2023`, is `None`. The function checks the parts, so a day does
+  not roll over to the next month. A year below 100 gives `None`. A date-time with no
+  seconds, or with a space in place of `T`, gives `None`. A number, an empty text, or
+  another value gives `None`.
+
 ## The import of MDX
 
 - `withoutImports` of `src/mdx-imports.ts` removes the import statements at the start of
