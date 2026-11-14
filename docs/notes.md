@@ -767,3 +767,25 @@ It gets the languages setting and the field definitions as `DraftRules`.
   input, then the message, for example `Title: Give the post a title.` `issueLabel` of
   `src/note-form.ts` gives the label, with the labels of `publishBlockers`. An extra field
   has the label of its definition, or its name.
+
+### The run
+
+- `apps/cms/src/lib/notes/import-run.ts` has the rows of an import. A row is a file and
+  its state, as one union with a `status` field: `waiting`, `importing`, `imported` (with
+  the post and its warnings), `skipped` (`slug-taken`), or `failed` (with the failure).
+- `importRows` gives one waiting row for each file, in the order of the names. The sort
+  uses `localeCompare` with `numeric` and the `base` sensitivity: `a2.md` comes before
+  `a10.md`, and capitals do not come first.
+- `signed-out`, `offline`, and `settings-needed` stop the run at the file: each next file
+  fails in the same way. The rows after it stay `waiting`.
+- A next run sends each row that `isToSend` accepts: a waiting row, and a failed row that
+  a retry can help (`signed-out`, `offline`, `settings-needed`, and `server`). An
+  imported row and a skipped row never go again. Each other failure comes from the file,
+  which does not change. A file that the browser cannot read (`file-not-read`) fails
+  again with the same `File`, so the writer must choose it again.
+- `finishedCount` counts the rows that no run sends again: imported, skipped, and failed
+  rows that `isToSend` refuses. The progress uses it, so its number does not go down
+  when a run continues.
+- `importSummary` counts the files of each state, and the imported posts with the mark
+  `publish`. `importSummaryText` gives one line, for example
+  `12 imported, 1 skipped, 0 failed. 12 with the mark To publish.`
