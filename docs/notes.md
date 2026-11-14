@@ -475,3 +475,23 @@ It gets the languages setting and the field definitions as `DraftRules`.
   `verifyApiToken`. A request with no valid token answers 401, with
   `WWW-Authenticate: Bearer`. Another method answers 405.
 - The sign-in guard needs no session below `/api/content/` (`docs/auth.md`).
+
+## The import of MDX
+
+- `withoutImports` of `src/mdx-imports.ts` removes the import statements at the start of
+  an MDX body. It is a pure function. The import of old posts will call it, and no code
+  calls it yet. It removes the blank lines before the imports,
+  between them, and after them. The first line that is not blank and not an import stops
+  the removal. An import after text, in a component, or in a paragraph stays. A body with
+  no import stays the same.
+- An import statement starts with `import` at column 0. It ends at the first line that
+  ends with `;` or a quote, or before a blank line. A statement of more than 64 lines stays.
+  The whole statement must be `import "source"` or `import names from "source"`, with an
+  optional `type` and `;`. The names are a default name, `* as name`, `{ … }`, or a default
+  name with one of the two others. Else the lines stay. Each check is linear in the length
+  of the statement.
+- `fenceEnd` of `src/mdx-imports.ts` gives the last line of a code fence. A fence starts
+  with 0 to 3 spaces, then three or more backticks or tildes. It ends at a line of 0 to 3
+  spaces and the same character, with the same length or more. A fence with no end runs to
+  the end of the text. A line with a tab or four spaces before the marker is not a fence. A
+  backtick fence with a backtick in its info string is not a fence.
