@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.1](https://github.com/rimzzlabs/daluang/compare/v0.5.0...v0.5.1) (2026-11-14)
+
+
+### Bug Fixes
+
+* **cms:** keep the focus on the import button during a run ([#121](https://github.com/rimzzlabs/daluang/issues/121)) ([0e0ffa4](https://github.com/rimzzlabs/daluang/commit/0e0ffa4fea6a7b4bb6a042eb82f5ec4b3c0460d9))
+
+
+### Documentation
+
+* record the plan of the images ([#123](https://github.com/rimzzlabs/daluang/issues/123)) ([1ae1207](https://github.com/rimzzlabs/daluang/commit/1ae1207beb2f1fd08d324b14e380bad4bf5b3793))
+
 ## [0.5.0](https://github.com/rimzzlabs/daluang/compare/v0.4.1...v0.5.0) (2026-11-14)
 
 
