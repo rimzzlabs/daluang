@@ -141,6 +141,8 @@ the `catalog` in `pnpm-workspace.yaml`.
   languages), their store in D1, the handler of the endpoint `/api/settings`, and the
   rules of the onboarding of the first sign-in. The settings pages, the onboarding, the
   route file, and the middleware are in `apps/cms`. See `docs/settings.md`.
+- `packages/media` (`@daluang/media`): the images. For now, it reads the type of an image
+  (PNG, JPEG, WebP, GIF, or AVIF) from its first bytes. See `docs/media.md`.
 - `packages/tsconfig` (`@daluang/tsconfig`): the TypeScript base that each workspace
   extends.
 
@@ -169,6 +171,7 @@ commit as the change.
 | `docs/settings.md`         | The settings, their store in D1, and the onboarding                       |
 | `docs/api-tokens.md`       | The tokens that let a site read the published notes                       |
 | `docs/webhooks.md`         | The webhooks that tell a site to rebuild                                  |
+| `docs/media.md`            | The images: the type of an image from its bytes                           |
 | `docs/app-shell.md`        | The app island, the menus of the sidebar, and the preferences             |
 
 Read `docs/code-conventions.md` and `docs/testing.md` before the first code edit of a
@@ -334,8 +337,8 @@ domain packages.
    | `styles/`              | The global CSS                                                                         |
 
 3. **A domain folder has the name of its package:** `auth`, `notes`, `settings`,
-   `api-tokens`, or `webhooks`. A domain of the app only has its own name, for example
-   `shell` or `security`.
+   `api-tokens`, `webhooks`, or `media`. A domain of the app only has its own name, for
+   example `shell` or `security`.
 4. **If a second domain imports a file, move the file to `shared/`.** A primitive stays in
    `packages/ui`.
 5. **A file in `pages/` is thin.** A page renders components. An endpoint reads the

@@ -1,0 +1,22 @@
+{
+	"name": "@daluang/media",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"license": "MIT",
+	"exports": {
+		"./*": "./src/*.ts"
+	},
+	"scripts": {
+		"typecheck": "tsc"
+	},
+	"dependencies": {
+		"@mobily/ts-belt": "catalog:"
+	},
+	"devDependencies": {
+		"@daluang/tsconfig": "workspace:*",
+		"@types/node": "catalog:",
+		"typescript": "catalog:",
+		"vitest": "catalog:"
+	}
+}
