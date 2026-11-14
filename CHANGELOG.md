@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.6.0](https://github.com/rimzzlabs/daluang/compare/v0.5.0...v0.6.0) (2026-11-14)
+
+
+### Features
+
+* **media:** read the type of an image from its bytes ([#124](https://github.com/rimzzlabs/daluang/issues/124)) ([cf73cad](https://github.com/rimzzlabs/daluang/commit/cf73cad227af43068a3bd7e9127763b9443936ac))
+
+
+### Bug Fixes
+
+* **cms:** keep the focus on the import button during a run ([#121](https://github.com/rimzzlabs/daluang/issues/121)) ([0e0ffa4](https://github.com/rimzzlabs/daluang/commit/0e0ffa4fea6a7b4bb6a042eb82f5ec4b3c0460d9))
+
+
+### Documentation
+
+* record the plan of the images ([#123](https://github.com/rimzzlabs/daluang/issues/123)) ([1ae1207](https://github.com/rimzzlabs/daluang/commit/1ae1207beb2f1fd08d324b14e380bad4bf5b3793))
+
 ## [0.5.0](https://github.com/rimzzlabs/daluang/compare/v0.4.1...v0.5.0) (2026-11-14)
 
 
