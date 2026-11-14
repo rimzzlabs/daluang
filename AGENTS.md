@@ -44,7 +44,8 @@ The first site that reads the notes is rimzzlabs.com. Its source is in
 - **D1 keeps the Markdown of a note**, in the row of the note, with its metadata and its
   extra fields. One write saves all of them. A row of D1 can hold 2 MB, and the largest
   post of rimzzlabs.com has 30 KB.
-- **A note is text only, for now.** Images and videos in a note come in a later step.
+- **A note is text only, for now.** The step of the images has a plan: see "Images: the
+  plan". Videos in a note come in a later step.
 - **A note has core metadata and extra fields.** The core fields are the same for each
   site: title, slug, language, description, keywords, status, publishedAt, and
   updatedAt. A site adds its own fields, for example `featured` or `relatedPosts`, and
@@ -55,15 +56,53 @@ The first site that reads the notes is rimzzlabs.com. Its source is in
 - Each step of this list has a plan before its code. "Open decisions" has the questions
   that have no answer yet.
 
+### Images: the plan
+
+The person decided these points on 2026-11-14. The code comes in four stages. `docs/media.md`
+tells what the code does now, from the first stage on. Do not change a point in code. Ask
+the person.
+
+- **R2 keeps the bytes of an image, and D1 keeps one row for each image**: the key, the
+  name of the file, the type, the size in bytes, the width, and the height. The binding of
+  the bucket is `MEDIA`.
+- **The key of an image is the first 32 hexadecimal characters of the SHA-256 of its
+  bytes.** The browser calculates the hash, and R2 checks it. The Worker does not
+  calculate a hash: Workers Free gives 10 ms of CPU. The same file gives the same key, so
+  a second upload of a file adds nothing.
+- **The CMS Worker serves an image at `/files/<key>.<ext>`, with no session and no
+  token.** A person cannot guess the key. The Worker does not resize an image: each site
+  optimizes its images at build time. `/media` is the Media page of the CMS.
+- **The server reads the type, the width, and the height from the bytes**, not from the
+  name of the file or from a header. The types are PNG, JPEG, WebP, GIF, and AVIF. SVG is
+  not a type. An image has a maximum of 10 MB.
+- **The response of an image has `X-Content-Type-Options: nosniff` and a sandbox policy.**
+  An image is on the origin of the CMS, so a browser must not run it as a page.
+- **A post keeps the full URL of an image**, as a Markdown image:
+  `![alt](https://cms.example.com/files/<key>.jpg)`. A component of a site gets the URL as
+  text, for example `::note-image{src="…" alt="…" caption="…"}`.
+- **An image does not belong to a post.** A delete of a post keeps its images.
+- **The import changes `<NoteImage>` into `::note-image`.** A component with one image
+  keeps the props `src`, `alt`, and `caption`. A gallery (`images={[…]}`) holds each image
+  as a Markdown image in its children.
+
+| Stage           | Result                                                                               |
+| --------------- | ------------------------------------------------------------------------------------ |
+| A. Store, serve | `POST /api/media` saves an image, and `/files/<key>.<ext>` gives it.                 |
+| B. Editor       | A button of the toolbar, a paste, and a drop put the Markdown of an image in a post. |
+| C. The site     | `GET /api/content/media` gives the width and the height of each image to a site.     |
+| D. Import       | The Import dialog takes image files with the Markdown files.                         |
+
+The Media page (the list and the delete of the images) comes after stage D.
+
 ### Open decisions
 
 Do not decide these in code. Ask the person you work for.
 
-| Question                                      | Current direction                                                                                                                                                                                                                                                                                                                                     |
-| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| How does a static site get a changed note?    | The site stays static. A publish in the CMS starts a rebuild of the site. The site reads the notes at build time through a content loader. The docs site gives the loader as a file to copy into the site. A package comes when a second site needs it. `experimental.incrementalBuild` of Astro 7.2 skips each page whose `cacheKey` did not change. |
-| Where do the bytes of an image or a video go? | R2 keeps the bytes. A Durable Object can keep the state of an upload. A Durable Object does not keep the bytes: one stored value has a size limit of 2 MB.                                                                                                                                                                                            |
-| How does a translation link to its note?      | Two notes with the same slug and different languages are translations of each other, as on rimzzlabs.com: `notes/en/<slug>` and `notes/id/<slug>`.                                                                                                                                                                                                    |
+| Question                                   | Current direction                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| How does a static site get a changed note? | The site stays static. A publish in the CMS starts a rebuild of the site. The site reads the notes at build time through a content loader. The docs site gives the loader as a file to copy into the site. A package comes when a second site needs it. `experimental.incrementalBuild` of Astro 7.2 skips each page whose `cacheKey` did not change. |
+| Where do the bytes of a video go?          | R2 keeps the bytes, as for an image. A large file needs an upload in parts. A Durable Object can keep the state of an upload. A Durable Object does not keep the bytes: one stored value has a size limit of 2 MB.                                                                                                                                    |
+| How does a translation link to its note?   | Two notes with the same slug and different languages are translations of each other, as on rimzzlabs.com: `notes/en/<slug>` and `notes/id/<slug>`.                                                                                                                                                                                                    |
 
 ## Repository layout
 
