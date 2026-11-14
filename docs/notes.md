@@ -675,3 +675,25 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - The function is for a post of a normal size: a post of rimzzlabs.com takes 2 ms or less.
   The cost is linear in the length of the body, at any depth of nesting. The worst case
   that we measured for 1 MB takes about 0.7 s: 12,000 blocks of 8 nested components.
+
+## The import endpoint
+
+- `src/import-draft.ts` has the pure functions of the import of a file. The import
+  endpoint will call them. No code calls them yet.
+- `importRules` gives the rules of a draft from the stored settings: the languages, and
+  the field definitions or `[]`. Before the onboarding saves the languages, it gives
+  `None`.
+- `importFileOf` reads a request body: `{ "fileName": "…", "language": "…", "text": "…" }`,
+  each a text. The text is the full file, with its frontmatter. The language is the
+  language of the import. The function gives the file, or the issues of a body that is
+  not a file, with the path and the message of each issue.
+- `checkedImport` checks the draft of an imported note with `noteDraftSchema` and the
+  rules. It gives the note with the checked draft, or the issues. A language that the CMS
+  does not have is an issue.
+- **`importMark` gives the mark of an imported note.** It gives `publish` when the file
+  has `status: published`, the import gave no warning, and `publishedDraftSchema` accepts
+  the draft: each required field has a value. Else it gives `null`: the post stays a plain
+  draft, and the writer publishes it after a check. A warning can be a date that the
+  import cannot read, a field that it leaves out, or a component that stays.
+- A file with `status: published` and no `publishedAt` gives no warning, so it gets the
+  mark. Its first publish then sets `publishedAt`.
