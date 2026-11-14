@@ -26,6 +26,7 @@ export default defineConfig({
 				{ text: "Deploy", link: "/guide/deploy" },
 				{ text: "First sign-in", link: "/guide/first-sign-in" },
 				{ text: "Write a post", link: "/guide/write-a-post" },
+				{ text: "Import posts", link: "/guide/import-posts" },
 				{ text: "API tokens", link: "/guide/api-tokens" },
 				{ text: "Webhooks", link: "/guide/webhooks" },
 				{ text: "Astro site", link: "/guide/astro-site" },
