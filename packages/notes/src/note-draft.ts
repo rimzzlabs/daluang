@@ -127,7 +127,7 @@ export function publishedDraftSchema(rules: DraftRules): z.ZodType<NoteDraft> {
 	return draftSchema({ rules, requireValues: true });
 }
 
-const UNTITLED_SLUG = "untitled";
+export const UNTITLED_SLUG = "untitled";
 
 /** True for the slug of an untitled draft: `untitled`, `untitled-2`, and so on. */
 export function isUntitledSlug(slug: string): boolean {
