@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.5.0](https://github.com/rimzzlabs/daluang/compare/v0.4.1...v0.5.0) (2026-11-14)
+
+
+### Features
+
+* **cms:** add the dialog of the import of posts ([#117](https://github.com/rimzzlabs/daluang/issues/117)) ([719dd0a](https://github.com/rimzzlabs/daluang/commit/719dd0ae929f1222b03d51dcf61b2fc5555a8da1))
+* **cms:** add the form of the import of posts ([#116](https://github.com/rimzzlabs/daluang/issues/116)) ([400934f](https://github.com/rimzzlabs/daluang/commit/400934f7f8b2fe67ab2de54690ec23805ad1f00c))
+* **cms:** give a message for each result of an import ([#111](https://github.com/rimzzlabs/daluang/issues/111)) ([360a27e](https://github.com/rimzzlabs/daluang/commit/360a27e1ff0ed024a2e74218984e7ae8065fe872))
+* **cms:** import posts from the posts page ([#118](https://github.com/rimzzlabs/daluang/issues/118)) ([531e9f4](https://github.com/rimzzlabs/daluang/commit/531e9f466c902171a2884bc7e6e27c0dd97d740f))
+* **cms:** keep the state of each file of an import ([#112](https://github.com/rimzzlabs/daluang/issues/112)) ([e840a08](https://github.com/rimzzlabs/daluang/commit/e840a0863c126cbad1139a8823d1d5c5ed4c9a53))
+* **cms:** run an import from a hook ([#114](https://github.com/rimzzlabs/daluang/issues/114)) ([30c59da](https://github.com/rimzzlabs/daluang/commit/30c59daf0edf47ef13ef97eb6db8b225c05349cc))
+* **cms:** send a file to the import endpoint from the browser ([#110](https://github.com/rimzzlabs/daluang/issues/110)) ([93f27c5](https://github.com/rimzzlabs/daluang/commit/93f27c5196515239dfef2836a6a91445ea468ea9))
+* **cms:** send the files of an import one at a time ([#113](https://github.com/rimzzlabs/daluang/issues/113)) ([3b6124e](https://github.com/rimzzlabs/daluang/commit/3b6124e83cd2167957894d1834424eae26367f23))
+* **cms:** show the result of each imported file ([#115](https://github.com/rimzzlabs/daluang/issues/115)) ([ec89117](https://github.com/rimzzlabs/daluang/commit/ec89117231b54cec5f99f1c945ddc0e3d15d9998))
+* **notes:** add the endpoint that imports a post from a file ([#108](https://github.com/rimzzlabs/daluang/issues/108)) ([cb90ab3](https://github.com/rimzzlabs/daluang/commit/cb90ab3cb85b6413c8d1440af00a4b35304f68ee))
+* **notes:** change the simple components of mdx to comark ([#100](https://github.com/rimzzlabs/daluang/issues/100)) ([7781228](https://github.com/rimzzlabs/daluang/commit/7781228d33aa41554505038cae4461323e03a9fe))
+* **notes:** check the draft of an imported post ([#107](https://github.com/rimzzlabs/daluang/issues/107)) ([4b05723](https://github.com/rimzzlabs/daluang/commit/4b05723d80f8820f7890be2412e74729875d56a5))
+* **notes:** make the draft of a post from a file ([#104](https://github.com/rimzzlabs/daluang/issues/104)) ([fdd2108](https://github.com/rimzzlabs/daluang/commit/fdd2108cdcf09f38ecde7ade43d10784087e88c1))
+* **notes:** read the date of a frontmatter ([#101](https://github.com/rimzzlabs/daluang/issues/101)) ([bf2e85c](https://github.com/rimzzlabs/daluang/commit/bf2e85c7362c47792d3edefaed406e796a6e3b15))
+* **notes:** read the extra fields of a frontmatter ([#103](https://github.com/rimzzlabs/daluang/issues/103)) ([97251bf](https://github.com/rimzzlabs/daluang/commit/97251bf2d1a9ae8055a86fb8598384f1dd5e5c6d))
+* **notes:** read the frontmatter of a file ([#102](https://github.com/rimzzlabs/daluang/issues/102)) ([45b6d61](https://github.com/rimzzlabs/daluang/commit/45b6d61e217ed39156180d499efc1d7823d78752))
+* **notes:** read the opening tag of an mdx component ([#99](https://github.com/rimzzlabs/daluang/issues/99)) ([b51ddff](https://github.com/rimzzlabs/daluang/commit/b51ddff7f0f7b7c9b231d993a31973098af3f6b4))
+* **notes:** remove the import statements of an mdx body ([#97](https://github.com/rimzzlabs/daluang/issues/97)) ([60b821a](https://github.com/rimzzlabs/daluang/commit/60b821a3868200ba6e3e8395ec9a47188380c4bd))
+* **notes:** write an imported post with the dates of its file ([#105](https://github.com/rimzzlabs/daluang/issues/105)) ([ec177d1](https://github.com/rimzzlabs/daluang/commit/ec177d145389320f3846c73c5caed36026c4fb66))
+
+
+### Bug Fixes
+
+* **ui:** keep the content of a dialog in its box ([#120](https://github.com/rimzzlabs/daluang/issues/120)) ([9216fe2](https://github.com/rimzzlabs/daluang/commit/9216fe211519a884c70289e9a14ede261a58dfb4))
+
+
+### Documentation
+
+* **docs:** add the guide of the import of posts ([#119](https://github.com/rimzzlabs/daluang/issues/119)) ([1db32a5](https://github.com/rimzzlabs/daluang/commit/1db32a5971f482850526c5b5683d751ceb394133))
+
 ## [0.4.1](https://github.com/rimzzlabs/daluang/compare/v0.4.0...v0.4.1) (2026-11-14)
 
 
