@@ -494,6 +494,34 @@ It gets the languages setting and the field definitions as `DraftRules`.
   seconds, or with a space in place of `T`, gives `None`. A number, an empty text, or
   another value gives `None`.
 
+- `readFrontmatter` of `src/frontmatter.ts` reads the YAML frontmatter of a Markdown or MDX
+  file. It gives `R.Ok` with the frontmatter and the body (`FileParts`), or
+  `R.Error("frontmatter-not-read")`. It is a pure function, and it never throws.
+- The function removes a BOM at the start of the text.
+- **The frontmatter** is a block at the start of the text. The first line is `---`, and the
+  block ends at the next line that is `---`. Spaces or tabs after `---` and a line ending of
+  `\r\n` are correct. If the text has no such block, or the block has no closing line, the
+  frontmatter is empty and the whole text is the body.
+- The function reads the YAML of the block with `parseMarkdown` of `comark`, so the package
+  needs no YAML library. Comark reads YAML with the JSON schema of js-yaml, so a date stays
+  a text. The function does not parse the body, so a long body costs little time.
+- These blocks give the error `frontmatter-not-read`:
+  - YAML that does not parse
+  - a line in the block that starts with `---`, such as `----`. Comark ends a frontmatter at
+    that line, and YAML reads it as a second document.
+  - YAML that is a list, a text, a number, or a boolean. The writer made a mistake, so the
+    function does not guess.
+- A block that is empty, that has only blank lines or comments, or that is `null` gives an
+  empty frontmatter.
+- The frontmatter is a new plain object with the keys of the YAML. A key such as
+  `__proto__`, `constructor`, or `toString` is an own key with its value. It does not change
+  a prototype.
+- **The body** is the text after the closing line, or the whole text. The function removes
+  the blank lines at its start. If the body then starts with `---`, the function puts one
+  empty line before it. The content API and the preview parse the stored body with
+  `parseMarkdown`. Comark reads a body that starts with `---` as frontmatter, so text goes
+  away from the sites. After an empty line, Comark reads `---` as a rule.
+
 ## The import of MDX
 
 - `withoutImports` of `src/mdx-imports.ts` removes the import statements at the start of
