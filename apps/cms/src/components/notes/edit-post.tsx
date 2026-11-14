@@ -139,8 +139,8 @@ export function EditPost(props: EditPostProps) {
 						) : null}
 					</PageTitle>
 					<PageDescription>
-						Change the post, then save it. A published post changes on your site
-						at Publish changes.
+						Daluang saves each change by itself. A published post changes on
+						your site at Publish changes.
 					</PageDescription>
 				</PageHeading>
 				{load.status === "ready" ? (
