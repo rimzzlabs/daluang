@@ -731,3 +731,29 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - The sign-in guard needs a session for the path, and it refuses a write from another
   origin. Astro gives the static route priority over `[id].ts`. An ID is a UUID, so no
   post has the ID `import`.
+
+## The Import dialog
+
+### The client and the messages
+
+- `importNoteOfCms` of the browser client sends one file to `POST /api/notes/import`:
+  `{ fileName, language, text }`. It gives `R.Ok` with an `ImportedPost` (the note and the
+  warnings of its file), or `R.Error` with an `ImportFailure`. It does not throw.
+- `ImportFailure` is one union with a `code` field. `invalid-note` keeps the path and the
+  message of each issue. The other codes are `frontmatter-not-read`, `no-title`,
+  `slug-taken`, `too-large`, `settings-needed`, `signed-out`, `offline`, and `server`.
+- The client reads a refused answer by its status and its `error`:
+  - 401 gives `signed-out`, and 413 gives `too-large`.
+  - A 409 gives `slug-taken` or `settings-needed`.
+  - A 422 gives a code of `ImportError` (`frontmatter-not-read` or `no-title`), or
+    `invalid-note` with its issues. `IMPORT_ERRORS` is a `Record` of each code of
+    `ImportError`, so a new code of the package is a type error in the client.
+  - Each other answer gives `server`, also `invalid-import`: the client always sends a
+    file. An answer that the schema refuses gives `server`.
+- The request has the timeout of 30 s of the other requests. A request with no answer
+  gives `offline`.
+- The client reads the answer with `noteSchema`, and with schemas of the type
+  `ImportWarning` and `NoteIssue` of the notes package.
+- The client does not import `NOTES_IMPORT_API_PATH`: its module imports the code of the
+  server. The client makes the same path from `NOTES_API_PATH`, and a test checks that
+  the two paths are equal.

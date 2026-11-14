@@ -1,3 +1,4 @@
+import type { NoteIssue } from "@daluang/notes/api";
 import {
 	CHANGES_API_PATH,
 	NOTE_CHANGES,
@@ -11,6 +12,11 @@ import {
 	noteSchema,
 	noteSummarySchema,
 } from "@daluang/notes/note";
+import type {
+	ImportError,
+	ImportFile,
+	ImportWarning,
+} from "@daluang/notes/note-import";
 import {
 	type ListedNote,
 	listedNotes,
@@ -94,10 +100,11 @@ async function refusal(response: Response): Promise<NotesError> {
 		.otherwise(() => "server" as const);
 }
 
-async function send(
+/** The answer of the server, of any status. No answer before the timeout gives `offline`. */
+async function request(
 	path: string,
 	init?: RequestInit,
-): Promise<R.Result<Response, NotesError>> {
+): Promise<R.Result<Response, "offline">> {
 	// A rejection of `fetch`, also the `TimeoutError` of the signal, gives `offline`.
 	const response = await R.fromPromise(
 		fetch(path, {
@@ -105,6 +112,14 @@ async function send(
 			signal: AbortSignal.timeout(NOTES_REQUEST_TIMEOUT_MS),
 		}),
 	);
+	return R.mapError(response, () => "offline" as const);
+}
+
+async function send(
+	path: string,
+	init?: RequestInit,
+): Promise<R.Result<Response, NotesError>> {
+	const response = await request(path, init);
 	if (R.isError(response)) return R.Error("offline");
 	const answer = R.getExn(response);
 	if (!answer.ok) return R.Error(await refusal(answer));
@@ -126,11 +141,11 @@ function notePath(id: string): string {
 	return `${NOTES_API_PATH}/${encodeURIComponent(id)}`;
 }
 
-function json(method: string, draft: NoteDraft): RequestInit {
+function json(method: string, body: NoteDraft | ImportFile): RequestInit {
 	return {
 		method,
 		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(draft),
+		body: JSON.stringify(body),
 	};
 }
 
@@ -264,4 +279,115 @@ export async function listPostsOfCms(): Promise<
 export async function refreshChangeCount(changes: ChangesStore): Promise<void> {
 	const list = await listChangesOfCms();
 	if (R.isOk(list)) changes.write(R.getExn(list).count);
+}
+
+// The path of `NOTES_IMPORT_API_PATH`. The module of that constant imports the code of the
+// server, so the browser does not import it. A test checks that the two paths are equal.
+const NOTES_IMPORT_PATH = `${NOTES_API_PATH}/import`;
+
+/** A post that the import added, and the warnings of its file. */
+export interface ImportedPost {
+	note: Note;
+	warnings: readonly ImportWarning[];
+}
+
+/** The codes of a refused import that need no more data. */
+export type ImportFailureCode =
+	| ImportError
+	| "slug-taken"
+	| "too-large"
+	| Extract<
+			NotesError,
+			"settings-needed" | "signed-out" | "offline" | "server"
+	  >;
+
+/** Why the import of one file failed. `invalid-note` keeps the issues of the draft. */
+export type ImportFailure =
+	| { code: ImportFailureCode }
+	| { code: "invalid-note"; issues: readonly NoteIssue[] };
+
+const issueSchema: z.ZodType<NoteIssue> = z.object({
+	path: z.string(),
+	message: z.string(),
+});
+
+const warningSchema: z.ZodType<ImportWarning> = z.discriminatedUnion("code", [
+	z.object({
+		code: z.literal("date-not-read"),
+		name: z.enum(["publishedAt", "updatedAt"]),
+	}),
+	z.object({ code: z.literal("field-left-out"), name: z.string() }),
+	z.object({
+		code: z.literal("component-kept"),
+		name: z.string(),
+		count: z.number(),
+	}),
+]);
+
+const importedSchema: z.ZodType<ImportedPost> = z.object({
+	note: noteSchema,
+	warnings: z.array(warningSchema),
+});
+
+const issuesSchema = z.object({ issues: z.array(issueSchema) });
+
+interface RefusedImport {
+	status: number;
+	body: unknown;
+}
+
+function invalidNote(body: unknown): ImportFailure {
+	const parsed = issuesSchema.safeParse(body);
+	if (!parsed.success) return { code: "server" };
+	return { code: "invalid-note", issues: parsed.data.issues };
+}
+
+// Each code of `ImportError` of the package. A new code is a type error here, so the client
+// does not read it as `server`.
+const IMPORT_ERRORS: Record<ImportError, true> = {
+	"frontmatter-not-read": true,
+	"no-title": true,
+};
+
+function isImportError(code: string | undefined): code is ImportError {
+	return code !== undefined && Object.hasOwn(IMPORT_ERRORS, code);
+}
+
+/** The failure of a refused import. An answer that the client does not expect gives `server`. */
+function importRefusal(refused: RefusedImport): ImportFailure {
+	const code = errorSchema.safeParse(refused.body).data?.error;
+	return match({ status: refused.status, code })
+		.with({ status: 401 }, (): ImportFailure => ({ code: "signed-out" }))
+		.with({ status: 413 }, (): ImportFailure => ({ code: "too-large" }))
+		.with(
+			{ status: 409, code: P.union("slug-taken", "settings-needed") },
+			(known): ImportFailure => ({ code: known.code }),
+		)
+		.with(
+			{ status: 422, code: P.when(isImportError) },
+			(known): ImportFailure => ({ code: known.code }),
+		)
+		.with({ status: 422, code: "invalid-note" }, () =>
+			invalidNote(refused.body),
+		)
+		.otherwise((): ImportFailure => ({ code: "server" }));
+}
+
+/**
+ * Imports one Markdown or MDX file as a draft, in the language of the import. The answer
+ * has the post and the warnings of its file. A failure keeps the issues of a refused draft.
+ */
+export async function importNoteOfCms(
+	file: ImportFile,
+): Promise<R.Result<ImportedPost, ImportFailure>> {
+	const response = await request(NOTES_IMPORT_PATH, json("POST", file));
+	if (R.isError(response)) return R.Error({ code: "offline" });
+	const answer = R.getExn(response);
+	const read = await R.fromPromise<unknown>(answer.json());
+	const body = R.getWithDefault(read, null);
+	if (!answer.ok)
+		return R.Error(importRefusal({ status: answer.status, body }));
+	const parsed = importedSchema.safeParse(body);
+	if (!parsed.success) return R.Error({ code: "server" });
+	return R.Ok(parsed.data);
 }
