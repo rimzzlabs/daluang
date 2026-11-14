@@ -76,20 +76,21 @@ function errorResponse(error: NotesApiError, status: number): Response {
 	return Response.json({ error }, { status });
 }
 
-function toIssues(error: z.ZodError): readonly NoteIssue[] {
+/** The issues of a refused value, in the form of the answer 422. */
+export function toIssues(error: z.ZodError): readonly NoteIssue[] {
 	return A.map(error.issues, (issue) => ({
 		path: pipe(issue.path, A.map(String), A.join(".")),
 		message: issue.message,
 	}));
 }
 
-/** The draft of a request, or the response that refuses it. */
-async function readDraft(
-	params: NotesRequest,
-): Promise<R.Result<NoteDraft, Response>> {
-	const { request, settings } = params;
-	if (settings.languages === null)
-		return R.Error(errorResponse("settings-needed", 409));
+/**
+ * The JSON body of a request, or the response that refuses it: a body of another type
+ * answers 415, a body above the size limit 413, and a body that is not JSON 400.
+ */
+export async function readJsonBody(
+	request: Request,
+): Promise<R.Result<unknown, Response>> {
 	if (
 		!S.startsWith(request.headers.get("content-type") ?? "", "application/json")
 	)
@@ -99,18 +100,31 @@ async function readDraft(
 		return R.Error(errorResponse("too-large", 413));
 	const body = O.fromExecution((): unknown => JSON.parse(text));
 	if (O.isNone(body)) return R.Error(errorResponse("not-json", 400));
-	const parsed = noteDraftSchema({
+	return R.Ok(body);
+}
+
+/** The draft of a request, or the response that refuses it. */
+async function readDraft(
+	params: NotesRequest,
+): Promise<R.Result<NoteDraft, Response>> {
+	const { request, settings } = params;
+	if (settings.languages === null)
+		return R.Error(errorResponse("settings-needed", 409));
+	const rules = {
 		languages: settings.languages,
 		fields: settings.fields ?? [],
-	}).safeParse(body);
-	if (!parsed.success)
-		return R.Error(
-			Response.json(
-				{ error: "invalid-note", issues: toIssues(parsed.error) },
-				{ status: 422 },
-			),
-		);
-	return R.Ok(parsed.data);
+	};
+	return R.flatMap(await readJsonBody(request), (body) => {
+		const parsed = noteDraftSchema(rules).safeParse(body);
+		if (!parsed.success)
+			return R.Error(
+				Response.json(
+					{ error: "invalid-note", issues: toIssues(parsed.error) },
+					{ status: 422 },
+				),
+			);
+		return R.Ok(parsed.data);
+	});
 }
 
 /**
@@ -234,7 +248,8 @@ async function deleteFrom(action: NoteAction): Promise<Response> {
 	return new Response(null, { status: 204 });
 }
 
-function notAllowed(allow: string): Promise<Response> {
+/** The answer 405, with the methods of the path in `Allow`. */
+export function notAllowed(allow: string): Promise<Response> {
 	return Promise.resolve(
 		Response.json(
 			{ error: "method-not-allowed" },
