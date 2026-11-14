@@ -700,7 +700,8 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - `POST /api/notes/import` adds a post from one Markdown or MDX file.
   `handleImportRequest` of `src/import.ts` answers, and the route file is
   `apps/cms/src/pages/api/notes/import.ts`. The handler calls the functions of
-  `src/import-draft.ts`. The dialog of the import comes in a later step.
+  `src/import-draft.ts`. The Import dialog of the posts page sends each file
+  ("The Import dialog").
 - A body of another type answers 415, a body that is not JSON 400, and a body above the
   limit of the notes endpoint 413. A body that `importFileOf` refuses answers 422
   (`invalid-import`), with the issues. Another method answers 405, with
@@ -832,3 +833,15 @@ It gets the languages setting and the field definitions as `DraftRules`.
 - During a run, **Import** and **Done** are disabled. If the run stops, an alert tells the
   reason and what to do. **Import** then continues. **Import** is disabled when no row is
   to send.
+
+### The dialog
+
+- `ImportPostsDialog` of `apps/cms/src/components/notes/import-posts-dialog.tsx` is a
+  `ResponsiveDialog` around `ImportForm`. It calls `useImportRun` and keeps the language
+  above the `ResponsiveDialog`. A change of the width changes the dialog to a drawer, or
+  back, and the run, the rows, and the language stay. The default language is the
+  default language of the CMS.
+- During a run, Escape or a click outside does not close the dialog.
+- The dialog does not reset its state. The page gives it a new `key` at each open.
+- `returnFocus` goes to `finalFocus` of `ResponsiveDialogContent`: the element that gets
+  the focus after a close.

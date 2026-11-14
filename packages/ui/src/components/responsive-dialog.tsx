@@ -3,6 +3,7 @@ import {
 	type ComponentProps,
 	createContext,
 	type ReactNode,
+	type RefObject,
 	useContext,
 } from "react";
 import { useIsDesktop } from "../hooks/use-desktop";
@@ -66,6 +67,11 @@ export interface ResponsiveDialogContentProps {
 	className?: string;
 	children?: ReactNode;
 	showCloseButton?: boolean;
+	/**
+	 * The element that gets the focus after a close. The default is the element that had
+	 * the focus before the open. Give it when that element can go away during the open.
+	 */
+	finalFocus?: RefObject<HTMLElement | null>;
 }
 
 export function ResponsiveDialogContent(props: ResponsiveDialogContentProps) {
@@ -75,12 +81,13 @@ export function ResponsiveDialogContent(props: ResponsiveDialogContentProps) {
 			<DialogContent
 				className={props.className}
 				showCloseButton={props.showCloseButton}
+				finalFocus={props.finalFocus}
 			>
 				{props.children}
 			</DialogContent>
 		);
 	return (
-		<DrawerContent>
+		<DrawerContent finalFocus={props.finalFocus}>
 			<div
 				className={cn(
 					"flex flex-col gap-6 overflow-y-auto px-4 pb-6",
