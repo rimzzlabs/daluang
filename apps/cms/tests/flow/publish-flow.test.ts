@@ -2,6 +2,7 @@ import { handleTokensRequest } from "@daluang/api-tokens/api";
 import { handleNotesRequest } from "@daluang/notes/api";
 import { handleChangesRequest } from "@daluang/notes/changes";
 import { handleContentRequest } from "@daluang/notes/content";
+import { handleImportRequest } from "@daluang/notes/import";
 import { type Note, noteSchema, noteSummarySchema } from "@daluang/notes/note";
 import { untitledDraft } from "@daluang/notes/note-draft";
 import { noteFormOf, parseNoteForm, withTitle } from "@daluang/notes/note-form";
@@ -16,9 +17,10 @@ import { notifySites } from "@/lib/notes/notify";
 import { createFakeD1 } from "../fake-d1";
 
 /**
- * The publish flow of a CMS, from the first settings to the content API of a site. Each
- * step calls the handler of an endpoint with the wiring of its route file, on one D1. A
- * step of the editor uses the pure functions of the editor, as the browser does.
+ * The publish flow of a CMS, from the first settings to the content API of a site, also for
+ * an imported post. Each step calls the handler of an endpoint with the wiring of its route
+ * file, on one D1. A step of the editor uses the pure functions of the editor, as the
+ * browser does.
  */
 
 const ORIGIN = "http://localhost:4321";
@@ -217,6 +219,63 @@ describe("the publish flow", () => {
 		await changes("POST");
 		expect(await content(secret)).toEqual([]);
 		expect(hook).toHaveBeenCalledTimes(3);
+	});
+
+	it("gives a site the dates of an imported post after Publish changes", async () => {
+		const { db } = createFakeD1();
+		await handleSettingsRequest({
+			request: request("PATCH", "/api/settings", { languages: LANGUAGES }),
+			db,
+			now: NOW,
+		});
+		const token = await handleTokensRequest({
+			request: request("POST", "/api/tokens", { name: "Site" }),
+			db,
+			id: undefined,
+			now: NOW,
+		});
+		const { secret } = await read(token, tokenAnswer);
+
+		// The writer imports an old post. The file asks for a publish, so the post gets the mark.
+		const text = `---\ntitle: Jotai recipes\npublishedAt: "09/30/2023"\nupdatedAt: "10/16/2026"\nstatus: published\n---\n\n<Callout type="note">\n  Small atoms.\n</Callout>\n`;
+		const imported = await handleImportRequest({
+			request: request("POST", "/api/notes/import", {
+				fileName: "jotai-recipes.mdx",
+				language: "en",
+				text,
+			}),
+			db,
+			settings: await readSettings(db),
+			now: NOW,
+		});
+		expect(imported.status).toBe(201);
+		const answer = await read(imported, z.object({ note: noteSchema }));
+		expect(answer.note.mark).toBe("publish");
+
+		// Publish changes copies it. The site gets the dates of the file, not of the import.
+		const applied = await handleChangesRequest({
+			request: request("POST", "/api/changes"),
+			db,
+			now: NOW,
+			notify: notifySites(db),
+		});
+		expect(applied.status).toBe(200);
+		const response = await handleContentRequest({
+			request: new Request(`${ORIGIN}/api/content/notes`, {
+				headers: { authorization: `Bearer ${secret}` },
+			}),
+			db,
+			authorize: authorizeSite(db),
+		});
+		const [published] = (await read(response, contentAnswer)).notes;
+		expect(published).toMatchObject({
+			slug: "jotai-recipes",
+			publishedAt: "2023-09-30T00:00:00.000Z",
+			updatedAt: "2026-10-16T00:00:00.000Z",
+		});
+		expect(published?.document).toMatchObject({
+			nodes: [["callout", { type: "note" }, "Small atoms."]],
+		});
 	});
 
 	it("refuses the content API without a valid token", async () => {
