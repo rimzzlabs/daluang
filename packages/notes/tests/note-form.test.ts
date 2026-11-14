@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { FieldDefinition } from "../src/field-definitions";
 import {
 	emptyNoteForm,
+	issueLabel,
 	type NoteForm,
 	noteFormOf,
 	parseNoteForm,
@@ -274,6 +275,24 @@ describe("noteFormOf", () => {
 			series: "3",
 			relatedPosts: "",
 		});
+	});
+});
+
+describe("issueLabel", () => {
+	it("names a core input by the first segment of the path", () => {
+		expect(issueLabel("title", FIELDS)).toBe("Title");
+		expect(issueLabel("keywords.1", FIELDS)).toBe("Keywords");
+	});
+
+	it("names an extra field by its definition, or by its name", () => {
+		expect(issueLabel("fields.relatedPosts.0", FIELDS)).toBe("Related posts");
+		expect(issueLabel("fields.cover", FIELDS)).toBe("cover");
+		expect(issueLabel("fields", FIELDS)).toBe("Extra fields");
+	});
+
+	it("gives the path of an unknown input, and no label for an empty path", () => {
+		expect(issueLabel("other.0", FIELDS)).toBe("other");
+		expect(issueLabel("", FIELDS)).toBe("");
 	});
 });
 

@@ -219,6 +219,24 @@ function blockerLabel(
 }
 
 /**
+ * The label of the input of an issue path of an answer 422, for example `title` or
+ * `fields.tags.0`. The path is a text, so the label of an extra field comes from the name
+ * after `fields`, and a core input from the first segment.
+ */
+export function issueLabel(
+	path: string,
+	definitions: readonly FieldDefinition[],
+): string {
+	const segments = S.split(path, ".");
+	const key = pipe(
+		segments,
+		A.take(segments[0] === "fields" ? 2 : 1),
+		A.join("."),
+	);
+	return blockerLabel(key, definitions);
+}
+
+/**
  * What stops a publish of a note: one entry for each input, with its first message. An
  * empty list means that Daluang can publish the note. The inputs have the keys of `formErrors`.
  */
