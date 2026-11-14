@@ -495,3 +495,8 @@ It gets the languages setting and the field definitions as `DraftRules`.
   spaces and the same character, with the same length or more. A fence with no end runs to
   the end of the text. A line with a tab or four spaces before the marker is not a fence. A
   backtick fence with a backtick in its info string is not a fence.
+- `parseTag` of `src/mdx-tag.ts` reads the opening tag of a JSX component, which can span
+  lines. A prop is `name="text"`, `name='text'`, `name` with no value, or an expression
+  `name={…}`. A spread `{…}` is an expression also. A string in an expression can hold a
+  brace. A string or an expression with no end breaks the tag up to the end of the text, so
+  the parse reads each part of the text one time.
