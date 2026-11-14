@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { NoteDraft } from "../src/note";
 import {
 	applyChanges,
+	createImportedNote,
 	createNote,
 	deleteNote,
 	findNote,
@@ -62,6 +63,87 @@ describe("createNote", () => {
 		});
 		expect(translation.language).toBe("id");
 		expect(await listNotes(db)).toHaveLength(2);
+	});
+});
+
+describe("createImportedNote", () => {
+	const PUBLISHED_AT = "2023-09-30T00:00:00.000Z";
+	const UPDATED_AT = "2026-10-16T00:00:00.000Z";
+
+	it("keeps the dates of the file and the mark", async () => {
+		const { db } = createFakeD1();
+		const note = await createImportedNote({
+			db,
+			imported: {
+				draft: DRAFT,
+				publishedAt: PUBLISHED_AT,
+				updatedAt: UPDATED_AT,
+			},
+			mark: "publish",
+			now: FIRST,
+		});
+		expect(note).toEqual({
+			...DRAFT,
+			id: note.id,
+			status: "draft",
+			publishedAt: PUBLISHED_AT,
+			createdAt: FIRST.toISOString(),
+			updatedAt: UPDATED_AT,
+			published: null,
+			mark: "publish",
+		});
+		expect(await findNote({ db, id: note.id })).toEqual(note);
+	});
+
+	it("gives updatedAt the time of the import when the file has no date", async () => {
+		const { db } = createFakeD1();
+		const note = await createImportedNote({
+			db,
+			imported: { draft: DRAFT, publishedAt: null, updatedAt: null },
+			mark: null,
+			now: FIRST,
+		});
+		expect(note).toMatchObject({
+			publishedAt: null,
+			updatedAt: FIRST.toISOString(),
+			mark: null,
+		});
+		expect(await findNote({ db, id: note.id })).toEqual(note);
+	});
+
+	it("keeps publishedAt of the file at the first publish", async () => {
+		const { db } = createFakeD1();
+		const note = await createImportedNote({
+			db,
+			imported: {
+				draft: DRAFT,
+				publishedAt: PUBLISHED_AT,
+				updatedAt: UPDATED_AT,
+			},
+			mark: "publish",
+			now: FIRST,
+		});
+		await applyChanges({ db, now: LATER });
+		expect(await findNote({ db, id: note.id })).toMatchObject({
+			status: "published",
+			publishedAt: PUBLISHED_AT,
+			updatedAt: UPDATED_AT,
+			published: { updatedAt: UPDATED_AT },
+			mark: null,
+		});
+	});
+
+	it("refuses a slug that another note has in the same language", async () => {
+		const { db } = createFakeD1();
+		await createNote({ db, draft: DRAFT, now: FIRST });
+		await expect(
+			createImportedNote({
+				db,
+				imported: { draft: DRAFT, publishedAt: null, updatedAt: null },
+				mark: null,
+				now: LATER,
+			}),
+		).rejects.toThrow(/UNIQUE/);
 	});
 });
 
